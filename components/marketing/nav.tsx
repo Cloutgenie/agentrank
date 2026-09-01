@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SignedIn, SignedOut } from "@clerk/nextjs";
+import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { isClerkConfigured } from "@/lib/clerk-configured";
 
@@ -44,6 +44,7 @@ export function MarketingNav() {
                 <Button size="sm" asChild>
                   <Link href="/dashboard">Dashboard</Link>
                 </Button>
+                <UserButton afterSignOutUrl="/" />
               </SignedIn>
             </>
           ) : (

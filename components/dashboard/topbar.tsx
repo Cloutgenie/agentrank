@@ -1,7 +1,9 @@
 import Link from "next/link";
+import { UserButton } from "@clerk/nextjs";
 import { Bell, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { isClerkConfigured } from "@/lib/clerk-configured";
 
 export function DashboardTopbar({
   title,
@@ -31,7 +33,7 @@ export function DashboardTopbar({
             </Badge>
           )}
         </Button>
-        <div className="h-8 w-8 rounded-full bg-secondary" />
+        {isClerkConfigured ? <UserButton afterSignOutUrl="/" /> : <div className="h-8 w-8 rounded-full bg-secondary" />}
       </div>
     </div>
   );
