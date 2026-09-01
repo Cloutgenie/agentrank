@@ -2,11 +2,13 @@ import { DashboardTopbar } from "@/components/dashboard/topbar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { demoRecommendations } from "@/lib/demo-data";
+import { getRecommendations } from "@/lib/queries";
 
 const IMPACT_VARIANT = { high: "destructive", medium: "outline", low: "secondary" } as const;
 
-export default function RecommendationsPage() {
+export default async function RecommendationsPage() {
+  const recommendations = await getRecommendations();
+
   return (
     <>
       <DashboardTopbar title="Recommendations" />
@@ -16,7 +18,7 @@ export default function RecommendationsPage() {
           Generated from gaps between you and competitors across tracked prompts and citations.
         </p>
 
-        {demoRecommendations.map((rec) => (
+        {recommendations.map((rec) => (
           <Card key={rec.id}>
             <CardContent className="flex items-start justify-between gap-4 p-6">
               <div>

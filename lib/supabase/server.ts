@@ -1,6 +1,13 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { auth } from "@clerk/nextjs/server";
+
+// Server-side reads need the service-role key (see createServiceClient below)
+// since there's no Clerk session yet to scope an RLS-respecting query to.
+export const isSupabaseServiceConfigured = Boolean(
+  process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
 /**
  * Server-side Supabase client scoped to the signed-in Clerk user. RLS
@@ -36,7 +43,6 @@ export async function createClient() {
  * handler that renders user input directly from it without an org check.
  */
 export function createServiceClient() {
-  const { createClient: createSupabaseClient } = require("@supabase/supabase-js");
   return createSupabaseClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,

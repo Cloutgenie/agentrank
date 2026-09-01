@@ -1,7 +1,7 @@
 import { DashboardTopbar } from "@/components/dashboard/topbar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { demoAlerts } from "@/lib/demo-data";
+import { getAlerts } from "@/lib/queries";
 
 const TYPE_VARIANT = {
   visibility_gained: "success",
@@ -12,7 +12,9 @@ const TYPE_VARIANT = {
   weekly_summary: "outline",
 } as const;
 
-export default function AlertsPage() {
+export default async function AlertsPage() {
+  const alerts = await getAlerts();
+
   return (
     <>
       <DashboardTopbar title="Alerts" />
@@ -22,7 +24,7 @@ export default function AlertsPage() {
           We check daily and email a weekly summary. Configure channels in Settings.
         </p>
 
-        {demoAlerts.map((alert) => (
+        {alerts.map((alert) => (
           <Card key={alert.id}>
             <CardContent className="flex items-start justify-between gap-4 p-6">
               <div>

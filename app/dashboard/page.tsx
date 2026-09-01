@@ -4,13 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { VisibilityTrendChart } from "@/components/dashboard/charts/visibility-trend-chart";
 import { CompetitorBarChart } from "@/components/dashboard/charts/competitor-bar-chart";
 import { TrendingUp, TrendingDown } from "lucide-react";
-import {
-  demoOverallScore,
-  demoEngineScores,
-  demoCompetitorComparison,
-  demoTrend,
-  demoAlerts,
-} from "@/lib/demo-data";
+import { getOverallScore, getEngineScores, getCompetitorComparison, getScoreTrend, getAlerts } from "@/lib/queries";
 
 function TrendBadge({ value }: { value: number }) {
   const up = value >= 0;
@@ -24,10 +18,18 @@ function TrendBadge({ value }: { value: number }) {
   );
 }
 
-export default function DashboardOverviewPage() {
+export default async function DashboardOverviewPage() {
+  const [overallScore, engineScores, competitorComparison, trend, alerts] = await Promise.all([
+    getOverallScore(),
+    getEngineScores(),
+    getCompetitorComparison(),
+    getScoreTrend(),
+    getAlerts(),
+  ]);
+
   return (
     <>
-      <DashboardTopbar title="Overview" alertCount={demoAlerts.length} showNewProject />
+      <DashboardTopbar title="Overview" alertCount={alerts.length} showNewProject />
 
       <div className="space-y-6 p-6">
         <div className="grid gap-4 md:grid-cols-4">
@@ -37,10 +39,10 @@ export default function DashboardOverviewPage() {
             </CardHeader>
             <CardContent>
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-semibold tabular-nums">{demoOverallScore.visibilityScore}</span>
+                <span className="text-3xl font-semibold tabular-nums">{overallScore.visibilityScore}</span>
                 <span className="text-sm text-muted-foreground">/ 100</span>
               </div>
-              <TrendBadge value={demoOverallScore.trend} />
+              <TrendBadge value={overallScore.trend} />
             </CardContent>
           </Card>
 
@@ -50,7 +52,7 @@ export default function DashboardOverviewPage() {
             </CardHeader>
             <CardContent>
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-semibold tabular-nums">{demoOverallScore.mentionFrequency}%</span>
+                <span className="text-3xl font-semibold tabular-nums">{overallScore.mentionFrequency}%</span>
               </div>
               <p className="text-xs text-muted-foreground">of tracked prompts mention you</p>
             </CardContent>
@@ -62,7 +64,7 @@ export default function DashboardOverviewPage() {
             </CardHeader>
             <CardContent>
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-semibold tabular-nums">{demoOverallScore.shareOfVoice}%</span>
+                <span className="text-3xl font-semibold tabular-nums">{overallScore.shareOfVoice}%</span>
               </div>
               <p className="text-xs text-muted-foreground">of all brand mentions are you</p>
             </CardContent>
@@ -74,7 +76,7 @@ export default function DashboardOverviewPage() {
             </CardHeader>
             <CardContent>
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-semibold tabular-nums">{demoOverallScore.avgPosition}</span>
+                <span className="text-3xl font-semibold tabular-nums">{overallScore.avgPosition}</span>
               </div>
               <p className="text-xs text-muted-foreground">when mentioned, average rank</p>
             </CardContent>
@@ -87,7 +89,7 @@ export default function DashboardOverviewPage() {
               <CardTitle>Visibility trend</CardTitle>
             </CardHeader>
             <CardContent className="h-72">
-              <VisibilityTrendChart data={demoTrend} />
+              <VisibilityTrendChart data={trend} />
             </CardContent>
           </Card>
 
@@ -96,7 +98,7 @@ export default function DashboardOverviewPage() {
               <CardTitle>By engine</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {demoEngineScores.map((engine) => (
+              {engineScores.map((engine) => (
                 <div key={engine.engine} className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium">{engine.label}</p>
@@ -118,7 +120,7 @@ export default function DashboardOverviewPage() {
               <CardTitle>Competitor comparison</CardTitle>
             </CardHeader>
             <CardContent className="h-64">
-              <CompetitorBarChart data={demoCompetitorComparison} />
+              <CompetitorBarChart data={competitorComparison} />
             </CardContent>
           </Card>
 
@@ -127,7 +129,7 @@ export default function DashboardOverviewPage() {
               <CardTitle>Recent alerts</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {demoAlerts.map((alert) => (
+              {alerts.map((alert) => (
                 <div key={alert.id} className="space-y-1">
                   <div className="flex items-center gap-2">
                     <Badge

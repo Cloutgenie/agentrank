@@ -3,9 +3,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Plus } from "lucide-react";
-import { demoCompetitors, demoCompetitorComparison } from "@/lib/demo-data";
+import { getCompetitors, getCompetitorComparison } from "@/lib/queries";
 
-export default function CompetitorsPage() {
+export default async function CompetitorsPage() {
+  const [competitors, competitorComparison] = await Promise.all([getCompetitors(), getCompetitorComparison()]);
+
   return (
     <>
       <DashboardTopbar title="Competitors" />
@@ -29,8 +31,8 @@ export default function CompetitorsPage() {
                 </tr>
               </thead>
               <tbody>
-                {demoCompetitors.map((competitor) => {
-                  const comparison = demoCompetitorComparison.find((c) => c.name === competitor.name);
+                {competitors.map((competitor) => {
+                  const comparison = competitorComparison.find((c) => c.name === competitor.name);
                   return (
                     <tr key={competitor.id} className="border-b border-border/60 last:border-0">
                       <td className="px-6 py-4">

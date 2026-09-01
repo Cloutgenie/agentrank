@@ -1,10 +1,11 @@
 import { DashboardTopbar } from "@/components/dashboard/topbar";
 import { Card, CardContent } from "@/components/ui/card";
-import { demoCitations } from "@/lib/demo-data";
+import { getCitationSummary } from "@/lib/queries";
 
-const maxMentions = Math.max(...demoCitations.map((c) => c.mentions));
+export default async function CitationsPage() {
+  const citations = await getCitationSummary();
+  const maxMentions = Math.max(...citations.map((c) => c.mentions), 1);
 
-export default function CitationsPage() {
   return (
     <>
       <DashboardTopbar title="Citations" />
@@ -16,7 +17,7 @@ export default function CitationsPage() {
 
         <Card>
           <CardContent className="space-y-4 p-6">
-            {demoCitations.map((citation) => (
+            {citations.map((citation) => (
               <div key={citation.domain} className="flex items-center gap-4">
                 <span className="w-36 shrink-0 text-sm font-medium">{citation.domain}</span>
                 <div className="h-2 flex-1 overflow-hidden rounded-full bg-secondary">
