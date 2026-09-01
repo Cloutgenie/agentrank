@@ -10,15 +10,14 @@ export const isSupabaseServiceConfigured = Boolean(
 );
 
 /**
- * Server-side Supabase client scoped to the signed-in Clerk user. RLS
- * policies read the Clerk user id from the JWT's `sub` claim, so the Clerk
- * session token must be forwarded as the Supabase access token (configure
- * Supabase's third-party auth integration to accept Clerk's JWKS).
+ * Server-side Supabase client scoped to the signed-in Clerk user, using
+ * Supabase's native Clerk integration (Auth > Third-Party Auth in the
+ * Supabase dashboard, configured via Clerk's "Connect with Supabase" flow).
+ * This replaces the old custom-JWT-template approach, deprecated by
+ * Supabase as of April 2025 — see docs/ROADMAP.md.
  */
 export async function createClient() {
   const cookieStore = await cookies();
-  const { getToken } = await auth();
-  const token = await getToken({ template: "supabase" });
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -30,9 +29,7 @@ export async function createClient() {
           cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
         },
       },
-      global: {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      },
+      accessToken: async () => (await auth()).getToken(),
     }
   );
 }

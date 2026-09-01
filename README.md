@@ -64,7 +64,9 @@ things make that possible, both documented inline where they matter:
 
 - `middleware.ts` and `app/layout.tsx` skip Clerk entirely when `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` isn't set, so
   `/dashboard` is reachable without auth in local/demo mode.
-- Dashboard pages read from `lib/demo-data.ts` rather than Supabase until a real project is connected.
+- Dashboard pages call `lib/queries.ts`, which reads live Supabase data when `SUPABASE_SERVICE_ROLE_KEY` is set
+  and falls back to `lib/demo-data.ts` otherwise (or if a query errors) — same graceful-degradation pattern as
+  Clerk above.
 
 The one fully live feature end-to-end today is the onboarding flow at `/dashboard/onboarding`: it calls
 `POST /api/prompts/generate`, which runs the real prompt-generation logic in `lib/prompts/generator.ts` — no API
@@ -74,8 +76,12 @@ keys required, since that step is pure templating.
 
 1. **Supabase** — create a project, run the migrations in `supabase/migrations/` in order, then set
    `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`.
-2. **Clerk** — create an app, set `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` / `CLERK_SECRET_KEY`. Configure a JWT
-   template named `supabase` so Clerk-issued tokens satisfy the RLS policies in `0002_rls.sql`.
+2. **Clerk** — create an app, set `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` / `CLERK_SECRET_KEY`. Connect it to Supabase
+   via Clerk's [Connect with Supabase](https://dashboard.clerk.com/setup/supabase) flow, then add Clerk as a
+   Third-Party Auth provider under Authentication → Sign In / Providers in the Supabase dashboard — this is
+   Supabase's current recommended integration (the old custom-JWT-template approach was deprecated April 2025).
+   `lib/supabase/server.ts` and `client.ts` already expect this: they pass Clerk's session token straight through
+   via the `accessToken` option, no template name involved.
 3. **AI engines** — set any of `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GOOGLE_AI_API_KEY`, `PERPLEXITY_API_KEY`.
    Each provider in `lib/engines/` falls back to `lib/engines/mock.ts` when its key is absent, so you can wire
    these up one at a time.
