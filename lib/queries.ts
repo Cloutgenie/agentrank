@@ -300,3 +300,43 @@ export async function getCompetitorComparison(projectId = DEMO_PROJECT_ID) {
     return rows.sort((a, b) => b.score - a.score);
   });
 }
+
+export async function getSubscription(organizationId = DEMO_ORG_ID) {
+  return withFallback(demo.demoSubscription, async () => {
+    const supabase = createServiceClient();
+
+    const { data: org, error: orgError } = await supabase
+      .from("organizations")
+      .select("stripe_customer_id")
+      .eq("id", organizationId)
+      .single();
+    if (orgError) throw orgError;
+
+    const { data: sub, error: subError } = await supabase
+      .from("subscriptions")
+      .select("plan_tier, status, current_period_end, cancel_at_period_end")
+      .eq("organization_id", organizationId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (subError) throw subError;
+
+    if (!sub) {
+      return {
+        planTier: null,
+        status: "none" as const,
+        stripeCustomerId: org?.stripe_customer_id ?? null,
+        currentPeriodEnd: null,
+        cancelAtPeriodEnd: false,
+      };
+    }
+
+    return {
+      planTier: sub.plan_tier as (typeof demo.demoSubscription)["planTier"],
+      status: sub.status as (typeof demo.demoSubscription)["status"],
+      stripeCustomerId: org?.stripe_customer_id ?? null,
+      currentPeriodEnd: sub.current_period_end,
+      cancelAtPeriodEnd: sub.cancel_at_period_end,
+    };
+  });
+}

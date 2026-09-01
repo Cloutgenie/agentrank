@@ -4,12 +4,30 @@
 // replace the demo-data calls in lib/queries.ts with the commented Supabase
 // queries left alongside each function.
 
+import type { PlanTier, SubscriptionStatus } from "@/lib/types";
+
 export const demoProject = {
   id: "demo-project",
   name: "AgentRank",
   slug: "agentrank",
   website_url: "https://agentrank.ai",
   industry: "AI Search Analytics",
+};
+
+export interface SubscriptionInfo {
+  planTier: PlanTier | null;
+  status: SubscriptionStatus | "none";
+  stripeCustomerId: string | null;
+  currentPeriodEnd: string | null;
+  cancelAtPeriodEnd: boolean;
+}
+
+export const demoSubscription: SubscriptionInfo = {
+  planTier: "growth",
+  status: "active",
+  stripeCustomerId: null,
+  currentPeriodEnd: null,
+  cancelAtPeriodEnd: false,
 };
 
 export const demoCompetitors = [

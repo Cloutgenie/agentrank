@@ -3,16 +3,44 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { getProject } from "@/lib/queries";
+import { Badge } from "@/components/ui/badge";
+import { getProject, getSubscription } from "@/lib/queries";
+import { createCheckoutSession, createPortalSession } from "@/lib/actions/stripe";
+import { PLAN_PRICE_IDS } from "@/lib/stripe";
 
-export default async function SettingsPage() {
-  const project = await getProject();
+const PLANS = [
+  { tier: "starter" as const, name: "Starter", price: 29 },
+  { tier: "growth" as const, name: "Growth", price: 99 },
+  { tier: "agency" as const, name: "Agency", price: 299 },
+];
+
+export default async function SettingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ checkout?: string; billing_error?: string }>;
+}) {
+  const [project, subscription, params] = await Promise.all([getProject(), getSubscription(), searchParams]);
+  const hasActiveSubscription = subscription.status !== "none";
 
   return (
     <>
       <DashboardTopbar title="Settings" />
 
       <div className="space-y-6 p-6">
+        {params.checkout === "success" && (
+          <Card className="max-w-2xl border-success/40 bg-success/5">
+            <CardContent className="p-4 text-sm text-success">Subscription active — welcome aboard.</CardContent>
+          </Card>
+        )}
+        {params.billing_error === "portal_not_configured" && (
+          <Card className="max-w-2xl border-destructive/40 bg-destructive/5">
+            <CardContent className="p-4 text-sm text-destructive">
+              The Stripe customer portal isn't configured yet — set it up under Settings → Billing → Customer portal
+              in the Stripe dashboard, then try again.
+            </CardContent>
+          </Card>
+        )}
+
         <Card className="max-w-2xl">
           <CardHeader>
             <CardTitle className="text-foreground">Project details</CardTitle>
@@ -38,13 +66,41 @@ export default async function SettingsPage() {
           <CardHeader>
             <CardTitle className="text-foreground">Billing</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2">
-            <p className="text-sm">
-              Current plan: <span className="font-medium text-foreground">Growth</span> — $99/month
-            </p>
-            <Button size="sm" variant="outline">
-              Manage billing in Stripe
-            </Button>
+          <CardContent className="space-y-4">
+            {hasActiveSubscription ? (
+              <>
+                <div className="flex items-center gap-2 text-sm">
+                  <span>
+                    Current plan: <span className="font-medium capitalize text-foreground">{subscription.planTier}</span>
+                  </span>
+                  <Badge variant={subscription.status === "active" ? "success" : "outline"}>{subscription.status}</Badge>
+                  {subscription.cancelAtPeriodEnd && <Badge variant="destructive">Cancels at period end</Badge>}
+                </div>
+                <form action={createPortalSession}>
+                  <Button size="sm" variant="outline" type="submit">
+                    Manage billing in Stripe
+                  </Button>
+                </form>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-muted-foreground">
+                  You're on the free trial — no card on file. Choose a plan to keep tracking after it ends.
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  {PLANS.map((plan) => {
+                    const priceId = PLAN_PRICE_IDS[plan.tier];
+                    return (
+                      <form key={plan.tier} action={priceId ? createCheckoutSession.bind(null, priceId) : undefined}>
+                        <Button size="sm" type="submit" disabled={!priceId}>
+                          Subscribe to {plan.name} — ${plan.price}/mo
+                        </Button>
+                      </form>
+                    );
+                  })}
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
