@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { currentUser } from "@clerk/nextjs/server";
 import { createCursorAgent, getCursorRunStatus } from "@/lib/cursor";
 import { createServiceClient } from "@/lib/supabase/server";
+import { recordOutcomeBaseline } from "@/lib/actions/recommendations";
 
 export async function launchCursorAgent(recommendationId: string) {
   const user = await currentUser();
@@ -17,6 +18,8 @@ export async function launchCursorAgent(recommendationId: string) {
     .single();
 
   if (!recommendation) redirect("/dashboard/recommendations");
+
+  await recordOutcomeBaseline(recommendationId, "cursor_agent");
 
   const promptText = [
     "Implement this AI-SEO recommendation for AgentRank.ai in this repo.",

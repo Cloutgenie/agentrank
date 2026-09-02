@@ -218,7 +218,7 @@ export async function getRecommendations(projectId = DEMO_PROJECT_ID) {
       .from("recommendations")
       .select("id, title, description, category, impact_estimate, cursor_agent_id, cursor_status, cursor_pr_url")
       .eq("project_id", projectId)
-      .eq("status", "open")
+      .in("status", ["open", "in_progress"])
       .order("created_at", { ascending: false });
     if (error) throw error;
     if (!data?.length) return demo.demoRecommendations;
@@ -352,5 +352,46 @@ export async function getSubscription(organizationId = DEMO_ORG_ID) {
       currentPeriodEnd: sub.current_period_end,
       cancelAtPeriodEnd: sub.cancel_at_period_end,
     };
+  });
+}
+
+export interface RecommendationOutcome {
+  recommendationId: string;
+  actionType: "manual" | "cursor_agent";
+  actionedAt: string;
+  scoreBefore: number;
+  scoreBeforeDate: string;
+  scoreAfter: number | null;
+  scoreAfterDate: string | null;
+}
+
+export async function getRecommendationOutcomes(projectId = DEMO_PROJECT_ID): Promise<RecommendationOutcome[]> {
+  return withFallback([] as RecommendationOutcome[], async () => {
+    const supabase = createServiceClient();
+    const { data, error } = await supabase
+      .from("recommendation_outcomes")
+      .select("recommendation_id, action_type, actioned_at, score_before, score_before_date, score_after, score_after_date")
+      .eq("project_id", projectId);
+    if (error) throw error;
+
+    return (data ?? []).map(
+      (row: {
+        recommendation_id: string;
+        action_type: string;
+        actioned_at: string;
+        score_before: number;
+        score_before_date: string;
+        score_after: number | null;
+        score_after_date: string | null;
+      }) => ({
+        recommendationId: row.recommendation_id,
+        actionType: row.action_type as "manual" | "cursor_agent",
+        actionedAt: row.actioned_at,
+        scoreBefore: Number(row.score_before),
+        scoreBeforeDate: row.score_before_date,
+        scoreAfter: row.score_after === null ? null : Number(row.score_after),
+        scoreAfterDate: row.score_after_date,
+      })
+    );
   });
 }
