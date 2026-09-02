@@ -14,12 +14,18 @@ export const googleProvider: EngineProvider = {
 
     const start = Date.now();
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${process.env.GOOGLE_AI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${process.env.GOOGLE_AI_API_KEY}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           contents: [{ parts: [{ text: input.prompt }] }],
+          // Without this, Gemini answers from static training data instead
+          // of live results — same grounding requirement as the other three
+          // providers. Requires billing enabled on the Google AI Studio
+          // project tied to the API key; the free tier has zero grounding
+          // quota and returns 429s otherwise.
+          tools: [{ google_search: {} }],
         }),
       }
     );
@@ -27,13 +33,30 @@ export const googleProvider: EngineProvider = {
     if (!res.ok) throw new Error(`Gemini request failed: ${res.status} ${await res.text()}`);
 
     const data = await res.json();
-    const rawResponse: string = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+    const candidate = data.candidates?.[0];
+    const rawResponse: string = (candidate?.content?.parts ?? []).map((p: { text?: string }) => p.text ?? "").join("");
+
+    const citedDomains = Array.from(
+      new Set(
+        (candidate?.groundingMetadata?.groundingChunks ?? [])
+          .map((chunk: { web?: { uri?: string } }) => chunk.web?.uri)
+          .filter(Boolean)
+          .map((uri: string) => {
+            try {
+              return new URL(uri).hostname.replace(/^www\./, "");
+            } catch {
+              return null;
+            }
+          })
+          .filter(Boolean)
+      )
+    ) as string[];
 
     return {
       engine: "gemini",
       rawResponse,
       mentionedEntities: extractMentionedEntities(rawResponse, input.projectName, input.competitorNames),
-      citedDomains: extractCitedDomains(rawResponse),
+      citedDomains: citedDomains.length ? citedDomains : extractCitedDomains(rawResponse),
       latencyMs: Date.now() - start,
       tokensUsed: data.usageMetadata?.totalTokenCount ?? null,
     };

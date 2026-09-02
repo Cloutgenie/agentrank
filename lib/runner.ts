@@ -34,11 +34,19 @@ export async function runProjectPrompts({ project, prompts, competitors }: RunPr
     const engineResults: { mentionedEntities: MentionedEntity[] }[] = [];
 
     for (const prompt of prompts) {
-      const result = await provider.query({
-        prompt: prompt.text,
-        projectName: project.name,
-        competitorNames,
-      });
+      let result: Awaited<ReturnType<typeof provider.query>>;
+      try {
+        result = await provider.query({
+          prompt: prompt.text,
+          projectName: project.name,
+          competitorNames,
+        });
+      } catch (error) {
+        // One engine being down (rate limit, billing, outage) shouldn't
+        // lose results the other engines already produced for this run.
+        console.error(`[runner] ${provider.slug} failed for prompt "${prompt.text}":`, error);
+        continue;
+      }
 
       const projectEntity = result.mentionedEntities.find((e) => e.is_project);
       const mentionType = !projectEntity
