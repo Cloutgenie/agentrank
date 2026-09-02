@@ -115,6 +115,14 @@ export default function PricingPage() {
         ))}
       </div>
 
+      <p className="mx-auto mt-16 max-w-2xl text-center text-sm text-muted-foreground">
+        Comparing AI visibility tools? See{" "}
+        <Link href="/vs/profound-vs-agentrank" className="text-foreground underline underline-offset-2 hover:text-primary">
+          AgentRank vs Profound
+        </Link>
+        .
+      </p>
+
       <div className="mx-auto mt-24 max-w-2xl">
         <h2 className="text-2xl font-semibold tracking-tight">Frequently asked questions</h2>
         <div className="mt-8 space-y-6">

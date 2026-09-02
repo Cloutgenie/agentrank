@@ -106,8 +106,12 @@ export default function AiSearchSeoPage() {
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">What is AI search SEO?</h2>
             <p className="mt-4 text-muted-foreground">
-              Every day, more buyers skip the search results page entirely and ask an AI model directly: "what's the
-              best CRM for a five-person sales team," "AgentRank vs Profound," "how do I track my brand in ChatGPT."
+              Every day, more buyers skip the search results page entirely and ask an AI model directly: &quot;what&apos;s
+              the best CRM for a five-person sales team,&quot;{" "}
+              <Link href="/vs/profound-vs-agentrank" className="text-foreground underline underline-offset-2 hover:text-primary">
+                AgentRank vs Profound
+              </Link>
+              , &quot;how do I track my brand in ChatGPT.&quot;
               The model synthesizes one answer from what it knows and, increasingly, from a live web search. AI
               search SEO is the discipline of making sure your company is one of the names that answer includes —
               by understanding what the model reads, who it trusts, and how it decides who to mention first.
@@ -203,6 +207,9 @@ export default function AiSearchSeoPage() {
             </Button>
             <Button variant="outline" asChild>
               <Link href="/claude-ranking-checker">Claude ranking checker</Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href="/vs/profound-vs-agentrank">AgentRank vs Profound</Link>
             </Button>
             <Button variant="outline" asChild>
               <Link href="/monitor-chatgpt-mentions">Monitor mentions weekly</Link>
