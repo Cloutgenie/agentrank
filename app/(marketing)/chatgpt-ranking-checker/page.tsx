@@ -106,7 +106,7 @@ export default function ChatGptRankingCheckerPage() {
             </Button>
           </div>
 
-          <p className="mt-4 text-xs text-muted-foreground">No credit card required · Free 14-day trial</p>
+          <p className="mt-4 text-xs text-muted-foreground">No credit card required · Free 3-day trial</p>
         </div>
       </section>
 
@@ -272,7 +272,7 @@ export default function ChatGptRankingCheckerPage() {
       <section className="py-24">
         <div className="container flex flex-col items-center rounded-2xl border border-border/60 bg-card px-8 py-16 text-center">
           <Badge variant="outline" className="mb-6 gap-1.5">
-            <Sparkles className="h-3 w-3" /> Free 14-day trial
+            <Sparkles className="h-3 w-3" /> Free 3-day trial
           </Badge>
           <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">Find out your ChatGPT ranking today</h2>
           <p className="mt-4 max-w-lg text-muted-foreground">

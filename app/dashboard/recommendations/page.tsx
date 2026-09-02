@@ -81,7 +81,7 @@ export default async function RecommendationsPage() {
                         Check status
                       </Button>
                     </form>
-                  ) : isCursorConfigured ? (
+                  ) : isCursorConfigured && context.isDemo ? (
                     <form action={launchCursorAgent.bind(null, rec.id)}>
                       <Button size="sm" type="submit">
                         Build with Cursor

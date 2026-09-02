@@ -79,7 +79,7 @@ export default function PricingPage() {
     <div className="container py-24">
       <div className="mx-auto max-w-2xl text-center">
         <h1 className="text-4xl font-semibold tracking-tight">Simple pricing that scales with your visibility</h1>
-        <p className="mt-4 text-muted-foreground">14-day free trial on every plan. Cancel anytime.</p>
+        <p className="mt-4 text-muted-foreground">3-day free trial on every plan. Cancel anytime.</p>
       </div>
 
       <div className="mt-16 grid gap-6 md:grid-cols-3">

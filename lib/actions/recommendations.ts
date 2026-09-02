@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { currentUser } from "@clerk/nextjs/server";
 import { createServiceClient } from "@/lib/supabase/server";
+import { getCurrentContext } from "@/lib/auth-context";
 
 /**
  * Snapshots the project's current blended visibility score as the "before"
@@ -49,6 +50,15 @@ export async function markRecommendationActioned(recommendationId: string) {
   const user = await currentUser();
   if (!user) redirect("/sign-in");
 
+  const context = await getCurrentContext();
+  const supabase = createServiceClient();
+  const { data: recommendation } = await supabase
+    .from("recommendations")
+    .select("project_id")
+    .eq("id", recommendationId)
+    .single();
+  if (recommendation?.project_id !== context.projectId) redirect("/dashboard/recommendations");
+
   await recordOutcomeBaseline(recommendationId, "manual");
   redirect("/dashboard/recommendations");
 }
@@ -62,6 +72,7 @@ export async function captureRecommendationResult(recommendationId: string) {
   const user = await currentUser();
   if (!user) redirect("/sign-in");
 
+  const context = await getCurrentContext();
   const supabase = createServiceClient();
 
   const { data: outcome } = await supabase
@@ -70,7 +81,7 @@ export async function captureRecommendationResult(recommendationId: string) {
     .eq("recommendation_id", recommendationId)
     .single();
 
-  if (outcome) {
+  if (outcome && outcome.project_id === context.projectId) {
     const { data: latestScore } = await supabase
       .from("visibility_scores")
       .select("visibility_score, score_date")

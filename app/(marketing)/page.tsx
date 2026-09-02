@@ -70,7 +70,7 @@ export default function HomePage() {
             </Button>
           </div>
 
-          <p className="mt-4 text-xs text-muted-foreground">No credit card required · Free 14-day trial</p>
+          <p className="mt-4 text-xs text-muted-foreground">No credit card required · Free 3-day trial</p>
 
           <div className="mt-16 flex flex-wrap items-center justify-center gap-x-10 gap-y-4 text-sm text-muted-foreground">
             <span className="font-medium text-foreground/70">Tracked across</span>

@@ -223,7 +223,7 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
         <section className="py-24">
           <div className="container flex flex-col items-center rounded-2xl border border-border/60 bg-card px-8 py-16 text-center">
             <Badge variant="outline" className="mb-6 gap-1.5">
-              <Sparkles className="h-3 w-3" /> Free 14-day trial
+              <Sparkles className="h-3 w-3" /> Free 3-day trial
             </Badge>
             <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">
               Own {companyName}? Claim this report.
