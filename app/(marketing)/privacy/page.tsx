@@ -2,7 +2,7 @@ import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
   title: "Privacy Policy",
-  description: "How AgentRank collects, uses, and protects your data.",
+  description: "How AgentRank Radar collects, uses, and protects your data.",
   path: "/privacy",
 });
 
@@ -64,8 +64,8 @@ export default function PrivacyPage() {
           <h2 className="text-base font-medium text-foreground">Questions</h2>
           <p className="mt-2">
             Reach us at{" "}
-            <a href="mailto:hello@agentrank.ai" className="text-foreground underline underline-offset-4">
-              hello@agentrank.ai
+            <a href="mailto:hello@agentrankradar.com" className="text-foreground underline underline-offset-4">
+              hello@agentrankradar.com
             </a>{" "}
             with any privacy questions.
           </p>

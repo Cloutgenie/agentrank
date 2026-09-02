@@ -74,7 +74,7 @@ const FAQ = [
     a: "It blends mention frequency, share of voice against tracked competitors, and average position when you're mentioned, so a brand mentioned first in half its prompts scores higher than one buried 6th in all of them.",
   },
   {
-    q: "Can I track competitors who aren't customers of AgentRank?",
+    q: "Can I track competitors who aren't customers of AgentRank Radar?",
     a: "Yes. You add competitor names and we track their visibility across the same prompt set — no cooperation from them required.",
   },
   {

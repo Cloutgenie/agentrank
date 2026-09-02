@@ -98,7 +98,7 @@ export default function OnboardingPage() {
                 required
                 value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
-                placeholder="AgentRank"
+                placeholder="AgentRank Radar"
               />
             </div>
 
@@ -110,7 +110,7 @@ export default function OnboardingPage() {
                 type="url"
                 value={websiteUrl}
                 onChange={(e) => setWebsiteUrl(e.target.value)}
-                placeholder="https://agentrank.ai"
+                placeholder="https://agentrankradar.com"
               />
             </div>
 

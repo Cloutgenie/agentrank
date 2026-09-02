@@ -3,7 +3,7 @@ import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
   title: "Contact",
-  description: "Get in touch with the AgentRank team.",
+  description: "Get in touch with the AgentRank Radar team.",
   path: "/contact",
 });
 
@@ -17,16 +17,16 @@ export default function ContactPage() {
 
       <div className="mt-10 flex items-center gap-3 rounded-lg border border-border p-4">
         <Mail className="h-5 w-5 text-primary" />
-        <a href="mailto:hello@agentrank.ai" className="font-medium underline underline-offset-4">
-          hello@agentrank.ai
+        <a href="mailto:hello@agentrankradar.com" className="font-medium underline underline-offset-4">
+          hello@agentrankradar.com
         </a>
       </div>
 
       <div className="mt-6 text-sm text-muted-foreground">
         <p>
           Security issue instead?{" "}
-          <a href="mailto:security@agentrank.ai" className="text-foreground underline underline-offset-4">
-            security@agentrank.ai
+          <a href="mailto:security@agentrankradar.com" className="text-foreground underline underline-offset-4">
+            security@agentrankradar.com
           </a>
         </p>
       </div>

@@ -18,7 +18,7 @@ export function MarketingNav() {
           <span className="flex h-6 w-6 items-center justify-center rounded bg-primary text-xs font-bold text-primary-foreground">
             A
           </span>
-          AgentRank
+          AgentRank Radar
         </Link>
 
         <nav className="hidden items-center gap-6 text-sm text-muted-foreground md:flex">

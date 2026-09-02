@@ -37,13 +37,13 @@ export default function OpengraphImage() {
           >
             A
           </div>
-          <div style={{ fontSize: 32, fontWeight: 600 }}>AgentRank</div>
+          <div style={{ fontSize: 32, fontWeight: 600 }}>AgentRank Radar</div>
         </div>
         <div style={{ fontSize: 56, fontWeight: 700, lineHeight: 1.15, maxWidth: 950 }}>
-          Does ChatGPT recommend your company — or your competitor&apos;s?
+          The 24/7 Radar for Your AI Answer Visibility
         </div>
         <div style={{ fontSize: 28, color: "#a1a1aa", marginTop: 32, maxWidth: 900 }}>
-          Track your AI search visibility across ChatGPT, Claude, Gemini &amp; Perplexity.
+          Continuously scanning ChatGPT, Claude, Gemini &amp; Perplexity for how often they recommend you.
         </div>
       </div>
     ),

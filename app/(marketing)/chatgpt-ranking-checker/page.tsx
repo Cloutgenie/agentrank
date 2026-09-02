@@ -9,7 +9,7 @@ import { FaqJsonLd } from "@/components/seo/json-ld";
 export const metadata = pageMetadata({
   title: "ChatGPT Ranking Checker — See If ChatGPT Recommends Your Company",
   description:
-    "Check whether ChatGPT mentions your company for the searches that matter, benchmark your position against competitors, and track it automatically with AgentRank's ChatGPT ranking checker.",
+    "Check whether ChatGPT mentions your company for the searches that matter, benchmark your position against competitors, and track it automatically with AgentRank Radar's ChatGPT ranking checker.",
   path: "/chatgpt-ranking-checker",
 });
 
@@ -18,7 +18,7 @@ const EXAMPLE_PROMPTS = [
   "what's a good Ahrefs alternative for AI search",
   "top CRM tools for small agencies",
   "recommend a tool to track brand mentions in ChatGPT",
-  "AgentRank vs Profound vs Otterly.AI",
+  "AgentRank Radar vs Profound vs Otterly.AI",
 ];
 
 const SCOREBOARD = [
@@ -31,7 +31,7 @@ const STEPS = [
   {
     title: "We generate buyer-intent prompts",
     description:
-      "Starting from your industry, website, and competitor list, AgentRank builds a set of category, comparison, and use-case prompts — the same phrasing real buyers type into ChatGPT.",
+      "Starting from your industry, website, and competitor list, AgentRank Radar builds a set of category, comparison, and use-case prompts — the same phrasing real buyers type into ChatGPT.",
   },
   {
     title: "We query the ChatGPT search model directly",
@@ -62,10 +62,10 @@ const COMPARISON_ROWS = [
 const FAQ = [
   {
     q: "Does asking ChatGPT myself give the same result as a ranking checker?",
-    a: "Not reliably. ChatGPT's answers vary by phrasing, account history, and the day you ask, and a single manual check only tells you about one prompt at one moment. AgentRank runs the same broad set of prompts on a schedule so you see a real trend instead of one noisy data point.",
+    a: "Not reliably. ChatGPT's answers vary by phrasing, account history, and the day you ask, and a single manual check only tells you about one prompt at one moment. AgentRank Radar runs the same broad set of prompts on a schedule so you see a real trend instead of one noisy data point.",
   },
   {
-    q: "Which ChatGPT model does AgentRank actually query?",
+    q: "Which ChatGPT model does AgentRank Radar actually query?",
     a: "We query OpenAI's gpt-4o-search-preview model, the web-search-enabled model behind ChatGPT's live answers, so the mentions and citations we record match what a prospect asking ChatGPT right now would actually see.",
   },
   {
@@ -74,7 +74,7 @@ const FAQ = [
   },
   {
     q: "Can I check a specific competitor's ChatGPT ranking too?",
-    a: "Yes. Add any competitor's name when you set up a project and AgentRank tracks their mentions across the exact same prompt set, so every comparison is apples-to-apples.",
+    a: "Yes. Add any competitor's name when you set up a project and AgentRank Radar tracks their mentions across the exact same prompt set, so every comparison is apples-to-apples.",
   },
 ];
 
@@ -94,7 +94,7 @@ export default function ChatGptRankingCheckerPage() {
           </h1>
 
           <p className="mt-6 max-w-xl text-balance text-lg text-muted-foreground">
-            AgentRank's ChatGPT ranking checker runs your category's real buyer-intent prompts against ChatGPT's live
+            AgentRank Radar's ChatGPT ranking checker runs your category's real buyer-intent prompts against ChatGPT's live
             search model and shows you exactly where you stand, mention by mention.
           </p>
 
@@ -156,7 +156,7 @@ export default function ChatGptRankingCheckerPage() {
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">
-              How AgentRank checks your ChatGPT ranking
+              How AgentRank Radar checks your ChatGPT ranking
             </h2>
             <p className="mt-4 text-muted-foreground">
               We don't scrape screenshots or guess from cached data — we query the model itself.
@@ -212,7 +212,7 @@ export default function ChatGptRankingCheckerPage() {
                 <tr className="bg-secondary text-left">
                   <th className="p-4 font-medium">Capability</th>
                   <th className="p-4 text-center font-medium">Asking ChatGPT yourself</th>
-                  <th className="p-4 text-center font-medium">AgentRank</th>
+                  <th className="p-4 text-center font-medium">AgentRank Radar</th>
                 </tr>
               </thead>
               <tbody>
@@ -247,7 +247,7 @@ export default function ChatGptRankingCheckerPage() {
             <CardContent className="p-8">
               <QuoteMark className="h-6 w-6 text-primary" />
               <p className="mt-4 text-lg">
-                "We were checking ChatGPT by hand every Monday morning. AgentRank replaced that with a real trend
+                "We were checking ChatGPT by hand every Monday morning. AgentRank Radar replaced that with a real trend
                 line and told us the exact prompts we were losing."
               </p>
               <p className="mt-4 text-sm text-muted-foreground">Founder, B2B SaaS company</p>

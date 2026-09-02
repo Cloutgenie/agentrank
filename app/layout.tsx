@@ -2,20 +2,20 @@ import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { isClerkConfigured } from "@/lib/clerk-configured";
 import { OrganizationJsonLd } from "@/components/seo/json-ld";
-import { SITE_NAME } from "@/lib/seo";
+import { SITE_NAME, SITE_URL, SITE_TAGLINE } from "@/lib/seo";
 import "./globals.css";
 
-const DEFAULT_TITLE = "AgentRank.ai — Track your brand's AI search visibility";
+const DEFAULT_TITLE = `${SITE_NAME} — ${SITE_TAGLINE}`;
 const DEFAULT_DESCRIPTION =
-  "AgentRank tracks how often ChatGPT, Claude, Gemini, and Perplexity recommend your company vs. competitors — and tells you what content to publish to win.";
+  "AgentRank Radar continuously scans ChatGPT, Claude, Gemini, and Perplexity for how often they recommend you vs. your competitors — and tells you what content to publish to win.";
 
 export const metadata: Metadata = {
   title: {
     default: DEFAULT_TITLE,
-    template: "%s · AgentRank.ai",
+    template: `%s · ${SITE_NAME}`,
   },
   description: DEFAULT_DESCRIPTION,
-  metadataBase: new URL("https://agentrank.ai"),
+  metadataBase: new URL(SITE_URL),
   openGraph: {
     title: DEFAULT_TITLE,
     description: DEFAULT_DESCRIPTION,

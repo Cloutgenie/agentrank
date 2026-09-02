@@ -37,7 +37,7 @@ export function DashboardSidebar() {
         <span className="flex h-6 w-6 items-center justify-center rounded bg-primary text-xs font-bold text-primary-foreground">
           A
         </span>
-        AgentRank
+        AgentRank Radar
       </Link>
 
       <nav className="space-y-1 p-3">

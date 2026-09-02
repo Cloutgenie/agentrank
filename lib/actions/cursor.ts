@@ -12,7 +12,7 @@ export async function launchCursorAgent(recommendationId: string) {
   if (!user) redirect("/sign-in");
 
   const context = await getCurrentContext();
-  // lib/cursor.ts always targets AgentRank's own repo (CURSOR_TARGET_REPO_URL)
+  // lib/cursor.ts always targets AgentRank Radar's own repo (CURSOR_TARGET_REPO_URL)
   // — there's no per-customer repo wiring yet, so letting a real tenant
   // trigger this would open PRs against our codebase, not theirs. Restrict
   // to the seeded demo project until that's built.
@@ -30,7 +30,7 @@ export async function launchCursorAgent(recommendationId: string) {
   await recordOutcomeBaseline(recommendationId, "cursor_agent");
 
   const promptText = [
-    "Implement this AI-SEO recommendation for AgentRank.ai in this repo.",
+    "Implement this AI-SEO recommendation for AgentRank Radar in this repo.",
     "",
     `Title: ${recommendation.title}`,
     `Description: ${recommendation.description}`,

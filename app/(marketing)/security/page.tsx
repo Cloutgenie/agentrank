@@ -3,7 +3,7 @@ import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
   title: "Security",
-  description: "How AgentRank protects your account and data.",
+  description: "How AgentRank Radar protects your account and data.",
   path: "/security",
 });
 
@@ -54,8 +54,8 @@ export default function SecurityPage() {
         <h2 className="font-medium text-foreground">Found a vulnerability?</h2>
         <p className="mt-2">
           We take security reports seriously. Email{" "}
-          <a href="mailto:security@agentrank.ai" className="text-foreground underline underline-offset-4">
-            security@agentrank.ai
+          <a href="mailto:security@agentrankradar.com" className="text-foreground underline underline-offset-4">
+            security@agentrankradar.com
           </a>{" "}
           with details and we'll respond as quickly as we can.
         </p>

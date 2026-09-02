@@ -3,16 +3,16 @@ import { ArrowRight, Check, TrendingUp, TrendingDown, Quote, Sparkles } from "lu
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { pageMetadata } from "@/lib/seo";
+import { pageMetadata, SITE_NAME, SITE_TAGLINE } from "@/lib/seo";
 
-const HOME_TITLE = "AgentRank.ai — Track your brand's AI search visibility";
+const HOME_TITLE = `${SITE_NAME} — ${SITE_TAGLINE}`;
 const HOME_DESCRIPTION =
-  "AgentRank tracks how often ChatGPT, Claude, Gemini, and Perplexity recommend your company vs. competitors — and tells you what content to publish to win.";
+  "AgentRank Radar continuously scans ChatGPT, Claude, Gemini, and Perplexity for how often they recommend you vs. your competitors — and tells you what content to publish to win.";
 
 export const metadata = {
   ...pageMetadata({ title: HOME_TITLE, description: HOME_DESCRIPTION, path: "/" }),
-  // The homepage's title already carries the "AgentRank.ai" brand name, so it
-  // must skip the layout's "%s · AgentRank.ai" template to avoid duplicating it.
+  // The homepage's title already carries the brand name, so it must skip the
+  // layout's "%s · AgentRank Radar" template to avoid duplicating it.
   title: { absolute: HOME_TITLE },
 };
 
@@ -59,16 +59,16 @@ export default function HomePage() {
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-background" />
         <div className="container relative flex flex-col items-center py-24 text-center md:py-32">
           <Badge variant="outline" className="mb-6 gap-1.5">
-            <Sparkles className="h-3 w-3" /> Now tracking ChatGPT, Claude, Gemini &amp; Perplexity
+            <Sparkles className="h-3 w-3" /> Now scanning ChatGPT, Claude, Gemini &amp; Perplexity
           </Badge>
 
           <h1 className="max-w-3xl text-balance text-4xl font-semibold tracking-tight md:text-6xl">
-            Does ChatGPT recommend <span className="text-primary">your company</span> — or your competitor's?
+            The 24/7 Radar for Your <span className="text-primary">AI Answer Visibility</span>
           </h1>
 
           <p className="mt-6 max-w-xl text-balance text-lg text-muted-foreground">
-            AgentRank is Ahrefs for ChatGPT. Track your AI search visibility, benchmark it against competitors, and get a
-            content plan to win the AI answer.
+            Does ChatGPT recommend your company — or your competitor's? AgentRank Radar continuously scans every major AI
+            engine, benchmarks you against competitors, and gets you a content plan to win the AI answer.
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -123,7 +123,7 @@ export default function HomePage() {
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">Everything you need to win AI search</h2>
             <p className="mt-4 text-muted-foreground">
-              SEO tools tell you how you rank on Google. AgentRank tells you how you rank inside the answer.
+              SEO tools tell you how you rank on Google. AgentRank Radar tells you how you rank inside the answer.
             </p>
           </div>
 
@@ -145,7 +145,7 @@ export default function HomePage() {
           <div>
             <h2 className="text-3xl font-semibold tracking-tight">Built for the teams who already won Google</h2>
             <p className="mt-4 text-muted-foreground">
-              SaaS founders, Shopify app developers, agencies, and SEO consultants use AgentRank to make sure they don't
+              SaaS founders, Shopify app developers, agencies, and SEO consultants use AgentRank Radar to make sure they don't
               lose the next search war before it starts.
             </p>
             <ul className="mt-6 space-y-3">
@@ -168,7 +168,7 @@ export default function HomePage() {
               <Quote className="h-6 w-6 text-primary" />
               <p className="mt-4 text-lg">
                 "We found out ChatGPT was recommending three competitors before us for our exact category — and had no
-                idea until AgentRank showed us the gap."
+                idea until AgentRank Radar showed us the gap."
               </p>
               <p className="mt-4 text-sm text-muted-foreground">Head of Growth, B2B SaaS company</p>
             </CardContent>

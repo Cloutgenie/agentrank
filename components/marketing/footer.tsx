@@ -48,9 +48,9 @@ export function MarketingFooter() {
             <span className="flex h-6 w-6 items-center justify-center rounded bg-primary text-xs font-bold text-primary-foreground">
               A
             </span>
-            AgentRank
+            AgentRank Radar
           </Link>
-          <p className="mt-3 text-sm text-muted-foreground">Ahrefs for ChatGPT.</p>
+          <p className="mt-3 text-sm text-muted-foreground">The 24/7 radar for your AI answer visibility.</p>
         </div>
 
         {COLUMNS.map((col) => (
@@ -70,7 +70,7 @@ export function MarketingFooter() {
       </div>
 
       <div className="container flex flex-col items-center justify-between gap-2 border-t border-border/60 py-6 text-xs text-muted-foreground md:flex-row">
-        <span>© {new Date().getFullYear()} AgentRank.ai. All rights reserved.</span>
+        <span>© {new Date().getFullYear()} AgentRank Radar. All rights reserved.</span>
         <span>Made for teams who want to win the AI answer.</span>
       </div>
     </footer>

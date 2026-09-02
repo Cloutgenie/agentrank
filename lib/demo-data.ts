@@ -8,9 +8,9 @@ import type { PlanTier, SubscriptionStatus } from "@/lib/types";
 
 export const demoProject = {
   id: "demo-project",
-  name: "AgentRank",
+  name: "AgentRank Radar",
   slug: "agentrank",
-  website_url: "https://agentrank.ai",
+  website_url: "https://agentrankradar.com",
   industry: "AI Search Analytics",
 };
 
@@ -52,7 +52,7 @@ export const demoOverallScore = {
 };
 
 export const demoCompetitorComparison = [
-  { name: "AgentRank (you)", score: 40, isYou: true },
+  { name: "AgentRank Radar (you)", score: 40, isYou: true },
   { name: "Profound", score: 34, isYou: false },
   { name: "Otterly.AI", score: 22, isYou: false },
   { name: "Peec AI", score: 16, isYou: false },
@@ -69,7 +69,7 @@ export const demoTrend = [
 export const demoPrompts = [
   { id: "p1", text: "best AI search visibility tracking tool", category: "category", mentionType: "top_pick" as const, position: 1, engine: "perplexity" },
   { id: "p2", text: "how do I track if ChatGPT recommends my company", category: "brand_monitoring", mentionType: "mentioned" as const, position: 3, engine: "chatgpt" },
-  { id: "p3", text: "AgentRank vs Profound", category: "comparison", mentionType: "mentioned" as const, position: 2, engine: "claude" },
+  { id: "p3", text: "AgentRank Radar vs Profound", category: "comparison", mentionType: "mentioned" as const, position: 2, engine: "claude" },
   { id: "p4", text: "tools to monitor brand mentions in AI answers", category: "category", mentionType: "not_mentioned" as const, position: null, engine: "gemini" },
   { id: "p5", text: "best Ahrefs alternative for AI search", category: "comparison", mentionType: "mentioned" as const, position: 4, engine: "chatgpt" },
 ];
@@ -85,7 +85,7 @@ export const demoCitations = [
 export const demoRecommendations = [
   {
     id: "r1",
-    title: 'Publish "AgentRank vs Profound" comparison page',
+    title: 'Publish "AgentRank Radar vs Profound" comparison page',
     description: "You're mentioned alongside Profound in 12 prompts but don't have a page targeting that comparison.",
     category: "comparison_page" as const,
     impact: "high" as const,
