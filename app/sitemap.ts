@@ -10,6 +10,7 @@ const STATIC_PATHS: { path: string; priority: number; changeFrequency: "daily" |
   { path: "/monitor-chatgpt-mentions", priority: 0.8, changeFrequency: "weekly" },
   { path: "/best-shopify-apps-ai-visibility", priority: 0.7, changeFrequency: "weekly" },
   { path: "/agency", priority: 0.6, changeFrequency: "monthly" },
+  { path: "/marketplace", priority: 0.5, changeFrequency: "daily" },
   { path: "/about", priority: 0.4, changeFrequency: "monthly" },
   { path: "/blog", priority: 0.5, changeFrequency: "weekly" },
   { path: "/changelog", priority: 0.4, changeFrequency: "weekly" },
