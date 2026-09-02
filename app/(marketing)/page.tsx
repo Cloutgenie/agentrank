@@ -1,9 +1,12 @@
 import Link from "next/link";
-import { ArrowRight, Check, TrendingUp, TrendingDown, Quote, Sparkles } from "lucide-react";
+import { ArrowRight, Check, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { pageMetadata, SITE_NAME, SITE_TAGLINE } from "@/lib/seo";
+import { getScoreTrend, getEngineScores, DEMO_PROJECT_ID } from "@/lib/queries";
+import { isSupabaseServiceConfigured } from "@/lib/supabase/server";
+import { VisibilityTrendChart } from "@/components/dashboard/charts/visibility-trend-chart";
 
 const HOME_TITLE = `${SITE_NAME} — ${SITE_TAGLINE}`;
 const HOME_DESCRIPTION =
@@ -46,13 +49,14 @@ const FEATURES = [
   },
 ];
 
-const SCOREBOARD = [
-  { name: "Your Company", score: 43, trend: "up" as const },
-  { name: "Competitor A", score: 31, trend: "down" as const },
-  { name: "Competitor B", score: 18, trend: "flat" as const },
-];
+export default async function HomePage() {
+  const [trend, engineScores] = await Promise.all([
+    getScoreTrend(DEMO_PROJECT_ID, 14),
+    getEngineScores(DEMO_PROJECT_ID),
+  ]);
+  const latestDate = trend.at(-1)?.date ?? null;
+  const isRealData = isSupabaseServiceConfigured;
 
-export default function HomePage() {
   return (
     <>
       <section className="relative overflow-hidden border-b border-border/60 bg-grid">
@@ -99,20 +103,28 @@ export default function HomePage() {
         <div className="container">
           <Card className="mx-auto max-w-2xl">
             <CardContent className="p-8">
-              <h3 className="text-sm font-medium text-muted-foreground">AI Visibility Score — "best project management software"</h3>
-              <div className="mt-6 space-y-4">
-                {SCOREBOARD.map((row) => (
-                  <div key={row.name} className="flex items-center gap-4">
-                    <span className="w-32 shrink-0 text-sm font-medium">{row.name}</span>
-                    <div className="h-2 flex-1 overflow-hidden rounded-full bg-secondary">
-                      <div className="h-full rounded-full bg-primary" style={{ width: `${row.score}%` }} />
-                    </div>
-                    <span className="w-10 shrink-0 text-right text-sm tabular-nums">{row.score}%</span>
-                    {row.trend === "up" && <TrendingUp className="h-4 w-4 shrink-0 text-success" />}
-                    {row.trend === "down" && <TrendingDown className="h-4 w-4 shrink-0 text-destructive" />}
+              <div className="flex items-center justify-between gap-4">
+                <h3 className="text-sm font-medium text-muted-foreground">
+                  {isRealData ? "Agent Rank Radar's own AI Visibility Score — real, tracked daily" : "Illustrative example"}
+                </h3>
+                {latestDate && <span className="shrink-0 text-xs text-muted-foreground">As of {latestDate}</span>}
+              </div>
+              <div className="mt-6 h-48">
+                <VisibilityTrendChart data={trend} />
+              </div>
+              <div className="mt-6 grid grid-cols-2 gap-4 border-t border-border pt-4 sm:grid-cols-4">
+                {engineScores.map((engine) => (
+                  <div key={engine.engine}>
+                    <p className="text-xs text-muted-foreground">{engine.label}</p>
+                    <p className="text-lg font-semibold tabular-nums">{engine.score}</p>
                   </div>
                 ))}
               </div>
+              <p className="mt-6 text-xs text-muted-foreground">
+                {isRealData
+                  ? "This is our own real score — produced by querying ChatGPT, Claude, Gemini, and Perplexity daily, the same tracking every customer gets. It moves, including down, because that's what actually happens."
+                  : "Sign up to see your own real, tracked score across all four engines."}
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -141,38 +153,25 @@ export default function HomePage() {
       </section>
 
       <section className="border-b border-border/60 py-24">
-        <div className="container grid gap-10 md:grid-cols-2 md:items-center">
-          <div>
-            <h2 className="text-3xl font-semibold tracking-tight">Built for the teams who already won Google</h2>
-            <p className="mt-4 text-muted-foreground">
-              SaaS founders, Shopify app developers, agencies, and SEO consultants use Agent Rank Radar to make sure they don't
-              lose the next search war before it starts.
-            </p>
-            <ul className="mt-6 space-y-3">
-              {[
-                "See your AI Visibility Score across 4 engines in one dashboard",
-                "Get alerted the moment a competitor overtakes you",
-                "Turn every gap into a prioritized content brief",
-                "Export white-label reports for your clients",
-              ].map((item) => (
-                <li key={item} className="flex items-start gap-2 text-sm">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-success" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <Card>
-            <CardContent className="p-8">
-              <Quote className="h-6 w-6 text-primary" />
-              <p className="mt-4 text-lg">
-                "We found out ChatGPT was recommending three competitors before us for our exact category — and had no
-                idea until Agent Rank Radar showed us the gap."
-              </p>
-              <p className="mt-4 text-sm text-muted-foreground">Head of Growth, B2B SaaS company</p>
-            </CardContent>
-          </Card>
+        <div className="container max-w-2xl">
+          <h2 className="text-3xl font-semibold tracking-tight">Built for the teams who already won Google</h2>
+          <p className="mt-4 text-muted-foreground">
+            SaaS founders, Shopify app developers, agencies, and SEO consultants use Agent Rank Radar to make sure they don't
+            lose the next search war before it starts.
+          </p>
+          <ul className="mt-6 space-y-3">
+            {[
+              "See your AI Visibility Score across 4 engines in one dashboard",
+              "Get alerted the moment a competitor overtakes you",
+              "Turn every gap into a prioritized content brief",
+              "Export white-label reports for your clients",
+            ].map((item) => (
+              <li key={item} className="flex items-start gap-2 text-sm">
+                <Check className="mt-0.5 h-4 w-4 shrink-0 text-success" />
+                {item}
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
