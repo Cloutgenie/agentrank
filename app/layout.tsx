@@ -7,7 +7,7 @@ import "./globals.css";
 
 const DEFAULT_TITLE = `${SITE_NAME} — ${SITE_TAGLINE}`;
 const DEFAULT_DESCRIPTION =
-  "AgentRank Radar continuously scans ChatGPT, Claude, Gemini, and Perplexity for how often they recommend you vs. your competitors — and tells you what content to publish to win.";
+  "Agent Rank Radar continuously scans ChatGPT, Claude, Gemini, and Perplexity for how often they recommend you vs. your competitors — and tells you what content to publish to win.";
 
 export const metadata: Metadata = {
   title: {

@@ -47,7 +47,7 @@ export function MarketingFooter() {
         <div className="md:col-span-1">
           <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
             <LogoMark className="h-6 w-6" />
-            AgentRank Radar
+            Agent Rank Radar
           </Link>
           <p className="mt-3 text-sm text-muted-foreground">The 24/7 radar for your AI answer visibility.</p>
         </div>
@@ -69,7 +69,7 @@ export function MarketingFooter() {
       </div>
 
       <div className="container flex flex-col items-center justify-between gap-2 border-t border-border/60 py-6 text-xs text-muted-foreground md:flex-row">
-        <span>© {new Date().getFullYear()} AgentRank Radar. All rights reserved.</span>
+        <span>© {new Date().getFullYear()} Agent Rank Radar. All rights reserved.</span>
         <span>Made for teams who want to win the AI answer.</span>
       </div>
     </footer>

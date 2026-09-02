@@ -9,7 +9,7 @@ import { FaqJsonLd } from "@/components/seo/json-ld";
 export const metadata = pageMetadata({
   title: "Best Shopify Apps for AI Visibility (2026 Leaderboard)",
   description:
-    "Which Shopify apps get recommended most often by ChatGPT, Claude, Gemini, and Perplexity? An illustrative AI visibility leaderboard for the Shopify app ecosystem, tracked by AgentRank Radar.",
+    "Which Shopify apps get recommended most often by ChatGPT, Claude, Gemini, and Perplexity? An illustrative AI visibility leaderboard for the Shopify app ecosystem, tracked by Agent Rank Radar.",
   path: "/best-shopify-apps-ai-visibility",
 });
 
@@ -44,15 +44,15 @@ const WHY_IT_MATTERS = [
 const FAQ = [
   {
     q: "Is this leaderboard live data?",
-    a: "This page shows an illustrative example of the leaderboard format AgentRank Radar produces — the app names and scores above are for demonstration. Track your own Shopify app's real AI Visibility Score by creating a project.",
+    a: "This page shows an illustrative example of the leaderboard format Agent Rank Radar produces — the app names and scores above are for demonstration. Track your own Shopify app's real AI Visibility Score by creating a project.",
   },
   {
-    q: "How would AgentRank Radar track a real Shopify app category?",
+    q: "How would Agent Rank Radar track a real Shopify app category?",
     a: "We'd generate the buyer-intent prompts merchants actually type — \"best app for X\", \"X vs Y for Shopify\", \"top rated Y app\" — run them against ChatGPT, Claude, Gemini, and Perplexity, and score every app in the category on the same prompt set.",
   },
   {
     q: "Can I track my Shopify app against a custom competitor list?",
-    a: "Yes. Add any competitor app names when you set up a project, and AgentRank Radar tracks their mentions across the exact same prompts as yours, so the comparison is apples-to-apples.",
+    a: "Yes. Add any competitor app names when you set up a project, and Agent Rank Radar tracks their mentions across the exact same prompts as yours, so the comparison is apples-to-apples.",
   },
   {
     q: "Does a higher Shopify App Store rating help my AI visibility?",
@@ -83,7 +83,7 @@ export default function BestShopifyAppsAiVisibilityPage() {
 
           <p className="mt-6 max-w-xl text-balance text-lg text-muted-foreground">
             Merchants ask ChatGPT and Perplexity for app recommendations every day. Here's an illustrative look at
-            how AgentRank Radar scores a Shopify app category for AI visibility — and how your app would stack up.
+            how Agent Rank Radar scores a Shopify app category for AI visibility — and how your app would stack up.
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -161,7 +161,7 @@ export default function BestShopifyAppsAiVisibilityPage() {
             </table>
           </div>
           <p className="mx-auto mt-4 max-w-4xl text-xs text-muted-foreground">
-            App names and scores are illustrative examples of AgentRank Radar's output format, not real measurements of
+            App names and scores are illustrative examples of Agent Rank Radar's output format, not real measurements of
             existing Shopify apps.
           </p>
         </div>
@@ -193,7 +193,7 @@ export default function BestShopifyAppsAiVisibilityPage() {
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">Build your own category leaderboard</h2>
             <p className="mt-4 text-muted-foreground">
-              AgentRank Radar can generate this same view for any Shopify app category — or any SaaS category at all.
+              Agent Rank Radar can generate this same view for any Shopify app category — or any SaaS category at all.
               Add your app and up to ten competitors, and we'll score every one of them against the same prompt
               set, refreshed automatically.
             </p>

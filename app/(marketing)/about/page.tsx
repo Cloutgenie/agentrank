@@ -2,14 +2,14 @@ import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
   title: "About",
-  description: "Why we built AgentRank Radar.",
+  description: "Why we built Agent Rank Radar.",
   path: "/about",
 });
 
 export default function AboutPage() {
   return (
     <div className="container max-w-2xl py-24">
-      <h1 className="text-4xl font-semibold tracking-tight">About AgentRank Radar</h1>
+      <h1 className="text-4xl font-semibold tracking-tight">About Agent Rank Radar</h1>
 
       <div className="mt-8 space-y-6 text-sm leading-relaxed text-muted-foreground">
         <p>
@@ -18,7 +18,7 @@ export default function AboutPage() {
           recommending your company or quietly sending buyers to a competitor instead.
         </p>
         <p>
-          AgentRank Radar tracks that gap. We generate the buyer-intent questions real prospects ask AI models about your
+          Agent Rank Radar tracks that gap. We generate the buyer-intent questions real prospects ask AI models about your
           category, run them daily across every major engine, and turn the results into a visibility score, a
           competitor breakdown, and a prioritized list of content to publish to close the gap.
         </p>

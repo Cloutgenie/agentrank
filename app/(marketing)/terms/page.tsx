@@ -2,7 +2,7 @@ import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
   title: "Terms of Service",
-  description: "The terms that govern your use of AgentRank Radar.",
+  description: "The terms that govern your use of Agent Rank Radar.",
   path: "/terms",
 });
 
@@ -14,9 +14,9 @@ export default function TermsPage() {
 
       <div className="mt-10 space-y-8 text-sm leading-relaxed text-muted-foreground">
         <section>
-          <h2 className="text-base font-medium text-foreground">Using AgentRank Radar</h2>
+          <h2 className="text-base font-medium text-foreground">Using Agent Rank Radar</h2>
           <p className="mt-2">
-            AgentRank Radar tracks how often ChatGPT, Claude, Gemini, and Perplexity mention your company and its
+            Agent Rank Radar tracks how often ChatGPT, Claude, Gemini, and Perplexity mention your company and its
             competitors, and generates content recommendations based on that data. By creating an account, you agree
             to these terms.
           </p>
@@ -43,7 +43,7 @@ export default function TermsPage() {
         <section>
           <h2 className="text-base font-medium text-foreground">Accuracy of AI visibility data</h2>
           <p className="mt-2">
-            AgentRank Radar reports what AI models actually returned when we queried them at a point in time. AI models are
+            Agent Rank Radar reports what AI models actually returned when we queried them at a point in time. AI models are
             non-deterministic and can change their answers between queries or update their underlying versions
             without notice. We do our best to track these changes, but we don't guarantee that any single result
             reflects what an end user would see at the exact moment they ask the same question.
@@ -53,7 +53,7 @@ export default function TermsPage() {
         <section>
           <h2 className="text-base font-medium text-foreground">Acceptable use</h2>
           <p className="mt-2">
-            Don't use AgentRank Radar to track prompts unrelated to evaluating AI search visibility, to abuse the
+            Don't use Agent Rank Radar to track prompts unrelated to evaluating AI search visibility, to abuse the
             underlying AI providers' terms of service, or to attempt to access another organization's data.
           </p>
         </section>

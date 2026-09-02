@@ -2,7 +2,7 @@ import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
   title: "Careers",
-  description: "Open roles at AgentRank Radar.",
+  description: "Open roles at Agent Rank Radar.",
   path: "/careers",
 });
 
@@ -11,7 +11,7 @@ export default function CareersPage() {
     <div className="container max-w-2xl py-24">
       <h1 className="text-4xl font-semibold tracking-tight">Careers</h1>
       <p className="mt-4 text-muted-foreground">
-        We're not hiring yet — AgentRank Radar is early and the team is small. That'll change as we grow, and we'll post
+        We're not hiring yet — Agent Rank Radar is early and the team is small. That'll change as we grow, and we'll post
         roles here when it does.
       </p>
       <p className="mt-4 text-sm text-muted-foreground">

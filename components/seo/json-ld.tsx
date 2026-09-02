@@ -7,7 +7,7 @@ export function OrganizationJsonLd() {
     name: SITE_NAME,
     url: SITE_URL,
     description:
-      "AgentRank Radar continuously scans ChatGPT, Claude, Gemini, and Perplexity for how often they recommend a company vs. its competitors, and tells teams what content to publish to win the AI answer.",
+      "Agent Rank Radar continuously scans ChatGPT, Claude, Gemini, and Perplexity for how often they recommend a company vs. its competitors, and tells teams what content to publish to win the AI answer.",
     sameAs: [],
   };
 
@@ -39,7 +39,7 @@ export function SoftwareApplicationJsonLd() {
     applicationCategory: "BusinessApplication",
     operatingSystem: "Web",
     description:
-      "AgentRank Radar continuously scans ChatGPT, Claude, Gemini, and Perplexity for how often they recommend a company vs. its competitors, and tells teams what content to publish to win the AI answer.",
+      "Agent Rank Radar continuously scans ChatGPT, Claude, Gemini, and Perplexity for how often they recommend a company vs. its competitors, and tells teams what content to publish to win the AI answer.",
     offers: [
       { "@type": "Offer", name: "Starter", price: "29", priceCurrency: "USD", url: `${SITE_URL}/pricing` },
       { "@type": "Offer", name: "Growth", price: "99", priceCurrency: "USD", url: `${SITE_URL}/pricing` },

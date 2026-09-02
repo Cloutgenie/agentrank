@@ -9,7 +9,7 @@ import { FaqJsonLd } from "@/components/seo/json-ld";
 export const metadata = pageMetadata({
   title: "Monitor ChatGPT Mentions — Weekly AI Visibility Alerts",
   description:
-    "Stop checking ChatGPT by hand. AgentRank Radar monitors your ChatGPT mentions continuously and sends weekly alerts the moment you lose visibility or a competitor overtakes you.",
+    "Stop checking ChatGPT by hand. Agent Rank Radar monitors your ChatGPT mentions continuously and sends weekly alerts the moment you lose visibility or a competitor overtakes you.",
   path: "/monitor-chatgpt-mentions",
 });
 
@@ -55,7 +55,7 @@ const WHY = [
 const HOW_IT_WORKS = [
   {
     title: "Continuous prompt runs",
-    description: "AgentRank Radar re-runs your full prompt set on a daily or weekly cadence, every engine, automatically.",
+    description: "Agent Rank Radar re-runs your full prompt set on a daily or weekly cadence, every engine, automatically.",
   },
   {
     title: "Change detection",
@@ -70,7 +70,7 @@ const HOW_IT_WORKS = [
 
 const FAQ = [
   {
-    q: "How often does AgentRank Radar check my ChatGPT mentions?",
+    q: "How often does Agent Rank Radar check my ChatGPT mentions?",
     a: "Starter plans refresh weekly; Growth and Agency plans refresh daily across all four engines, so you catch changes within a day instead of finding out at the end of the month.",
   },
   {
@@ -103,7 +103,7 @@ export default function MonitorChatGptMentionsPage() {
           </h1>
 
           <p className="mt-6 max-w-xl text-balance text-lg text-muted-foreground">
-            AgentRank Radar watches your ChatGPT mentions continuously and tells you the moment you lose visibility or a
+            Agent Rank Radar watches your ChatGPT mentions continuously and tells you the moment you lose visibility or a
             competitor overtakes you — before it shows up in your pipeline numbers.
           </p>
 
@@ -184,7 +184,7 @@ export default function MonitorChatGptMentionsPage() {
           <div>
             <h2 className="text-3xl font-semibold tracking-tight">How monitoring works</h2>
             <p className="mt-4 text-muted-foreground">
-              Set it up once during onboarding. From then on, AgentRank Radar does the checking — you just read the
+              Set it up once during onboarding. From then on, Agent Rank Radar does the checking — you just read the
               alerts.
             </p>
             <ul className="mt-6 space-y-4">

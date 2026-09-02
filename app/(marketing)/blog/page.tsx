@@ -2,7 +2,7 @@ import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
   title: "Blog",
-  description: "Notes on AI search visibility from the AgentRank Radar team.",
+  description: "Notes on AI search visibility from the Agent Rank Radar team.",
   path: "/blog",
 });
 

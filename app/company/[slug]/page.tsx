@@ -142,7 +142,7 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
             <div className="mx-auto max-w-2xl text-center">
               <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">Per-engine breakdown</h2>
               <p className="mt-4 text-muted-foreground">
-                How {companyName} shows up across each AI engine AgentRank Radar tracks.
+                How {companyName} shows up across each AI engine Agent Rank Radar tracks.
               </p>
             </div>
 

@@ -1,8 +1,8 @@
-# AgentRank Radar
+# Agent Rank Radar
 
-> AgentRank Radar is the 24/7 radar for your AI answer visibility — it tracks how often ChatGPT, Claude, Gemini, and Perplexity mention a company versus its competitors when answering buyer-intent questions, and turns the gaps into a prioritized content plan.
+> Agent Rank Radar is the 24/7 radar for your AI answer visibility — it tracks how often ChatGPT, Claude, Gemini, and Perplexity mention a company versus its competitors when answering buyer-intent questions, and turns the gaps into a prioritized content plan.
 
-AgentRank Radar generates hundreds of realistic buyer-intent prompts for a company's category (e.g. "best project management software for remote teams"), runs them daily against OpenAI's, Anthropic's, Google's, and Perplexity's live models, and scores the results into an AI Visibility Score, a per-engine breakdown, and a competitor comparison. It also analyzes which sources (Reddit, G2, Trustpilot, blogs) the models actually cite, and recommends specific pages to publish or update to close visibility gaps.
+Agent Rank Radar generates hundreds of realistic buyer-intent prompts for a company's category (e.g. "best project management software for remote teams"), runs them daily against OpenAI's, Anthropic's, Google's, and Perplexity's live models, and scores the results into an AI Visibility Score, a per-engine breakdown, and a competitor comparison. It also analyzes which sources (Reddit, G2, Trustpilot, blogs) the models actually cite, and recommends specific pages to publish or update to close visibility gaps.
 
 ## Product
 
@@ -12,8 +12,8 @@ AgentRank Radar generates hundreds of realistic buyer-intent prompts for a compa
 ## How it works
 
 - [AI Search SEO Guide](https://agentrankradar.com/ai-search-seo): A practical guide to AEO (Answer Engine Optimization) and GEO (Generative Engine Optimization) — how to get cited by AI models, not just ranked on Google.
-- [ChatGPT Ranking Checker](https://agentrankradar.com/chatgpt-ranking-checker): How AgentRank Radar checks whether ChatGPT recommends a given company.
-- [Claude Ranking Checker](https://agentrankradar.com/claude-ranking-checker): How AgentRank Radar checks whether Claude recommends a given company.
+- [ChatGPT Ranking Checker](https://agentrankradar.com/chatgpt-ranking-checker): How Agent Rank Radar checks whether ChatGPT recommends a given company.
+- [Claude Ranking Checker](https://agentrankradar.com/claude-ranking-checker): How Agent Rank Radar checks whether Claude recommends a given company.
 - [Monitor ChatGPT Mentions](https://agentrankradar.com/monitor-chatgpt-mentions): How the weekly/daily alerting works when visibility changes.
 
 ## Company

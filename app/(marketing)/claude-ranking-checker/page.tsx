@@ -9,7 +9,7 @@ import { FaqJsonLd } from "@/components/seo/json-ld";
 export const metadata = pageMetadata({
   title: "Claude Ranking Checker — See If Claude Recommends Your Company",
   description:
-    "Check whether Anthropic's Claude mentions your company for the questions your buyers ask, benchmark it against competitors, and track it automatically with AgentRank Radar's Claude ranking checker.",
+    "Check whether Anthropic's Claude mentions your company for the questions your buyers ask, benchmark it against competitors, and track it automatically with Agent Rank Radar's Claude ranking checker.",
   path: "/claude-ranking-checker",
 });
 
@@ -18,7 +18,7 @@ const EXAMPLE_PROMPTS = [
   "what should I use instead of Ahrefs for AI search",
   "top help desk software for startups",
   "how do I know if Claude recommends my product",
-  "AgentRank Radar vs Otterly.AI vs Peec AI",
+  "Agent Rank Radar vs Otterly.AI vs Peec AI",
 ];
 
 const SCOREBOARD = [
@@ -31,7 +31,7 @@ const STEPS = [
   {
     title: "We generate buyer-intent prompts",
     description:
-      "From your industry, website, and competitor list, AgentRank Radar builds category, comparison, and use-case prompts — the same phrasing real buyers type when they ask Claude for a recommendation.",
+      "From your industry, website, and competitor list, Agent Rank Radar builds category, comparison, and use-case prompts — the same phrasing real buyers type when they ask Claude for a recommendation.",
   },
   {
     title: "We query the Claude API directly",
@@ -62,10 +62,10 @@ const COMPARISON_ROWS = [
 const FAQ = [
   {
     q: "Is Claude's answer about my company the same every time I ask?",
-    a: "No. Claude's answers vary with phrasing and context, so a single manual chat only captures one data point. AgentRank Radar runs a broad, consistent prompt set on a schedule so you see a trend, not a fluke.",
+    a: "No. Claude's answers vary with phrasing and context, so a single manual chat only captures one data point. Agent Rank Radar runs a broad, consistent prompt set on a schedule so you see a trend, not a fluke.",
   },
   {
-    q: "Which Claude model does AgentRank Radar query?",
+    q: "Which Claude model does Agent Rank Radar query?",
     a: "We call Anthropic's Messages API against the current Claude Sonnet model, the same family of model most Claude.ai users are talking to, so the mentions we record match what a real prospect would see.",
   },
   {
@@ -74,7 +74,7 @@ const FAQ = [
   },
   {
     q: "Does this replace tracking ChatGPT, Gemini, and Perplexity?",
-    a: "No — it complements them. AgentRank Radar tracks all four engines from the same prompt set and project, so you get one AI Visibility Score plus a per-engine breakdown instead of four separate tools.",
+    a: "No — it complements them. Agent Rank Radar tracks all four engines from the same prompt set and project, so you get one AI Visibility Score plus a per-engine breakdown instead of four separate tools.",
   },
 ];
 
@@ -94,7 +94,7 @@ export default function ClaudeRankingCheckerPage() {
           </h1>
 
           <p className="mt-6 max-w-xl text-balance text-lg text-muted-foreground">
-            AgentRank Radar's Claude ranking checker runs your category's real buyer-intent prompts against Anthropic's
+            Agent Rank Radar's Claude ranking checker runs your category's real buyer-intent prompts against Anthropic's
             Claude and shows you exactly where you stand, mention by mention.
           </p>
 
@@ -154,7 +154,7 @@ export default function ClaudeRankingCheckerPage() {
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">
-              How AgentRank Radar checks your Claude ranking
+              How Agent Rank Radar checks your Claude ranking
             </h2>
             <p className="mt-4 text-muted-foreground">
               We don't scrape screenshots or guess from cached data — we query the model itself.
@@ -210,7 +210,7 @@ export default function ClaudeRankingCheckerPage() {
                 <tr className="bg-secondary text-left">
                   <th className="p-4 font-medium">Capability</th>
                   <th className="p-4 text-center font-medium">Asking Claude yourself</th>
-                  <th className="p-4 text-center font-medium">AgentRank Radar</th>
+                  <th className="p-4 text-center font-medium">Agent Rank Radar</th>
                 </tr>
               </thead>
               <tbody>

@@ -36,7 +36,7 @@ export function DashboardSidebar() {
         className="flex h-16 items-center gap-2 border-b border-border/60 px-6 font-semibold tracking-tight"
       >
         <LogoMark className="h-6 w-6" />
-        AgentRank Radar
+        Agent Rank Radar
       </Link>
 
       <nav className="space-y-1 p-3">

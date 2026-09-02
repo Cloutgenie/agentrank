@@ -33,7 +33,7 @@ export default function AgencyPage() {
       <div className="text-center">
         <h1 className="text-4xl font-semibold tracking-tight">Run AI visibility tracking for every client</h1>
         <p className="mt-4 text-muted-foreground">
-          Agency Mode turns AgentRank Radar into your client-reporting layer for AI search — one dashboard, unlimited
+          Agency Mode turns Agent Rank Radar into your client-reporting layer for AI search — one dashboard, unlimited
           projects, reports with your name on them.
         </p>
         <Button className="mt-8" size="lg" asChild>

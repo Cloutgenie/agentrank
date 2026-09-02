@@ -3,7 +3,7 @@ import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
   title: "Contact",
-  description: "Get in touch with the AgentRank Radar team.",
+  description: "Get in touch with the Agent Rank Radar team.",
   path: "/contact",
 });
 

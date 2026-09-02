@@ -110,7 +110,7 @@ export default function AiSearchSeoPage() {
             <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">What is AI search SEO?</h2>
             <p className="mt-4 text-muted-foreground">
               Every day, more buyers skip the search results page entirely and ask an AI model directly: "what's the
-              best CRM for a five-person sales team," "AgentRank Radar vs Profound," "how do I track my brand in ChatGPT."
+              best CRM for a five-person sales team," "Agent Rank Radar vs Profound," "how do I track my brand in ChatGPT."
               The model synthesizes one answer from what it knows and, increasingly, from a live web search. AI
               search SEO is the discipline of making sure your company is one of the names that answer includes —
               by understanding what the model reads, who it trusts, and how it decides who to mention first.
@@ -160,7 +160,7 @@ export default function AiSearchSeoPage() {
               Why citation sources matter more than your homepage
             </h2>
             <p className="mt-4 text-muted-foreground">
-              These are the domains AgentRank Radar sees cited most often when AI models justify a recommendation.
+              These are the domains Agent Rank Radar sees cited most often when AI models justify a recommendation.
             </p>
           </div>
 
@@ -237,7 +237,7 @@ export default function AiSearchSeoPage() {
           </Badge>
           <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">See your AI search SEO baseline</h2>
           <p className="mt-4 max-w-lg text-muted-foreground">
-            Enter your company and competitors. AgentRank Radar shows your current AI Visibility Score and exactly which
+            Enter your company and competitors. Agent Rank Radar shows your current AI Visibility Score and exactly which
             content to publish next.
           </p>
           <Button size="lg" className="mt-8" asChild>

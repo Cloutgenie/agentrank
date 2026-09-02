@@ -47,7 +47,7 @@ export default function OpengraphImage() {
               }}
             />
           </div>
-          <div style={{ fontSize: 32, fontWeight: 600 }}>AgentRank Radar</div>
+          <div style={{ fontSize: 32, fontWeight: 600 }}>Agent Rank Radar</div>
         </div>
         <div style={{ fontSize: 56, fontWeight: 700, lineHeight: 1.15, maxWidth: 950 }}>
           The 24/7 Radar for Your AI Answer Visibility

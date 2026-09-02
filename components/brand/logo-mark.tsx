@@ -1,4 +1,4 @@
-/** The AgentRank Radar mark: a dot orbiting a center point, evoking continuous
+/** The Agent Rank Radar mark: a dot orbiting a center point, evoking continuous
  *  24/7 scanning. Center is the brand (violet); the orbiting dot is the radar
  *  signal (teal). Bridges the old violet-only brand into the new palette. */
 export function LogoMark({ className }: { className?: string }) {

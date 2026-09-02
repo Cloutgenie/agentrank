@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const SITE_URL = "https://agentrankradar.com";
-export const SITE_NAME = "AgentRank Radar";
+export const SITE_NAME = "Agent Rank Radar";
 export const SITE_TAGLINE = "The 24/7 Radar for Your AI Answer Visibility";
 
 interface PageMetadataInput {

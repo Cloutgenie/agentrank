@@ -98,7 +98,7 @@ export default function OnboardingPage() {
                 required
                 value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
-                placeholder="AgentRank Radar"
+                placeholder="Agent Rank Radar"
               />
             </div>
 

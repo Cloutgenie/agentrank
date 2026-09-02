@@ -17,7 +17,7 @@ export function MarketingNav() {
       <div className="container flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
           <LogoMark className="h-6 w-6" />
-          AgentRank Radar
+          Agent Rank Radar
         </Link>
 
         <nav className="hidden items-center gap-6 text-sm text-muted-foreground md:flex">
