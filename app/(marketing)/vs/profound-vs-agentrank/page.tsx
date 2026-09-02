@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { VisibilityTrendChart } from "@/components/dashboard/charts/visibility-trend-chart";
-import { demoCompetitorComparison, demoPrompts, demoTrend } from "@/lib/demo-data";
+import { getScoreTrend, getCompetitorComparison, getPromptResults } from "@/lib/queries";
 
 export const revalidate = 86400;
 
@@ -122,7 +122,14 @@ const faqJsonLd = {
   })),
 };
 
-export default function ProfoundVsAgentRankPage() {
+export default async function ProfoundVsAgentRankPage() {
+  const [trend, competitorComparison, promptResults] = await Promise.all([
+    getScoreTrend(),
+    getCompetitorComparison(),
+    getPromptResults(),
+  ]);
+  const trackedPrompts = Array.from(new Set(promptResults.map((r) => r.text))).slice(0, 8);
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
@@ -140,7 +147,7 @@ export default function ProfoundVsAgentRankPage() {
 
           <p className="mt-6 max-w-xl text-balance text-lg text-muted-foreground">
             Side-by-side on pricing, engines, refresh cadence, recommendations, and agency mode — backed by AgentRank
-            tracking the query &quot;AgentRank vs Profound&quot; against the same engines we run for customers.
+            tracking real buyer-intent and comparison prompts across the same four engines we run for customers.
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -217,8 +224,8 @@ export default function ProfoundVsAgentRankPage() {
               How AI currently talks about AgentRank vs Profound
             </h2>
             <p className="mt-4 text-muted-foreground">
-              Live from AgentRank&apos;s own tracker — the same visibility scores and prompt set we use internally,
-              including the comparison query this page targets. Updated daily.
+              Live from AgentRank&apos;s own tracker — the same visibility scores and prompt set we use internally.
+              Refreshes daily.
             </p>
           </div>
 
@@ -227,7 +234,7 @@ export default function ProfoundVsAgentRankPage() {
               <CardContent className="p-6">
                 <h3 className="text-sm font-medium text-muted-foreground">AI Visibility Score trend</h3>
                 <div className="mt-4 h-64">
-                  <VisibilityTrendChart data={demoTrend} />
+                  <VisibilityTrendChart data={trend} />
                 </div>
               </CardContent>
             </Card>
@@ -236,7 +243,7 @@ export default function ProfoundVsAgentRankPage() {
               <CardContent className="p-6">
                 <h3 className="text-sm font-medium text-muted-foreground">Share of tracked mentions</h3>
                 <div className="mt-6 space-y-4">
-                  {demoCompetitorComparison.map((row) => (
+                  {competitorComparison.map((row) => (
                     <div key={row.name} className="flex items-center gap-3">
                       <span className="w-28 shrink-0 text-sm font-medium">{row.isYou ? "AgentRank" : row.name}</span>
                       <div className="h-2 flex-1 overflow-hidden rounded-full bg-secondary">
@@ -263,15 +270,15 @@ export default function ProfoundVsAgentRankPage() {
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">Prompts this comparison actually ranks for</h2>
             <p className="mt-4 text-muted-foreground">
-              These are real shapes from AgentRank&apos;s tracked prompt set — the reason a dedicated comparison URL
-              matters for AI citations, not just Google.
+              Pulled straight from AgentRank&apos;s tracked prompt set — the reason a dedicated comparison URL matters
+              for AI citations, not just Google.
             </p>
           </div>
 
           <div className="mx-auto mt-10 flex max-w-2xl flex-wrap justify-center gap-2">
-            {demoPrompts.map((prompt) => (
-              <Badge key={prompt.id} variant="secondary" className="gap-1.5 px-3 py-1.5 text-sm font-normal">
-                <Search className="h-3 w-3" /> {prompt.text}
+            {trackedPrompts.map((text) => (
+              <Badge key={text} variant="secondary" className="gap-1.5 px-3 py-1.5 text-sm font-normal">
+                <Search className="h-3 w-3" /> {text}
               </Badge>
             ))}
           </div>
