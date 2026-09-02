@@ -106,7 +106,12 @@ export default function ChatGptRankingCheckerPage() {
             </Button>
           </div>
 
-          <p className="mt-4 text-xs text-muted-foreground">No credit card required · Free 14-day trial</p>
+          <p className="mt-4 text-xs text-muted-foreground">
+            No credit card required · Free 14-day trial ·{" "}
+            <Link href="/vs/profound-vs-agentrank" className="underline underline-offset-2 hover:text-foreground">
+              AgentRank vs Profound
+            </Link>
+          </p>
         </div>
       </section>
 

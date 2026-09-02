@@ -17,6 +17,7 @@ const COLUMNS = [
       { href: "/claude-ranking-checker", label: "Claude ranking checker" },
       { href: "/monitor-chatgpt-mentions", label: "Monitor ChatGPT mentions" },
       { href: "/ai-search-seo", label: "AI search SEO guide" },
+      { href: "/vs/profound-vs-agentrank", label: "AgentRank vs Profound" },
       { href: "/best-shopify-apps-ai-visibility", label: "Best Shopify apps (AI visibility)" },
     ],
   },
