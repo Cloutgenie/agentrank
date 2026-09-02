@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Loader2, Plus, X, ArrowRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,16 +9,37 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { GeneratedPrompt } from "@/lib/prompts/generator";
+import { createProjectFromOnboarding } from "@/lib/actions/onboarding";
 
 export default function OnboardingPage() {
+  const router = useRouter();
   const [companyName, setCompanyName] = useState("");
   const [websiteUrl, setWebsiteUrl] = useState("");
   const [industry, setIndustry] = useState("");
   const [competitorInput, setCompetitorInput] = useState("");
   const [competitors, setCompetitors] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
   const [prompts, setPrompts] = useState<GeneratedPrompt[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [createError, setCreateError] = useState<string | null>(null);
+
+  async function handleCreateProject() {
+    setCreateError(null);
+    setIsCreating(true);
+    try {
+      const result = await createProjectFromOnboarding({ companyName, websiteUrl, industry, competitors });
+      if (result.ok) {
+        router.push("/dashboard");
+        return;
+      }
+      setCreateError(result.error);
+    } catch {
+      setCreateError("Couldn't create your project. Try again.");
+    } finally {
+      setIsCreating(false);
+    }
+  }
 
   function addCompetitor() {
     const name = competitorInput.trim();
@@ -165,10 +186,10 @@ export default function OnboardingPage() {
               These will run against ChatGPT, Claude, Gemini, and Perplexity daily. Set your AI provider keys in .env to
               start pulling live results instead of mocked ones — see lib/engines.
             </p>
-            <Button asChild className="w-full">
-              <Link href="/dashboard">
-                Go to dashboard <ArrowRight className="h-4 w-4" />
-              </Link>
+            {createError && <p className="text-sm text-destructive">{createError}</p>}
+            <Button type="button" className="w-full" disabled={isCreating} onClick={handleCreateProject}>
+              {isCreating ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
+              Save and go to dashboard
             </Button>
           </CardContent>
         </Card>

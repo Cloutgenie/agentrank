@@ -1,9 +1,14 @@
+import { redirect } from "next/navigation";
 import { DashboardTopbar } from "@/components/dashboard/topbar";
 import { Card, CardContent } from "@/components/ui/card";
 import { getCitationSummary } from "@/lib/queries";
+import { getCurrentContext } from "@/lib/auth-context";
 
 export default async function CitationsPage() {
-  const citations = await getCitationSummary();
+  const context = await getCurrentContext();
+  if (!context.projectId) redirect("/dashboard/onboarding");
+
+  const citations = await getCitationSummary(context.projectId);
   const maxMentions = Math.max(...citations.map((c) => c.mentions), 1);
 
   return (

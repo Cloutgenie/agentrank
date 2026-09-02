@@ -1,7 +1,9 @@
+import { redirect } from "next/navigation";
 import { DashboardTopbar } from "@/components/dashboard/topbar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { getAlerts } from "@/lib/queries";
+import { getCurrentContext } from "@/lib/auth-context";
 
 const TYPE_VARIANT = {
   visibility_gained: "success",
@@ -13,7 +15,10 @@ const TYPE_VARIANT = {
 } as const;
 
 export default async function AlertsPage() {
-  const alerts = await getAlerts();
+  const context = await getCurrentContext();
+  if (!context.projectId) redirect("/dashboard/onboarding");
+
+  const alerts = await getAlerts(context.orgId);
 
   return (
     <>

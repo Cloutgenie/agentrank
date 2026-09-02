@@ -1,7 +1,9 @@
+import { redirect } from "next/navigation";
 import { DashboardTopbar } from "@/components/dashboard/topbar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { getPromptResults } from "@/lib/queries";
+import { getCurrentContext } from "@/lib/auth-context";
 
 const MENTION_STYLE = {
   top_pick: { label: "Top pick", variant: "success" as const },
@@ -11,7 +13,10 @@ const MENTION_STYLE = {
 };
 
 export default async function PromptsPage() {
-  const results = await getPromptResults();
+  const context = await getCurrentContext();
+  if (!context.projectId) redirect("/dashboard/onboarding");
+
+  const results = await getPromptResults(context.projectId);
   const promptCount = new Set(results.map((r) => r.text)).size;
 
   return (

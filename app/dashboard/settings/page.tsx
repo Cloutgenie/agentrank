@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { DashboardTopbar } from "@/components/dashboard/topbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { getProject, getSubscription } from "@/lib/queries";
 import { createCheckoutSession, createPortalSession } from "@/lib/actions/stripe";
 import { PLAN_PRICE_IDS } from "@/lib/stripe";
+import { getCurrentContext } from "@/lib/auth-context";
 
 const PLANS = [
   { tier: "starter" as const, name: "Starter", price: 29 },
@@ -19,7 +21,14 @@ export default async function SettingsPage({
 }: {
   searchParams: Promise<{ checkout?: string; billing_error?: string }>;
 }) {
-  const [project, subscription, params] = await Promise.all([getProject(), getSubscription(), searchParams]);
+  const context = await getCurrentContext();
+  if (!context.projectId) redirect("/dashboard/onboarding");
+
+  const [project, subscription, params] = await Promise.all([
+    getProject(context.projectId),
+    getSubscription(context.orgId),
+    searchParams,
+  ]);
   const hasActiveSubscription = subscription.status !== "none";
 
   return (

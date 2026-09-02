@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { DashboardTopbar } from "@/components/dashboard/topbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -5,6 +6,7 @@ import { VisibilityTrendChart } from "@/components/dashboard/charts/visibility-t
 import { CompetitorBarChart } from "@/components/dashboard/charts/competitor-bar-chart";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { getOverallScore, getEngineScores, getCompetitorComparison, getScoreTrend, getAlerts } from "@/lib/queries";
+import { getCurrentContext } from "@/lib/auth-context";
 
 function TrendBadge({ value }: { value: number }) {
   const up = value >= 0;
@@ -19,12 +21,15 @@ function TrendBadge({ value }: { value: number }) {
 }
 
 export default async function DashboardOverviewPage() {
+  const context = await getCurrentContext();
+  if (!context.projectId) redirect("/dashboard/onboarding");
+
   const [overallScore, engineScores, competitorComparison, trend, alerts] = await Promise.all([
-    getOverallScore(),
-    getEngineScores(),
-    getCompetitorComparison(),
-    getScoreTrend(),
-    getAlerts(),
+    getOverallScore(context.projectId),
+    getEngineScores(context.projectId),
+    getCompetitorComparison(context.projectId),
+    getScoreTrend(context.projectId),
+    getAlerts(context.orgId),
   ]);
 
   return (

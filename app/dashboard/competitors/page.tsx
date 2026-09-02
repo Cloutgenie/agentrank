@@ -1,12 +1,20 @@
+import { redirect } from "next/navigation";
 import { DashboardTopbar } from "@/components/dashboard/topbar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Plus } from "lucide-react";
 import { getCompetitors, getCompetitorComparison } from "@/lib/queries";
+import { getCurrentContext } from "@/lib/auth-context";
 
 export default async function CompetitorsPage() {
-  const [competitors, competitorComparison] = await Promise.all([getCompetitors(), getCompetitorComparison()]);
+  const context = await getCurrentContext();
+  if (!context.projectId) redirect("/dashboard/onboarding");
+
+  const [competitors, competitorComparison] = await Promise.all([
+    getCompetitors(context.projectId),
+    getCompetitorComparison(context.projectId),
+  ]);
 
   return (
     <>

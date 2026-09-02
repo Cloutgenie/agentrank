@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { DashboardTopbar } from "@/components/dashboard/topbar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,12 +8,19 @@ import { getRecommendations, getRecommendationOutcomes } from "@/lib/queries";
 import { launchCursorAgent, refreshCursorAgentStatus } from "@/lib/actions/cursor";
 import { markRecommendationActioned, captureRecommendationResult } from "@/lib/actions/recommendations";
 import { isCursorConfigured } from "@/lib/cursor";
+import { getCurrentContext } from "@/lib/auth-context";
 import { GitPullRequest, TrendingUp, TrendingDown, Minus } from "lucide-react";
 
 const IMPACT_VARIANT = { high: "destructive", medium: "outline", low: "secondary" } as const;
 
 export default async function RecommendationsPage() {
-  const [recommendations, outcomes] = await Promise.all([getRecommendations(), getRecommendationOutcomes()]);
+  const context = await getCurrentContext();
+  if (!context.projectId) redirect("/dashboard/onboarding");
+
+  const [recommendations, outcomes] = await Promise.all([
+    getRecommendations(context.projectId),
+    getRecommendationOutcomes(context.projectId),
+  ]);
   const outcomeByRecId = new Map(outcomes.map((o) => [o.recommendationId, o]));
 
   return (

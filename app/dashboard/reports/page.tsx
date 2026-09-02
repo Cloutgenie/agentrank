@@ -1,15 +1,22 @@
+import { redirect } from "next/navigation";
 import { DashboardTopbar } from "@/components/dashboard/topbar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
+import { getCurrentContext } from "@/lib/auth-context";
 
+// Placeholder content — report generation isn't wired to real data yet
+// (no `reports` table query exists), separate from the multi-tenancy pass.
 const REPORTS = [
   { id: "1", label: "Week of Aug 25 – Sep 1", type: "Weekly" },
   { id: "2", label: "Week of Aug 18 – Aug 24", type: "Weekly" },
   { id: "3", label: "August 2026", type: "Monthly" },
 ];
 
-export default function ReportsPage() {
+export default async function ReportsPage() {
+  const context = await getCurrentContext();
+  if (!context.projectId) redirect("/dashboard/onboarding");
+
   return (
     <>
       <DashboardTopbar title="Reports" />
