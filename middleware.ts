@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-const isProtectedRoute = createRouteMatcher(["/dashboard(.*)", "/api/((?!webhooks|prompts/generate).*)"]);
+const isProtectedRoute = createRouteMatcher(["/dashboard(.*)", "/api/((?!webhooks|prompts/generate|cron).*)"]);
 
 // Clerk isn't wired to real keys until you add them to .env — running the
 // middleware without keys throws on every request, which would make the
