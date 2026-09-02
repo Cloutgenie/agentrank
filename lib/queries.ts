@@ -216,20 +216,34 @@ export async function getRecommendations(projectId = DEMO_PROJECT_ID) {
     const supabase = createServiceClient();
     const { data, error } = await supabase
       .from("recommendations")
-      .select("id, title, description, category, impact_estimate")
+      .select("id, title, description, category, impact_estimate, cursor_agent_id, cursor_status, cursor_pr_url")
       .eq("project_id", projectId)
       .eq("status", "open")
       .order("created_at", { ascending: false });
     if (error) throw error;
     if (!data?.length) return demo.demoRecommendations;
 
-    return data.map((r: { id: string; title: string; description: string; category: string; impact_estimate: string | null }) => ({
-      id: r.id,
-      title: r.title,
-      description: r.description,
-      category: r.category as (typeof demo.demoRecommendations)[number]["category"],
-      impact: (r.impact_estimate ?? "medium") as "high" | "medium" | "low",
-    }));
+    return data.map(
+      (r: {
+        id: string;
+        title: string;
+        description: string;
+        category: string;
+        impact_estimate: string | null;
+        cursor_agent_id: string | null;
+        cursor_status: string | null;
+        cursor_pr_url: string | null;
+      }) => ({
+        id: r.id,
+        title: r.title,
+        description: r.description,
+        category: r.category as (typeof demo.demoRecommendations)[number]["category"],
+        impact: (r.impact_estimate ?? "medium") as "high" | "medium" | "low",
+        cursorAgentId: r.cursor_agent_id,
+        cursorStatus: r.cursor_status,
+        cursorPrUrl: r.cursor_pr_url,
+      })
+    );
   });
 }
 

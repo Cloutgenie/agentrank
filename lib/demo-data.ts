@@ -89,6 +89,9 @@ export const demoRecommendations = [
     description: "You're mentioned alongside Profound in 12 prompts but don't have a page targeting that comparison.",
     category: "comparison_page" as const,
     impact: "high" as const,
+    cursorAgentId: null as string | null,
+    cursorStatus: null as string | null,
+    cursorPrUrl: null as string | null,
   },
   {
     id: "r2",
@@ -96,6 +99,9 @@ export const demoRecommendations = [
     description: "Reddit is cited in 34% of answers where a competitor is recommended over you.",
     category: "reddit_presence" as const,
     impact: "high" as const,
+    cursorAgentId: null as string | null,
+    cursorStatus: null as string | null,
+    cursorPrUrl: null as string | null,
   },
   {
     id: "r3",
@@ -103,6 +109,9 @@ export const demoRecommendations = [
     description: '"What is AI visibility" and similar definitional prompts currently favor Otterly.AI.',
     category: "glossary" as const,
     impact: "medium" as const,
+    cursorAgentId: null as string | null,
+    cursorStatus: null as string | null,
+    cursorPrUrl: null as string | null,
   },
 ];
 
