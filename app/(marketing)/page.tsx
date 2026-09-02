@@ -3,6 +3,18 @@ import { ArrowRight, Check, TrendingUp, TrendingDown, Quote, Sparkles } from "lu
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { pageMetadata } from "@/lib/seo";
+
+const HOME_TITLE = "AgentRank.ai — Track your brand's AI search visibility";
+const HOME_DESCRIPTION =
+  "AgentRank tracks how often ChatGPT, Claude, Gemini, and Perplexity recommend your company vs. competitors — and tells you what content to publish to win.";
+
+export const metadata = {
+  ...pageMetadata({ title: HOME_TITLE, description: HOME_DESCRIPTION, path: "/" }),
+  // The homepage's title already carries the "AgentRank.ai" brand name, so it
+  // must skip the layout's "%s · AgentRank.ai" template to avoid duplicating it.
+  title: { absolute: HOME_TITLE },
+};
 
 const ENGINES = ["ChatGPT", "Claude", "Gemini", "Perplexity"];
 

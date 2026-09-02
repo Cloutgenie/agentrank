@@ -1,15 +1,17 @@
 import Link from "next/link";
-import type { Metadata } from "next";
 import { ArrowRight, ShoppingBag, TrendingUp, TrendingDown, Minus, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { pageMetadata } from "@/lib/seo";
+import { FaqJsonLd } from "@/components/seo/json-ld";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Best Shopify Apps for AI Visibility (2026 Leaderboard)",
   description:
     "Which Shopify apps get recommended most often by ChatGPT, Claude, Gemini, and Perplexity? An illustrative AI visibility leaderboard for the Shopify app ecosystem, tracked by AgentRank.",
-};
+  path: "/best-shopify-apps-ai-visibility",
+});
 
 const LEADERBOARD = [
   { rank: 1, name: "CartLift", category: "Cart recovery & upsells", score: 61, trend: "up" as const, chatgpt: 64, claude: 58, perplexity: 66 },
@@ -67,6 +69,7 @@ const TREND_ICON = {
 export default function BestShopifyAppsAiVisibilityPage() {
   return (
     <>
+      <FaqJsonLd faq={FAQ} />
       <section className="relative overflow-hidden border-b border-border/60 bg-grid">
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-background" />
         <div className="container relative flex flex-col items-center py-24 text-center md:py-32">

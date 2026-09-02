@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
 import { Mail } from "lucide-react";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Contact",
   description: "Get in touch with the AgentRank team.",
-};
+  path: "/contact",
+});
 
 export default function ContactPage() {
   return (

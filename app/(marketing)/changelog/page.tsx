@@ -1,9 +1,10 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Changelog",
   description: "What's new in AgentRank.",
-};
+  path: "/changelog",
+});
 
 const ENTRIES = [
   {

@@ -1,9 +1,10 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "About",
   description: "Why we built AgentRank.",
-};
+  path: "/about",
+});
 
 export default function AboutPage() {
   return (

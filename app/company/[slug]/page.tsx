@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MarketingNav } from "@/components/marketing/nav";
 import { MarketingFooter } from "@/components/marketing/footer";
+import { pageMetadata } from "@/lib/seo";
 
 type CompanyPageProps = {
   params: Promise<{ slug: string }>;
@@ -42,10 +43,11 @@ export async function generateMetadata({ params }: CompanyPageProps): Promise<Me
   const { slug } = await params;
   const companyName = titleCaseSlug(slug);
 
-  return {
+  return pageMetadata({
     title: `${companyName} AI Visibility Report — ChatGPT, Claude, Gemini & Perplexity`,
     description: `See how often ChatGPT, Claude, Gemini, and Perplexity mention ${companyName} in AI search answers, with a per-engine visibility breakdown and trend.`,
-  };
+    path: `/company/${slug}`,
+  });
 }
 
 export default async function CompanyPage({ params }: CompanyPageProps) {

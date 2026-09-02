@@ -1,15 +1,17 @@
 import Link from "next/link";
-import type { Metadata } from "next";
 import { ArrowRight, Bell, TrendingUp, TrendingDown, Sparkles, Mail, Slack } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { pageMetadata } from "@/lib/seo";
+import { FaqJsonLd } from "@/components/seo/json-ld";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Monitor ChatGPT Mentions — Weekly AI Visibility Alerts",
   description:
     "Stop checking ChatGPT by hand. AgentRank monitors your ChatGPT mentions continuously and sends weekly alerts the moment you lose visibility or a competitor overtakes you.",
-};
+  path: "/monitor-chatgpt-mentions",
+});
 
 const ALERTS = [
   {
@@ -88,6 +90,7 @@ const FAQ = [
 export default function MonitorChatGptMentionsPage() {
   return (
     <>
+      <FaqJsonLd faq={FAQ} />
       <section className="relative overflow-hidden border-b border-border/60 bg-grid">
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-background" />
         <div className="container relative flex flex-col items-center py-24 text-center md:py-32">

@@ -1,15 +1,17 @@
 import Link from "next/link";
-import type { Metadata } from "next";
 import { ArrowRight, BookOpen, Sparkles, MessageSquare, Star, Users2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { pageMetadata } from "@/lib/seo";
+import { FaqJsonLd } from "@/components/seo/json-ld";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "AI Search SEO — A Practical Guide to AEO & GEO",
   description:
     "What AI search SEO (AEO/GEO) actually means, how it differs from traditional SEO, why citation sources like Reddit and G2 matter, and how to start optimizing for ChatGPT, Claude, Gemini, and Perplexity.",
-};
+  path: "/ai-search-seo",
+});
 
 const COMPARISON_ROWS = [
   { dimension: "What you're optimizing for", seo: "Ranking position in a list of 10 blue links", aeo: "Being named inside a single generated answer" },
@@ -72,6 +74,7 @@ const FAQ = [
 export default function AiSearchSeoPage() {
   return (
     <>
+      <FaqJsonLd faq={FAQ} />
       <section className="relative overflow-hidden border-b border-border/60 bg-grid">
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-background" />
         <div className="container relative flex flex-col items-center py-24 text-center md:py-32">

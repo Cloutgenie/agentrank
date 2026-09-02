@@ -1,15 +1,17 @@
 import Link from "next/link";
-import type { Metadata } from "next";
 import { ArrowRight, Search, Bot, Quote as QuoteMark, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { pageMetadata } from "@/lib/seo";
+import { FaqJsonLd } from "@/components/seo/json-ld";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "ChatGPT Ranking Checker — See If ChatGPT Recommends Your Company",
   description:
     "Check whether ChatGPT mentions your company for the searches that matter, benchmark your position against competitors, and track it automatically with AgentRank's ChatGPT ranking checker.",
-};
+  path: "/chatgpt-ranking-checker",
+});
 
 const EXAMPLE_PROMPTS = [
   "best project management software for remote teams",
@@ -79,6 +81,7 @@ const FAQ = [
 export default function ChatGptRankingCheckerPage() {
   return (
     <>
+      <FaqJsonLd faq={FAQ} />
       <section className="relative overflow-hidden border-b border-border/60 bg-grid">
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-background" />
         <div className="container relative flex flex-col items-center py-24 text-center md:py-32">

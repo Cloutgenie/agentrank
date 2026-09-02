@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
 import { ShieldCheck, Lock, Database, KeyRound } from "lucide-react";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Security",
   description: "How AgentRank protects your account and data.",
-};
+  path: "/security",
+});
 
 const PRACTICES = [
   {

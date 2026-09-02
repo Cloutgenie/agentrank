@@ -3,6 +3,15 @@ import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { pageMetadata } from "@/lib/seo";
+import { FaqJsonLd, SoftwareApplicationJsonLd } from "@/components/seo/json-ld";
+
+export const metadata = pageMetadata({
+  title: "Pricing",
+  description:
+    "Simple pricing that scales with your visibility. Starter, Growth, and Agency plans, each with a 3-day free trial and no credit card required.",
+  path: "/pricing",
+});
 
 const PLANS = [
   {
@@ -77,6 +86,9 @@ const FAQ = [
 export default function PricingPage() {
   return (
     <div className="container py-24">
+      <SoftwareApplicationJsonLd />
+      <FaqJsonLd faq={FAQ} />
+
       <div className="mx-auto max-w-2xl text-center">
         <h1 className="text-4xl font-semibold tracking-tight">Simple pricing that scales with your visibility</h1>
         <p className="mt-4 text-muted-foreground">3-day free trial on every plan. Cancel anytime.</p>

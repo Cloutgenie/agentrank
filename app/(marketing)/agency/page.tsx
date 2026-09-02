@@ -1,12 +1,13 @@
 import Link from "next/link";
-import type { Metadata } from "next";
 import { Check, Users, FileBarChart, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Agency Mode",
   description: "Manage AI search visibility for every client from one dashboard, with white-label reports.",
-};
+  path: "/agency",
+});
 
 const FEATURES = [
   {
