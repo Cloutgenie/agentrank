@@ -2,6 +2,7 @@ import Link from "next/link";
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { isClerkConfigured } from "@/lib/clerk-configured";
+import { LogoMark } from "@/components/brand/logo-mark";
 
 const LINKS = [
   { href: "/#features", label: "Features" },
@@ -15,9 +16,7 @@ export function MarketingNav() {
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur">
       <div className="container flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
-          <span className="flex h-6 w-6 items-center justify-center rounded bg-primary text-xs font-bold text-primary-foreground">
-            A
-          </span>
+          <LogoMark className="h-6 w-6" />
           AgentRank Radar
         </Link>
 

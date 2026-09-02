@@ -29,13 +29,23 @@ export default function OpengraphImage() {
               width: 56,
               height: 56,
               borderRadius: 12,
-              backgroundColor: "#6366f1",
-              color: "#fafafa",
-              fontSize: 28,
-              fontWeight: 700,
+              backgroundColor: "#8163F8",
+              position: "relative",
             }}
           >
-            A
+            <div style={{ width: 14, height: 14, borderRadius: "50%", backgroundColor: "#ffffff", display: "flex" }} />
+            <div
+              style={{
+                position: "absolute",
+                top: 9,
+                right: 9,
+                width: 10,
+                height: 10,
+                borderRadius: "50%",
+                backgroundColor: "#25D0A8",
+                display: "flex",
+              }}
+            />
           </div>
           <div style={{ fontSize: 32, fontWeight: 600 }}>AgentRank Radar</div>
         </div>

@@ -13,6 +13,7 @@ import {
   Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { LogoMark } from "@/components/brand/logo-mark";
 
 const NAV = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
@@ -34,9 +35,7 @@ export function DashboardSidebar() {
         href="/"
         className="flex h-16 items-center gap-2 border-b border-border/60 px-6 font-semibold tracking-tight"
       >
-        <span className="flex h-6 w-6 items-center justify-center rounded bg-primary text-xs font-bold text-primary-foreground">
-          A
-        </span>
+        <LogoMark className="h-6 w-6" />
         AgentRank Radar
       </Link>
 

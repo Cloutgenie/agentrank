@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LogoMark } from "@/components/brand/logo-mark";
 
 const COLUMNS = [
   {
@@ -45,9 +46,7 @@ export function MarketingFooter() {
       <div className="container grid gap-10 py-16 md:grid-cols-5">
         <div className="md:col-span-1">
           <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
-            <span className="flex h-6 w-6 items-center justify-center rounded bg-primary text-xs font-bold text-primary-foreground">
-              A
-            </span>
+            <LogoMark className="h-6 w-6" />
             AgentRank Radar
           </Link>
           <p className="mt-3 text-sm text-muted-foreground">The 24/7 radar for your AI answer visibility.</p>
