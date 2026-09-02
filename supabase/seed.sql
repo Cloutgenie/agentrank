@@ -11,7 +11,17 @@ insert into projects (id, organization_id, name, slug, website_url, industry) va
 insert into competitors (project_id, name, website_url, is_primary) values
   ('00000000-0000-0000-0000-000000000010', 'Profound', 'https://tryprofound.com', true),
   ('00000000-0000-0000-0000-000000000010', 'Otterly.AI', 'https://otterly.ai', false),
-  ('00000000-0000-0000-0000-000000000010', 'Peec AI', 'https://peec.ai', false);
+  ('00000000-0000-0000-0000-000000000010', 'Peec AI', 'https://peec.ai', false),
+  -- Discovered from real prompt_results (see supabase/migrations + the
+  -- runProjectPrompts() pass run against live engines) — these came back as
+  -- named, dedicated AI-visibility competitors across multiple engines when
+  -- AgentRank itself was invisible in the real results.
+  ('00000000-0000-0000-0000-000000000010', 'SE Ranking', 'https://seranking.com', false),
+  ('00000000-0000-0000-0000-000000000010', 'Semrush', 'https://semrush.com', false),
+  ('00000000-0000-0000-0000-000000000010', 'Rankability', 'https://rankability.com', false),
+  ('00000000-0000-0000-0000-000000000010', 'Omnia', 'https://useomnia.com', false),
+  ('00000000-0000-0000-0000-000000000010', 'AIclicks', 'https://aiclicks.io', false),
+  ('00000000-0000-0000-0000-000000000010', 'Dageno AI', 'https://dageno.ai', false);
 
 insert into prompts (project_id, text, category, source) values
   ('00000000-0000-0000-0000-000000000010', 'best AI search visibility tracking tool', 'category', 'auto_generated'),
