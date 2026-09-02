@@ -28,6 +28,7 @@ const COLUMNS = [
       { href: "/blog", label: "Blog" },
       { href: "/careers", label: "Careers" },
       { href: "/contact", label: "Contact" },
+      { href: "https://trustmrr.com/?ref=jay-gauthier-the-m-78c3bb", label: "Buy/sell your SaaS", external: true },
     ],
   },
   {
@@ -56,13 +57,26 @@ export function MarketingFooter() {
           <div key={col.title}>
             <h4 className="text-sm font-medium">{col.title}</h4>
             <ul className="mt-3 space-y-2">
-              {col.links.map((link) => (
-                <li key={link.href}>
-                  <Link href={link.href} className="text-sm text-muted-foreground hover:text-foreground">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
+              {col.links.map((link) =>
+                "external" in link && link.external ? (
+                  <li key={link.href}>
+                    <a
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer sponsored"
+                      className="text-sm text-muted-foreground hover:text-foreground"
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ) : (
+                  <li key={link.href}>
+                    <Link href={link.href} className="text-sm text-muted-foreground hover:text-foreground">
+                      {link.label}
+                    </Link>
+                  </li>
+                )
+              )}
             </ul>
           </div>
         ))}
