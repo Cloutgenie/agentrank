@@ -30,12 +30,15 @@ export function DashboardSidebar() {
 
   return (
     <aside className="hidden w-60 shrink-0 border-r border-border/60 bg-card/40 md:block">
-      <div className="flex h-16 items-center gap-2 border-b border-border/60 px-6 font-semibold tracking-tight">
+      <Link
+        href="/"
+        className="flex h-16 items-center gap-2 border-b border-border/60 px-6 font-semibold tracking-tight"
+      >
         <span className="flex h-6 w-6 items-center justify-center rounded bg-primary text-xs font-bold text-primary-foreground">
           A
         </span>
         AgentRank
-      </div>
+      </Link>
 
       <nav className="space-y-1 p-3">
         {NAV.map(({ href, label, icon: Icon }) => {
