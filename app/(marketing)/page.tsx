@@ -56,6 +56,11 @@ export default async function HomePage() {
   ]);
   const latestDate = trend.at(-1)?.date ?? null;
   const isRealData = isSupabaseServiceConfigured;
+  // Only feature the live score once it has something worth showing — a
+  // brand-new project (or one that just changed names) can have a real but
+  // uninformative 0 for a day or two before AI models catch up. Re-appears
+  // automatically once real tracking picks up mentions again.
+  const hasTrackedSignal = (trend.at(-1)?.score ?? 0) > 0;
 
   return (
     <>
@@ -99,36 +104,38 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="border-b border-border/60 py-20">
-        <div className="container">
-          <Card className="mx-auto max-w-2xl">
-            <CardContent className="p-8">
-              <div className="flex items-center justify-between gap-4">
-                <h3 className="text-sm font-medium text-muted-foreground">
-                  {isRealData ? "Agent Rank Radar's own AI Visibility Score — real, tracked daily" : "Illustrative example"}
-                </h3>
-                {latestDate && <span className="shrink-0 text-xs text-muted-foreground">As of {latestDate}</span>}
-              </div>
-              <div className="mt-6 h-48">
-                <VisibilityTrendChart data={trend} />
-              </div>
-              <div className="mt-6 grid grid-cols-2 gap-4 border-t border-border pt-4 sm:grid-cols-4">
-                {engineScores.map((engine) => (
-                  <div key={engine.engine}>
-                    <p className="text-xs text-muted-foreground">{engine.label}</p>
-                    <p className="text-lg font-semibold tabular-nums">{engine.score}</p>
-                  </div>
-                ))}
-              </div>
-              <p className="mt-6 text-xs text-muted-foreground">
-                {isRealData
-                  ? "This is our own real score — produced by querying ChatGPT, Claude, Gemini, and Perplexity daily, the same tracking every customer gets. It moves, including down, because that's what actually happens."
-                  : "Sign up to see your own real, tracked score across all four engines."}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
+      {hasTrackedSignal && (
+        <section className="border-b border-border/60 py-20">
+          <div className="container">
+            <Card className="mx-auto max-w-2xl">
+              <CardContent className="p-8">
+                <div className="flex items-center justify-between gap-4">
+                  <h3 className="text-sm font-medium text-muted-foreground">
+                    {isRealData ? "Agent Rank Radar's own AI Visibility Score — real, tracked daily" : "Illustrative example"}
+                  </h3>
+                  {latestDate && <span className="shrink-0 text-xs text-muted-foreground">As of {latestDate}</span>}
+                </div>
+                <div className="mt-6 h-48">
+                  <VisibilityTrendChart data={trend} />
+                </div>
+                <div className="mt-6 grid grid-cols-2 gap-4 border-t border-border pt-4 sm:grid-cols-4">
+                  {engineScores.map((engine) => (
+                    <div key={engine.engine}>
+                      <p className="text-xs text-muted-foreground">{engine.label}</p>
+                      <p className="text-lg font-semibold tabular-nums">{engine.score}</p>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-6 text-xs text-muted-foreground">
+                  {isRealData
+                    ? "This is our own real score — produced by querying ChatGPT, Claude, Gemini, and Perplexity daily, the same tracking every customer gets. It moves, including down, because that's what actually happens."
+                    : "Sign up to see your own real, tracked score across all four engines."}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+      )}
 
       <section id="features" className="border-b border-border/60 py-24">
         <div className="container">
