@@ -56,7 +56,6 @@ const PLANS = [
       "Unlimited client projects",
       "2,500 tracked prompts",
       "White-label reports",
-      "Client dashboard access",
       "Monthly automated reports",
       "Priority support",
       "Custom onboarding",
@@ -79,7 +78,7 @@ const FAQ = [
   },
   {
     q: "Do you offer an annual discount?",
-    a: "Yes, annual billing saves 20% on any plan. Toggle it at checkout.",
+    a: "Not yet — every plan is billed monthly today. Annual billing is on the roadmap once we've got more usage data to price it against.",
   },
 ];
 

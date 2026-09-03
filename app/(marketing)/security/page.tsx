@@ -11,7 +11,7 @@ const PRACTICES = [
   {
     icon: KeyRound,
     title: "Authentication",
-    body: "Sign-in is handled by Clerk, with support for email/password and Google OAuth. We never store your password ourselves.",
+    body: "Sign-in is handled by Clerk, with email and password. We never store your password ourselves.",
   },
   {
     icon: Database,

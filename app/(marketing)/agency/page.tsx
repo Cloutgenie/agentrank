@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Check, Users, FileBarChart, Building2 } from "lucide-react";
+import { Check, FileBarChart, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { pageMetadata } from "@/lib/seo";
 
@@ -19,11 +19,6 @@ const FEATURES = [
     icon: FileBarChart,
     title: "White-label reports",
     body: "Export reports with your agency's branding, not ours. Clients see a report you built, not a tool they've never heard of.",
-  },
-  {
-    icon: Users,
-    title: "Client dashboard access",
-    body: "Give clients read-only access to their own project dashboard when you want them to see the data directly.",
   },
 ];
 
@@ -60,7 +55,6 @@ export default function AgencyPage() {
             "Unlimited client projects",
             "2,500 tracked prompts",
             "White-label reports",
-            "Client dashboard access",
             "Monthly automated reports",
             "Priority support",
             "Custom onboarding",
