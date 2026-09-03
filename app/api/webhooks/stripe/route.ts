@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { stripe, planTierForPrice } from "@/lib/stripe";
 import { createServiceClient } from "@/lib/supabase/server";
+import { PLAN_LIMITS, limitOrSentinel } from "@/lib/plan-limits";
 
 /**
  * Keeps our `subscriptions` and `organizations.stripe_customer_id` rows in
@@ -49,6 +50,7 @@ export async function POST(request: Request) {
       const planTier = priceId ? planTierForPrice(priceId) : null;
 
       if (organizationId && planTier) {
+        const limits = PLAN_LIMITS[planTier];
         await supabase.from("subscriptions").upsert(
           {
             organization_id: organizationId,
@@ -60,6 +62,8 @@ export async function POST(request: Request) {
             current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
             current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
             cancel_at_period_end: subscription.cancel_at_period_end,
+            projects_limit: limitOrSentinel(limits.projects),
+            prompts_limit: limitOrSentinel(limits.prompts),
           },
           { onConflict: "stripe_subscription_id" }
         );

@@ -1,9 +1,12 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { createServiceClient } from "@/lib/supabase/server";
 import { getCurrentContext } from "@/lib/auth-context";
 import { generateBuyerIntentPrompts } from "@/lib/prompts/generator";
 import { slugify } from "@/lib/utils";
+
+const ACTIVE_PROJECT_COOKIE = "active_project_id";
 
 interface CreateProjectInput {
   companyName: string;
@@ -26,7 +29,11 @@ interface CreateProjectInput {
  */
 export async function createProjectFromOnboarding(input: CreateProjectInput): Promise<{ ok: true } | { ok: false; error: string }> {
   const context = await getCurrentContext();
-  if (context.isDemo || context.projectId) return { ok: true };
+  if (context.isDemo) return { ok: true };
+
+  if (context.projects.length >= context.projectsLimit) {
+    return { ok: false, error: "You've reached your plan's project limit. Upgrade to add another." };
+  }
 
   const supabase = createServiceClient();
   const baseSlug = slugify(input.companyName) || "project";
@@ -75,6 +82,15 @@ export async function createProjectFromOnboarding(input: CreateProjectInput): Pr
       }))
     );
   }
+
+  // Land the user on the project they just created, not whichever project
+  // was previously active — relevant once an org has more than one.
+  const cookieStore = await cookies();
+  cookieStore.set(ACTIVE_PROJECT_COOKIE, project.id, {
+    httpOnly: true,
+    sameSite: "lax",
+    maxAge: 60 * 60 * 24 * 365,
+  });
 
   return { ok: true };
 }

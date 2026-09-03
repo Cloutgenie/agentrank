@@ -20,6 +20,8 @@ export interface SubscriptionInfo {
   stripeCustomerId: string | null;
   currentPeriodEnd: string | null;
   cancelAtPeriodEnd: boolean;
+  /** From subscriptions.projects_limit, or the Starter default when there's no subscription row yet. */
+  projectsLimit: number;
 }
 
 export const demoSubscription: SubscriptionInfo = {
@@ -28,6 +30,7 @@ export const demoSubscription: SubscriptionInfo = {
   stripeCustomerId: null,
   currentPeriodEnd: null,
   cancelAtPeriodEnd: false,
+  projectsLimit: 3,
 };
 
 export const demoCompetitors = [

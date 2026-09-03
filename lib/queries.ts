@@ -1,6 +1,7 @@
 import { createServiceClient, isSupabaseServiceConfigured } from "@/lib/supabase/server";
 import { computeVisibilityScore } from "@/lib/scoring";
 import type { EngineSlug, MentionedEntity, MentionType } from "@/lib/types";
+import { PLAN_LIMITS, limitOrSentinel } from "@/lib/plan-limits";
 import * as demo from "@/lib/demo-data";
 
 // There's no Clerk session (and no project switcher UI) yet, so every query
@@ -328,7 +329,7 @@ export async function getSubscription(organizationId = DEMO_ORG_ID) {
 
     const { data: sub, error: subError } = await supabase
       .from("subscriptions")
-      .select("plan_tier, status, current_period_end, cancel_at_period_end")
+      .select("plan_tier, status, current_period_end, cancel_at_period_end, projects_limit")
       .eq("organization_id", organizationId)
       .order("created_at", { ascending: false })
       .limit(1)
@@ -342,6 +343,7 @@ export async function getSubscription(organizationId = DEMO_ORG_ID) {
         stripeCustomerId: org?.stripe_customer_id ?? null,
         currentPeriodEnd: null,
         cancelAtPeriodEnd: false,
+        projectsLimit: limitOrSentinel(PLAN_LIMITS.starter.projects),
       };
     }
 
@@ -351,6 +353,7 @@ export async function getSubscription(organizationId = DEMO_ORG_ID) {
       stripeCustomerId: org?.stripe_customer_id ?? null,
       currentPeriodEnd: sub.current_period_end,
       cancelAtPeriodEnd: sub.cancel_at_period_end,
+      projectsLimit: sub.projects_limit,
     };
   });
 }

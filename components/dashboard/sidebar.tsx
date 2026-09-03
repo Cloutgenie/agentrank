@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LogoMark } from "@/components/brand/logo-mark";
+import { ProjectSwitcher } from "@/components/dashboard/project-switcher";
 
 const NAV = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
@@ -26,7 +27,13 @@ const NAV = [
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
-export function DashboardSidebar() {
+interface DashboardSidebarProps {
+  projects: { id: string; name: string }[];
+  activeProjectId: string | null;
+  projectsLimit: number;
+}
+
+export function DashboardSidebar({ projects, activeProjectId, projectsLimit }: DashboardSidebarProps) {
   const pathname = usePathname();
 
   return (
@@ -38,6 +45,8 @@ export function DashboardSidebar() {
         <LogoMark className="h-6 w-6" />
         Agent Rank Radar
       </Link>
+
+      <ProjectSwitcher projects={projects} activeProjectId={activeProjectId} projectsLimit={projectsLimit} />
 
       <nav className="space-y-1 p-3">
         {NAV.map(({ href, label, icon: Icon }) => {

@@ -1,15 +1,23 @@
 import { cache } from "react";
+import { cookies } from "next/headers";
 import { currentUser } from "@clerk/nextjs/server";
 import { createServiceClient } from "@/lib/supabase/server";
 import { isClerkConfigured } from "@/lib/clerk-configured";
 import { slugify } from "@/lib/utils";
-import { DEMO_ORG_ID, DEMO_PROJECT_ID } from "@/lib/queries";
+import { DEMO_ORG_ID, DEMO_PROJECT_ID, getSubscription } from "@/lib/queries";
+import { PLAN_LIMITS, limitOrSentinel } from "@/lib/plan-limits";
+
+const ACTIVE_PROJECT_COOKIE = "active_project_id";
 
 export interface CurrentContext {
   userId: string | null;
   orgId: string;
   /** null means the org exists but hasn't onboarded a project yet. */
   projectId: string | null;
+  /** Every non-archived project under the org, oldest first. */
+  projects: { id: string; name: string }[];
+  /** How many projects this org's plan allows; a very large number means unlimited. */
+  projectsLimit: number;
   isDemo: boolean;
 }
 
@@ -23,14 +31,28 @@ export interface CurrentContext {
  */
 export const getCurrentContext = cache(async (): Promise<CurrentContext> => {
   if (!isClerkConfigured) {
-    return { userId: null, orgId: DEMO_ORG_ID, projectId: DEMO_PROJECT_ID, isDemo: true };
+    return {
+      userId: null,
+      orgId: DEMO_ORG_ID,
+      projectId: DEMO_PROJECT_ID,
+      projects: [{ id: DEMO_PROJECT_ID, name: "Agent Rank Radar" }],
+      projectsLimit: limitOrSentinel(PLAN_LIMITS.starter.projects),
+      isDemo: true,
+    };
   }
 
   const user = await currentUser();
   if (!user) {
     // Shouldn't happen — middleware protects every /dashboard route once
     // Clerk is configured — but fall back rather than crash the page.
-    return { userId: null, orgId: DEMO_ORG_ID, projectId: DEMO_PROJECT_ID, isDemo: true };
+    return {
+      userId: null,
+      orgId: DEMO_ORG_ID,
+      projectId: DEMO_PROJECT_ID,
+      projects: [{ id: DEMO_PROJECT_ID, name: "Agent Rank Radar" }],
+      projectsLimit: limitOrSentinel(PLAN_LIMITS.starter.projects),
+      isDemo: true,
+    };
   }
 
   const supabase = createServiceClient();
@@ -57,17 +79,29 @@ export const getCurrentContext = cache(async (): Promise<CurrentContext> => {
     orgId = await createOrgForUser(user.id, fullName ?? email);
   }
 
-  // No project switcher yet (see docs/ROADMAP.md) — the org's first project
-  // is "the" project. Agencies with multiple projects are a v2 concern.
-  const { data: project } = await supabase
-    .from("projects")
-    .select("id")
-    .eq("organization_id", orgId)
-    .order("created_at", { ascending: true })
-    .limit(1)
-    .maybeSingle();
+  const [{ data: projects }, subscription] = await Promise.all([
+    supabase
+      .from("projects")
+      .select("id, name")
+      .eq("organization_id", orgId)
+      .eq("is_archived", false)
+      .order("created_at", { ascending: true }),
+    getSubscription(orgId),
+  ]);
 
-  return { userId: user.id, orgId, projectId: project?.id ?? null, isDemo: false };
+  const projectList = projects ?? [];
+  const cookieStore = await cookies();
+  const activeCookieId = cookieStore.get(ACTIVE_PROJECT_COOKIE)?.value;
+  const activeProject = projectList.find((p: { id: string }) => p.id === activeCookieId) ?? projectList[0];
+
+  return {
+    userId: user.id,
+    orgId,
+    projectId: activeProject?.id ?? null,
+    projects: projectList,
+    projectsLimit: subscription.projectsLimit,
+    isDemo: false,
+  };
 });
 
 async function createOrgForUser(userId: string, displayName: string): Promise<string> {

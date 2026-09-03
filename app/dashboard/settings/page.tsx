@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { getProject, getSubscription } from "@/lib/queries";
 import { createCheckoutSession, createPortalSession } from "@/lib/actions/stripe";
 import { PLAN_PRICE_IDS } from "@/lib/stripe";
+import { isUnlimited } from "@/lib/plan-limits";
 import { getCurrentContext } from "@/lib/auth-context";
 
 const PLANS = [
@@ -68,6 +69,19 @@ export default async function SettingsPage({
               <Input id="industry" defaultValue={project.industry} />
             </div>
             <Button size="sm">Save changes</Button>
+          </CardContent>
+        </Card>
+
+        <Card className="max-w-2xl">
+          <CardHeader>
+            <CardTitle className="text-foreground">Projects</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">
+              {context.projects.length} of {isUnlimited(context.projectsLimit) ? "unlimited" : context.projectsLimit}{" "}
+              projects used
+              {isUnlimited(context.projectsLimit) ? "" : " on your plan"}.
+            </p>
           </CardContent>
         </Card>
 
