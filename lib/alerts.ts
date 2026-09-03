@@ -1,6 +1,6 @@
 import { createServiceClient } from "@/lib/supabase/server";
 import { isResendConfigured, getResendClient, ALERTS_FROM_EMAIL } from "@/lib/email/resend";
-import { SLACK_ELIGIBLE_TIERS } from "@/lib/plan-limits";
+import { GROWTH_PLUS_TIERS } from "@/lib/plan-limits";
 import type { AlertType, MentionedEntity } from "@/lib/types";
 
 // A single day's score swing can be sampling noise from the LLM itself, not
@@ -238,7 +238,7 @@ async function sendToSlackIfEligible(
     .eq("id", input.organizationId)
     .single();
 
-  if (!org?.slack_webhook_url || !SLACK_ELIGIBLE_TIERS.has(org.plan_tier)) return;
+  if (!org?.slack_webhook_url || !GROWTH_PLUS_TIERS.has(org.plan_tier)) return;
 
   try {
     await fetch(org.slack_webhook_url, {

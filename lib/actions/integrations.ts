@@ -3,20 +3,30 @@
 import { revalidatePath } from "next/cache";
 import { createServiceClient } from "@/lib/supabase/server";
 import { getCurrentContext } from "@/lib/auth-context";
+import { GROWTH_PLUS_TIERS } from "@/lib/plan-limits";
 
 const SLACK_WEBHOOK_PREFIX = "https://hooks.slack.com/services/";
 
-/** Saves the org's Slack Incoming Webhook URL — Growth+ only. */
+/**
+ * Saves the org's Slack Incoming Webhook URL — Growth+ only, enforced here
+ * (not just by hiding the form in Settings, which a direct action call
+ * would bypass).
+ */
 export async function saveSlackWebhook(formData: FormData): Promise<{ ok: true } | { ok: false; error: string }> {
   const context = await getCurrentContext();
   if (context.isDemo) return { ok: false, error: "Not available in demo mode." };
+
+  const supabase = createServiceClient();
+  const { data: org } = await supabase.from("organizations").select("plan_tier").eq("id", context.orgId).single();
+  if (!org || !GROWTH_PLUS_TIERS.has(org.plan_tier)) {
+    return { ok: false, error: "Slack alerts are a Growth-plan feature. Upgrade to connect Slack." };
+  }
 
   const url = String(formData.get("webhookUrl") ?? "").trim();
   if (url && !url.startsWith(SLACK_WEBHOOK_PREFIX)) {
     return { ok: false, error: "That doesn't look like a Slack Incoming Webhook URL." };
   }
 
-  const supabase = createServiceClient();
   const { error } = await supabase
     .from("organizations")
     .update({ slack_webhook_url: url || null })

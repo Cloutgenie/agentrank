@@ -1,6 +1,6 @@
 import { createServiceClient, isSupabaseServiceConfigured } from "@/lib/supabase/server";
 import { computeVisibilityScore } from "@/lib/scoring";
-import type { EngineSlug, MentionedEntity, MentionType } from "@/lib/types";
+import type { EngineSlug, MentionedEntity, MentionType, PlanTier } from "@/lib/types";
 import { PLAN_LIMITS, limitOrSentinel } from "@/lib/plan-limits";
 import * as demo from "@/lib/demo-data";
 
@@ -400,17 +400,20 @@ export async function getRecommendationOutcomes(projectId = DEMO_PROJECT_ID): Pr
 }
 
 export async function getOrganizationBranding(organizationId = DEMO_ORG_ID) {
-  return withFallback({ whiteLabelEnabled: false, logoUrl: null as string | null, name: "Agent Rank Radar" }, async () => {
-    const supabase = createServiceClient();
-    const { data, error } = await supabase
-      .from("organizations")
-      .select("name, logo_url, white_label_enabled")
-      .eq("id", organizationId)
-      .single();
-    if (error) throw error;
+  return withFallback(
+    { whiteLabelEnabled: false, logoUrl: null as string | null, name: "Agent Rank Radar", planTier: null as PlanTier | null },
+    async () => {
+      const supabase = createServiceClient();
+      const { data, error } = await supabase
+        .from("organizations")
+        .select("name, logo_url, white_label_enabled, plan_tier")
+        .eq("id", organizationId)
+        .single();
+      if (error) throw error;
 
-    return { whiteLabelEnabled: data.white_label_enabled, logoUrl: data.logo_url, name: data.name };
-  });
+      return { whiteLabelEnabled: data.white_label_enabled, logoUrl: data.logo_url, name: data.name, planTier: data.plan_tier };
+    }
+  );
 }
 
 export async function getSlackIntegration(organizationId = DEMO_ORG_ID) {
@@ -424,6 +427,27 @@ export async function getSlackIntegration(organizationId = DEMO_ORG_ID) {
     if (error) throw error;
 
     return { webhookUrl: data.slack_webhook_url };
+  });
+}
+
+export async function getApiKeys(organizationId = DEMO_ORG_ID) {
+  return withFallback([] as { id: string; name: string; keyPrefix: string; createdAt: string; lastUsedAt: string | null }[], async () => {
+    const supabase = createServiceClient();
+    const { data, error } = await supabase
+      .from("api_keys")
+      .select("id, name, key_prefix, created_at, last_used_at")
+      .eq("organization_id", organizationId)
+      .is("revoked_at", null)
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+
+    return (data ?? []).map((k: { id: string; name: string; key_prefix: string; created_at: string; last_used_at: string | null }) => ({
+      id: k.id,
+      name: k.name,
+      keyPrefix: k.key_prefix,
+      createdAt: k.created_at,
+      lastUsedAt: k.last_used_at,
+    }));
   });
 }
 

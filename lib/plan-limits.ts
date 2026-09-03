@@ -31,7 +31,8 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
   enterprise: { projects: null, prompts: null },
 };
 
-// Slack alerts are Growth+ per the pricing page ("Slack + email alerts").
-// Shared between the Settings UI gate and lib/alerts.ts's delivery check so
-// the two can't drift out of sync.
-export const SLACK_ELIGIBLE_TIERS: ReadonlySet<PlanTier> = new Set(["growth", "agency", "enterprise"]);
+// Slack alerts and API access are both Growth+ per the pricing page
+// ("Slack + email alerts", "API access"). Shared between each feature's
+// Settings UI gate and its own delivery/auth check so they can't drift
+// out of sync with each other.
+export const GROWTH_PLUS_TIERS: ReadonlySet<PlanTier> = new Set(["growth", "agency", "enterprise"]);

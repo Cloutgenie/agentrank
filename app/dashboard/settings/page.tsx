@@ -5,12 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { getProject, getSubscription, getOrganizationBranding, getSlackIntegration } from "@/lib/queries";
+import { getProject, getSubscription, getOrganizationBranding, getSlackIntegration, getApiKeys } from "@/lib/queries";
 import { createCheckoutSession, createPortalSession } from "@/lib/actions/stripe";
 import { uploadOrgLogoForm } from "@/lib/actions/branding";
 import { saveSlackWebhookForm, sendTestSlackMessage } from "@/lib/actions/integrations";
+import { ApiKeyManager } from "@/components/dashboard/api-key-manager";
 import { PLAN_PRICE_IDS } from "@/lib/stripe";
-import { isUnlimited, SLACK_ELIGIBLE_TIERS } from "@/lib/plan-limits";
+import { isUnlimited, GROWTH_PLUS_TIERS } from "@/lib/plan-limits";
 import { getCurrentContext } from "@/lib/auth-context";
 
 const PLANS = [
@@ -27,15 +28,21 @@ export default async function SettingsPage({
   const context = await getCurrentContext();
   if (!context.projectId) redirect("/dashboard/onboarding");
 
-  const [project, subscription, branding, slack, params] = await Promise.all([
+  const [project, subscription, branding, slack, apiKeys, params] = await Promise.all([
     getProject(context.projectId),
     getSubscription(context.orgId),
     getOrganizationBranding(context.orgId),
     getSlackIntegration(context.orgId),
+    getApiKeys(context.orgId),
     searchParams,
   ]);
   const hasActiveSubscription = subscription.status !== "none";
-  const slackEligible = Boolean(subscription.planTier && SLACK_ELIGIBLE_TIERS.has(subscription.planTier));
+  // Gated on organizations.plan_tier, not subscription.planTier — this is
+  // the same column lib/alerts.ts and lib/actions/api-keys.ts actually
+  // enforce against, so the UI can't show a feature the backend then
+  // refuses (the two tables can genuinely diverge, e.g. a manually-set
+  // organizations.plan_tier with no subscriptions row behind it).
+  const growthPlusEligible = Boolean(branding.planTier && GROWTH_PLUS_TIERS.has(branding.planTier));
 
   return (
     <>
@@ -119,7 +126,7 @@ export default async function SettingsPage({
           </Card>
         )}
 
-        {slackEligible && (
+        {growthPlusEligible && (
           <Card className="max-w-2xl">
             <CardHeader>
               <CardTitle className="text-foreground">Slack alerts</CardTitle>
@@ -155,6 +162,24 @@ export default async function SettingsPage({
                   </Button>
                 </form>
               )}
+            </CardContent>
+          </Card>
+        )}
+
+        {growthPlusEligible && (
+          <Card className="max-w-2xl">
+            <CardHeader>
+              <CardTitle className="text-foreground">API access</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="mb-4 text-sm text-muted-foreground">
+                Read your visibility score and competitor comparison programmatically. See{" "}
+                <code className="rounded bg-secondary px-1 py-0.5 text-xs">GET /api/v1/projects</code>,{" "}
+                <code className="rounded bg-secondary px-1 py-0.5 text-xs">GET /api/v1/visibility-score</code>, and{" "}
+                <code className="rounded bg-secondary px-1 py-0.5 text-xs">GET /api/v1/competitors</code>, authenticated
+                via <code className="rounded bg-secondary px-1 py-0.5 text-xs">Authorization: Bearer &lt;key&gt;</code>.
+              </p>
+              <ApiKeyManager keys={apiKeys} />
             </CardContent>
           </Card>
         )}
