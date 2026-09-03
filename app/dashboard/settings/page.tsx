@@ -5,8 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { getProject, getSubscription } from "@/lib/queries";
+import { getProject, getSubscription, getOrganizationBranding } from "@/lib/queries";
 import { createCheckoutSession, createPortalSession } from "@/lib/actions/stripe";
+import { uploadOrgLogoForm } from "@/lib/actions/branding";
 import { PLAN_PRICE_IDS } from "@/lib/stripe";
 import { isUnlimited } from "@/lib/plan-limits";
 import { getCurrentContext } from "@/lib/auth-context";
@@ -25,9 +26,10 @@ export default async function SettingsPage({
   const context = await getCurrentContext();
   if (!context.projectId) redirect("/dashboard/onboarding");
 
-  const [project, subscription, params] = await Promise.all([
+  const [project, subscription, branding, params] = await Promise.all([
     getProject(context.projectId),
     getSubscription(context.orgId),
+    getOrganizationBranding(context.orgId),
     searchParams,
   ]);
   const hasActiveSubscription = subscription.status !== "none";
@@ -84,6 +86,35 @@ export default async function SettingsPage({
             </p>
           </CardContent>
         </Card>
+
+        {branding.whiteLabelEnabled && (
+          <Card className="max-w-2xl">
+            <CardHeader>
+              <CardTitle className="text-foreground">Branding</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Your Agency plan replaces Agent Rank Radar branding with yours on generated PDF reports.
+              </p>
+              {branding.logoUrl && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={branding.logoUrl} alt="Current logo" className="h-10 w-auto rounded border border-border/60 bg-secondary p-1" />
+              )}
+              <form action={uploadOrgLogoForm} className="flex items-center gap-3">
+                <input
+                  type="file"
+                  name="logo"
+                  accept="image/*"
+                  required
+                  className="text-sm text-muted-foreground file:mr-3 file:rounded-md file:border file:border-border file:bg-secondary file:px-3 file:py-1.5 file:text-sm file:font-medium"
+                />
+                <Button size="sm" type="submit">
+                  Upload logo
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        )}
 
         <Card className="max-w-2xl">
           <CardHeader>

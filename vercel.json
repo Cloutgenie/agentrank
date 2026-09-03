@@ -3,6 +3,14 @@
     {
       "path": "/api/cron/run-tracking",
       "schedule": "0 13 * * *"
+    },
+    {
+      "path": "/api/cron/generate-reports",
+      "schedule": "0 14 * * 1"
+    },
+    {
+      "path": "/api/cron/generate-reports?type=monthly",
+      "schedule": "0 15 1 * *"
     }
   ]
 }

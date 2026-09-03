@@ -398,3 +398,39 @@ export async function getRecommendationOutcomes(projectId = DEMO_PROJECT_ID): Pr
     );
   });
 }
+
+export async function getOrganizationBranding(organizationId = DEMO_ORG_ID) {
+  return withFallback({ whiteLabelEnabled: false, logoUrl: null as string | null, name: "Agent Rank Radar" }, async () => {
+    const supabase = createServiceClient();
+    const { data, error } = await supabase
+      .from("organizations")
+      .select("name, logo_url, white_label_enabled")
+      .eq("id", organizationId)
+      .single();
+    if (error) throw error;
+
+    return { whiteLabelEnabled: data.white_label_enabled, logoUrl: data.logo_url, name: data.name };
+  });
+}
+
+export async function getReports(projectId = DEMO_PROJECT_ID) {
+  return withFallback(demo.demoReports, async () => {
+    const supabase = createServiceClient();
+    const { data, error } = await supabase
+      .from("reports")
+      .select("id, report_type, period_start, period_end, pdf_url")
+      .eq("project_id", projectId)
+      .order("period_end", { ascending: false })
+      .limit(20);
+    if (error) throw error;
+    if (!data?.length) return [];
+
+    return data.map((r: { id: string; report_type: string; period_start: string; period_end: string; pdf_url: string | null }) => ({
+      id: r.id,
+      type: r.report_type as (typeof demo.demoReports)[number]["type"],
+      periodStart: r.period_start,
+      periodEnd: r.period_end,
+      pdfUrl: r.pdf_url,
+    }));
+  });
+}

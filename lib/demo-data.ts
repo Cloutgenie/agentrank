@@ -123,3 +123,8 @@ export const demoAlerts = [
   { id: "a2", type: "competitor_overtook" as const, title: "Profound overtook you in Claude", body: 'For "best AI visibility tool for agencies", Profound now ranks above you.', createdAt: "2026-08-27" },
   { id: "a3", type: "visibility_gained" as const, title: "You gained visibility in Perplexity", body: "Mention frequency rose from 58% to 66% this week.", createdAt: "2026-08-25" },
 ];
+
+export const demoReports = [
+  { id: "rep1", type: "weekly" as const, periodStart: "2026-08-25", periodEnd: "2026-09-01", pdfUrl: null as string | null },
+  { id: "rep2", type: "weekly" as const, periodStart: "2026-08-18", periodEnd: "2026-08-24", pdfUrl: null as string | null },
+];

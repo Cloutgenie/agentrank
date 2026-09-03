@@ -67,6 +67,15 @@ export async function POST(request: Request) {
           },
           { onConflict: "stripe_subscription_id" }
         );
+
+        // White-label reports (docs/PRD.md §4.9) gate on this flag, not
+        // plan_tier directly, so a canceled Agency subscription loses
+        // white-labeling immediately rather than on next billing sync.
+        const isActiveAgency = planTier === "agency" && subscription.status !== "canceled" && subscription.status !== "incomplete";
+        await supabase
+          .from("organizations")
+          .update({ is_agency: isActiveAgency, white_label_enabled: isActiveAgency, plan_tier: planTier })
+          .eq("id", organizationId);
       } else {
         console.warn("[stripe webhook] subscription event missing organization_id or unrecognized price:", subscription.id);
       }
