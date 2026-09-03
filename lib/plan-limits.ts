@@ -30,3 +30,8 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
   agency: { projects: null, prompts: 2500 },
   enterprise: { projects: null, prompts: null },
 };
+
+// Slack alerts are Growth+ per the pricing page ("Slack + email alerts").
+// Shared between the Settings UI gate and lib/alerts.ts's delivery check so
+// the two can't drift out of sync.
+export const SLACK_ELIGIBLE_TIERS: ReadonlySet<PlanTier> = new Set(["growth", "agency", "enterprise"]);

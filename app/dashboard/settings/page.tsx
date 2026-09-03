@@ -5,11 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { getProject, getSubscription, getOrganizationBranding } from "@/lib/queries";
+import { getProject, getSubscription, getOrganizationBranding, getSlackIntegration } from "@/lib/queries";
 import { createCheckoutSession, createPortalSession } from "@/lib/actions/stripe";
 import { uploadOrgLogoForm } from "@/lib/actions/branding";
+import { saveSlackWebhookForm, sendTestSlackMessage } from "@/lib/actions/integrations";
 import { PLAN_PRICE_IDS } from "@/lib/stripe";
-import { isUnlimited } from "@/lib/plan-limits";
+import { isUnlimited, SLACK_ELIGIBLE_TIERS } from "@/lib/plan-limits";
 import { getCurrentContext } from "@/lib/auth-context";
 
 const PLANS = [
@@ -26,13 +27,15 @@ export default async function SettingsPage({
   const context = await getCurrentContext();
   if (!context.projectId) redirect("/dashboard/onboarding");
 
-  const [project, subscription, branding, params] = await Promise.all([
+  const [project, subscription, branding, slack, params] = await Promise.all([
     getProject(context.projectId),
     getSubscription(context.orgId),
     getOrganizationBranding(context.orgId),
+    getSlackIntegration(context.orgId),
     searchParams,
   ]);
   const hasActiveSubscription = subscription.status !== "none";
+  const slackEligible = Boolean(subscription.planTier && SLACK_ELIGIBLE_TIERS.has(subscription.planTier));
 
   return (
     <>
@@ -112,6 +115,46 @@ export default async function SettingsPage({
                   Upload logo
                 </Button>
               </form>
+            </CardContent>
+          </Card>
+        )}
+
+        {slackEligible && (
+          <Card className="max-w-2xl">
+            <CardHeader>
+              <CardTitle className="text-foreground">Slack alerts</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Paste an{" "}
+                <a
+                  href="https://api.slack.com/messaging/webhooks"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-foreground underline underline-offset-4"
+                >
+                  Incoming Webhook URL
+                </a>{" "}
+                from your Slack workspace to get visibility and competitor alerts there too.
+              </p>
+              <form action={saveSlackWebhookForm} className="flex items-center gap-3">
+                <Input
+                  name="webhookUrl"
+                  placeholder="https://hooks.slack.com/services/..."
+                  defaultValue={slack.webhookUrl ?? ""}
+                  className="max-w-md"
+                />
+                <Button size="sm" type="submit">
+                  Save
+                </Button>
+              </form>
+              {slack.webhookUrl && (
+                <form action={sendTestSlackMessage}>
+                  <Button size="sm" variant="outline" type="submit">
+                    Send test message
+                  </Button>
+                </form>
+              )}
             </CardContent>
           </Card>
         )}

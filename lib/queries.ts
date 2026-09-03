@@ -413,6 +413,20 @@ export async function getOrganizationBranding(organizationId = DEMO_ORG_ID) {
   });
 }
 
+export async function getSlackIntegration(organizationId = DEMO_ORG_ID) {
+  return withFallback({ webhookUrl: null as string | null }, async () => {
+    const supabase = createServiceClient();
+    const { data, error } = await supabase
+      .from("organizations")
+      .select("slack_webhook_url")
+      .eq("id", organizationId)
+      .single();
+    if (error) throw error;
+
+    return { webhookUrl: data.slack_webhook_url };
+  });
+}
+
 export async function getReports(projectId = DEMO_PROJECT_ID) {
   return withFallback(demo.demoReports, async () => {
     const supabase = createServiceClient();

@@ -1,5 +1,6 @@
 import { createServiceClient } from "@/lib/supabase/server";
 import { isResendConfigured, getResendClient, ALERTS_FROM_EMAIL } from "@/lib/email/resend";
+import { SLACK_ELIGIBLE_TIERS } from "@/lib/plan-limits";
 import type { AlertType, MentionedEntity } from "@/lib/types";
 
 // A single day's score swing can be sampling noise from the LLM itself, not
@@ -194,6 +195,8 @@ async function createAndSendAlert(
     metadata: input.metadata ?? {},
   });
 
+  await sendToSlackIfEligible(supabase, input);
+
   if (!isResendConfigured) return;
 
   const { data: members } = await supabase
@@ -221,5 +224,29 @@ async function createAndSendAlert(
     // above already persisted, so a delivery failure shouldn't be treated
     // as the alert itself having failed.
     console.error(`[alerts] failed to email project ${input.projectId}:`, error);
+  }
+}
+
+/** Slack alerts are Growth+ (docs/PRD.md §4.8) — delivered alongside email, not instead of it. */
+async function sendToSlackIfEligible(
+  supabase: ReturnType<typeof createServiceClient>,
+  input: { organizationId: string; title: string; body: string }
+) {
+  const { data: org } = await supabase
+    .from("organizations")
+    .select("slack_webhook_url, plan_tier")
+    .eq("id", input.organizationId)
+    .single();
+
+  if (!org?.slack_webhook_url || !SLACK_ELIGIBLE_TIERS.has(org.plan_tier)) return;
+
+  try {
+    await fetch(org.slack_webhook_url, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ text: `*${input.title}*\n${input.body}` }),
+    });
+  } catch (error) {
+    console.error(`[alerts] failed to post to Slack for org ${input.organizationId}:`, error);
   }
 }
