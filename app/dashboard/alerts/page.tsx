@@ -18,7 +18,7 @@ export default async function AlertsPage() {
   const context = await getCurrentContext();
   if (!context.projectId) redirect("/dashboard/onboarding");
 
-  const alerts = await getAlerts(context.orgId);
+  const alerts = await getAlerts(context.projectId);
 
   return (
     <>

@@ -29,7 +29,7 @@ export default async function DashboardOverviewPage() {
     getEngineScores(context.projectId),
     getCompetitorComparison(context.projectId),
     getScoreTrend(context.projectId),
-    getAlerts(context.orgId),
+    getAlerts(context.projectId),
   ]);
 
   return (

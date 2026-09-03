@@ -248,13 +248,13 @@ export async function getRecommendations(projectId = DEMO_PROJECT_ID) {
   });
 }
 
-export async function getAlerts(organizationId = DEMO_ORG_ID) {
+export async function getAlerts(projectId = DEMO_PROJECT_ID) {
   return withFallback(demo.demoAlerts, async () => {
     const supabase = createServiceClient();
     const { data, error } = await supabase
       .from("alerts")
       .select("id, alert_type, title, body, created_at")
-      .eq("organization_id", organizationId)
+      .eq("project_id", projectId)
       .order("created_at", { ascending: false })
       .limit(10);
     if (error) throw error;

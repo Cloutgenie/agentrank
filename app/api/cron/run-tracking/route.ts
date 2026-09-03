@@ -29,7 +29,7 @@ export async function GET(request: Request) {
   }
 
   const supabase = createServiceClient();
-  const { data: projects, error: projectsError } = await supabase.from("projects").select("id, name");
+  const { data: projects, error: projectsError } = await supabase.from("projects").select("id, name, organization_id");
   if (projectsError) {
     return NextResponse.json({ error: projectsError.message }, { status: 500 });
   }

@@ -1,10 +1,11 @@
 import { createServiceClient } from "@/lib/supabase/server";
 import { getAllProviders } from "@/lib/engines";
 import { computeVisibilityScore } from "@/lib/scoring";
+import { detectAndCreateAlerts } from "@/lib/alerts";
 import type { Prompt, Competitor, Project, MentionedEntity } from "@/lib/types";
 
 interface RunProjectPromptsOptions {
-  project: Pick<Project, "id" | "name">;
+  project: Pick<Project, "id" | "name" | "organization_id">;
   prompts: Pick<Prompt, "id" | "text">[];
   competitors: Pick<Competitor, "name">[];
 }
@@ -136,6 +137,12 @@ export async function runProjectPrompts({ project, prompts, competitors }: RunPr
       { onConflict: "project_id,engine_id,score_date" }
     );
   }
+
+  await detectAndCreateAlerts({
+    projectId: project.id,
+    organizationId: project.organization_id,
+    projectName: project.name,
+  });
 
   return overall;
 }
