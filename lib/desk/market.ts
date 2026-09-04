@@ -1,34 +1,32 @@
+import { SETTINGS } from "./brand";
 import { inferGexSign } from "./regime";
+import { demoSentiment } from "./sentiment";
 import { synthesizeChain } from "./strikes";
 import type { MarketSnapshot, RiskLimits } from "./types";
 
-/** Demo SPX-like session used when live quote feeds aren't connected. */
 export function demoMarket(overrides?: Partial<MarketSnapshot>): MarketSnapshot {
   const underlying = overrides?.underlying ?? 5624.5;
-  const orLow = overrides?.orLow ?? 5608;
-  const orHigh = overrides?.orHigh ?? 5632;
-  const vwap = overrides?.vwap ?? 5619.2;
-  const vix = overrides?.vix ?? 14.8;
   const gex = overrides?.gex ?? 2.4e9;
   const base: MarketSnapshot = {
     symbol: "SPX",
     underlying,
-    vwap,
-    vix,
+    vwap: overrides?.vwap ?? 5619.2,
+    vix: overrides?.vix ?? 14.8,
     gex,
     gexSign: inferGexSign(gex),
-    orHigh,
-    orLow,
-    sessionProgress: 0.35,
-    asOf: "10:42 ET",
+    orHigh: overrides?.orHigh ?? 5632,
+    orLow: overrides?.orLow ?? 5608,
+    sessionProgress: overrides?.sessionProgress ?? 0.35,
+    asOf: overrides?.asOf ?? "10:42 ET",
     chain: [],
+    sentiment: overrides?.sentiment ?? demoSentiment(),
   };
-  const merged = { ...base, ...overrides };
+  const merged = { ...base, ...overrides, gexSign: inferGexSign(overrides?.gex ?? gex) };
   if (!merged.chain.length) merged.chain = synthesizeChain(merged);
+  if (!merged.sentiment) merged.sentiment = demoSentiment();
   return merged;
 }
 
-/** Alternate scenario: negative GEX / hot VIX — engine should refuse or cut. */
 export function demoDangerMarket(): MarketSnapshot {
   return demoMarket({
     vix: 27.4,
@@ -44,8 +42,8 @@ export function demoDangerMarket(): MarketSnapshot {
 
 export const DEFAULT_RISK: RiskLimits = {
   accountEquity: 100_000,
-  riskPerTrade: 0.015,
-  dailyLossLimit: 0.03,
+  riskPerTrade: SETTINGS.riskPerTrade,
+  dailyLossLimit: SETTINGS.dailyLossLimit,
   dayPnl: 0,
 };
 

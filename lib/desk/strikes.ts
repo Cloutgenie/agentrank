@@ -1,12 +1,14 @@
-import type { Leg, MarketSnapshot, OptionQuote, StructureKind, StructurePlan, TradeStructure } from "./types";
+import { SETTINGS } from "./brand";
+import type {
+  Leg,
+  MarketSnapshot,
+  OptionQuote,
+  StructurePlan,
+  TradeStructure,
+} from "./types";
 
 const MULTIPLIER = 100;
 
-/**
- * Strikes from the view, not the chain.
- * Pick the short leg by delta or distance from VWAP,
- * then place the long wing to cap the loss you already budgeted.
- */
 export function buildStructure(
   m: MarketSnapshot,
   plan: StructurePlan,
@@ -14,70 +16,66 @@ export function buildStructure(
 ): TradeStructure | null {
   if (plan.kind === "no_trade") return null;
 
-  const shortDeltaTarget = opts?.shortDelta ?? 0.16;
-  const defaultWidth = opts?.widthPoints ?? defaultWidthForUnderlying(m.underlying);
+  const shortDeltaTarget = opts?.shortDelta ?? SETTINGS.shortDelta;
+  const defaultWidth = opts?.widthPoints ?? defaultWidthFor(m.underlying);
   const chain = m.chain.length ? m.chain : synthesizeChain(m);
+  const budget = opts?.budgetMaxLoss;
 
   if (plan.kind === "bull_put_vertical") {
-    return buildVertical(m, chain, "P", "bull_put_vertical", shortDeltaTarget, defaultWidth, opts?.budgetMaxLoss);
+    return buildVertical(m, chain, "P", "bull_put_vertical", shortDeltaTarget, defaultWidth, budget);
   }
   if (plan.kind === "bear_call_vertical") {
-    return buildVertical(m, chain, "C", "bear_call_vertical", shortDeltaTarget, defaultWidth, opts?.budgetMaxLoss);
+    return buildVertical(m, chain, "C", "bear_call_vertical", shortDeltaTarget, defaultWidth, budget);
   }
-  return buildIronCondor(m, chain, shortDeltaTarget, defaultWidth, opts?.budgetMaxLoss);
+  return buildIronCondor(m, chain, shortDeltaTarget, defaultWidth, budget);
 }
 
 function buildVertical(
   m: MarketSnapshot,
   chain: OptionQuote[],
   right: "C" | "P",
-  kind: Exclude<StructureKind, "no_trade" | "iron_condor">,
+  kind: "bull_put_vertical" | "bear_call_vertical",
   shortDeltaTarget: number,
   width: number,
   budgetMaxLoss?: number
 ): TradeStructure | null {
-  const shorts = chain.filter((q) => q.right === right && q.dte === 0);
-  const short = pickByDelta(shorts, shortDeltaTarget, m);
+  const side = chain.filter((q) => q.right === right && q.dte === 0);
+  const short = pickByDelta(side, right === "P" ? -shortDeltaTarget : shortDeltaTarget, m);
   if (!short) return null;
 
-  const wingStrike =
-    right === "P" ? short.strike - width : short.strike + width;
-  const long =
-    findStrike(shorts, wingStrike, { excludeStrike: short.strike, minDistance: 1 }) ??
+  const wingStrike = right === "P" ? short.strike - width : short.strike + width;
+  let long =
+    findStrike(side, wingStrike, { excludeStrike: short.strike, minDistance: 1 }) ??
     synthesizeWing(short, wingStrike);
 
-  // Cap width to budgeted max loss if provided: maxLoss = (width - credit) * 100
-  // We refine width after seeing credit.
-  let legs = toCreditVerticalLegs(short, long);
+  let legs = toCreditLegs(short, long);
   let credit = netCredit(legs);
   let usedWidth = Math.abs(short.strike - long.strike);
 
   if (budgetMaxLoss && budgetMaxLoss > 0) {
-    // Ensure (width - credit) * 100 <= budget → width <= budget/100 + credit
-    const maxWidth = budgetMaxLoss / MULTIPLIER + credit;
-    if (usedWidth > maxWidth && maxWidth >= 5) {
-      const cappedWing =
-        right === "P" ? short.strike - Math.floor(maxWidth) : short.strike + Math.floor(maxWidth);
-      const cappedLong =
-        findStrike(shorts, cappedWing, { excludeStrike: short.strike, minDistance: 1 }) ??
+    for (let i = 0; i < 5; i++) {
+      const maxLoss = Math.max(0, (usedWidth - credit) * MULTIPLIER);
+      if (maxLoss <= budgetMaxLoss || usedWidth <= 5) break;
+      const targetWidth = Math.max(5, Math.floor(budgetMaxLoss / MULTIPLIER + credit));
+      if (targetWidth >= usedWidth) break;
+      const cappedWing = right === "P" ? short.strike - targetWidth : short.strike + targetWidth;
+      long =
+        findStrike(side, cappedWing, { excludeStrike: short.strike, minDistance: 1 }) ??
         synthesizeWing(short, cappedWing);
-      legs = toCreditVerticalLegs(short, cappedLong);
+      legs = toCreditLegs(short, long);
       credit = netCredit(legs);
-      usedWidth = Math.abs(short.strike - cappedLong.strike);
+      usedWidth = Math.abs(short.strike - long.strike);
     }
   }
-
-  const maxLossPerContract = Math.max(0, (usedWidth - credit) * MULTIPLIER);
-  const distanceFromVwap = Math.abs(short.strike - m.vwap);
 
   return {
     kind,
     legs,
     credit: round2(credit),
     width: usedWidth,
-    maxLossPerContract: round2(maxLossPerContract),
-    shortDelta: short.delta,
-    distanceFromVwap: round2(distanceFromVwap),
+    maxLossPerContract: round2(Math.max(0, (usedWidth - credit) * MULTIPLIER)),
+    shortDelta: Math.abs(short.delta),
+    distanceFromVwap: round2(Math.abs(short.strike - m.vwap)),
   };
 }
 
@@ -90,55 +88,51 @@ function buildIronCondor(
 ): TradeStructure | null {
   const puts = chain.filter((q) => q.right === "P" && q.dte === 0);
   const calls = chain.filter((q) => q.right === "C" && q.dte === 0);
-  const shortPut = pickByDelta(puts, -shortDeltaTarget, m); // put delta negative
+  const shortPut = pickByDelta(puts, -shortDeltaTarget, m);
   const shortCall = pickByDelta(calls, shortDeltaTarget, m);
   if (!shortPut || !shortCall) return null;
 
-  const longPut =
-    findStrike(puts, shortPut.strike - width, {
-      excludeStrike: shortPut.strike,
-      minDistance: 1,
-    }) ?? synthesizeWing(shortPut, shortPut.strike - width);
-  const longCall =
+  let longPut =
+    findStrike(puts, shortPut.strike - width, { excludeStrike: shortPut.strike, minDistance: 1 }) ??
+    synthesizeWing(shortPut, shortPut.strike - width);
+  let longCall =
     findStrike(calls, shortCall.strike + width, {
       excludeStrike: shortCall.strike,
       minDistance: 1,
     }) ?? synthesizeWing(shortCall, shortCall.strike + width);
 
-  const putLegs = toCreditVerticalLegs(shortPut, longPut);
-  const callLegs = toCreditVerticalLegs(shortCall, longCall);
-  const legs = [...putLegs, ...callLegs];
+  const legs = [...toCreditLegs(shortPut, longPut), ...toCreditLegs(shortCall, longCall)];
   let credit = netCredit(legs);
   let usedWidth = Math.max(
     Math.abs(shortPut.strike - longPut.strike),
     Math.abs(shortCall.strike - longCall.strike)
   );
 
-  // Iron condor max loss is one side: (width - credit) * 100
   if (budgetMaxLoss && budgetMaxLoss > 0) {
-    // Solve for width such that (width - credit) * 100 <= budget
-    // Recompute after wing adjust since credit changes with width.
-    for (let guard = 0; guard < 5; guard++) {
+    for (let i = 0; i < 5; i++) {
       const maxLoss = Math.max(0, (usedWidth - credit) * MULTIPLIER);
       if (maxLoss <= budgetMaxLoss || usedWidth <= 5) break;
       const targetWidth = Math.max(5, Math.floor(budgetMaxLoss / MULTIPLIER + credit));
       if (targetWidth >= usedWidth) break;
-      const lp =
+      longPut =
         findStrike(puts, shortPut.strike - targetWidth, {
           excludeStrike: shortPut.strike,
           minDistance: 1,
         }) ?? synthesizeWing(shortPut, shortPut.strike - targetWidth);
-      const lc =
+      longCall =
         findStrike(calls, shortCall.strike + targetWidth, {
           excludeStrike: shortCall.strike,
           minDistance: 1,
         }) ?? synthesizeWing(shortCall, shortCall.strike + targetWidth);
-      const rebuilt = [...toCreditVerticalLegs(shortPut, lp), ...toCreditVerticalLegs(shortCall, lc)];
+      const rebuilt = [
+        ...toCreditLegs(shortPut, longPut),
+        ...toCreditLegs(shortCall, longCall),
+      ];
       legs.splice(0, legs.length, ...rebuilt);
       credit = netCredit(legs);
       usedWidth = Math.max(
-        Math.abs(shortPut.strike - lp.strike),
-        Math.abs(shortCall.strike - lc.strike)
+        Math.abs(shortPut.strike - longPut.strike),
+        Math.abs(shortCall.strike - longCall.strike)
       );
     }
   }
@@ -156,7 +150,7 @@ function buildIronCondor(
   };
 }
 
-function toCreditVerticalLegs(short: OptionQuote, long: OptionQuote): Leg[] {
+function toCreditLegs(short: OptionQuote, long: OptionQuote): Leg[] {
   return [
     {
       right: short.right,
@@ -179,37 +173,28 @@ function toCreditVerticalLegs(short: OptionQuote, long: OptionQuote): Leg[] {
   ];
 }
 
-/** Credit vertical: sell short mid, buy long mid. Use conservative fill: short at bid, long at ask. */
 function netCredit(legs: Leg[]): number {
   let credit = 0;
   for (const leg of legs) {
-    if (leg.side === "short") credit += leg.bid; // sell at bid
-    else credit -= leg.ask; // buy wing at ask
+    if (leg.side === "short") credit += leg.bid;
+    else credit -= leg.ask;
   }
   return Math.max(0.05, credit);
 }
 
 function pickByDelta(quotes: OptionQuote[], target: number, m: MarketSnapshot): OptionQuote | null {
   if (!quotes.length) return null;
-  const wantPut = target < 0 || quotes[0]?.right === "P";
-  const scored = quotes
-    .filter((q) => {
-      // Keep shorts OTM relative to spot
-      if (q.right === "P") return q.strike < m.underlying;
-      return q.strike > m.underlying;
-    })
-    .map((q) => {
-      const deltaDist = Math.abs(Math.abs(q.delta) - Math.abs(target));
-      const vwapDist = Math.abs(q.strike - m.vwap) / m.underlying;
-      return { q, score: deltaDist + vwapDist * 0.25 };
-    });
-  const pool = scored.length ? scored : quotes.map((q) => ({
-    q,
-    score: Math.abs(Math.abs(q.delta) - Math.abs(target)),
-  }));
-  pool.sort((a, b) => a.score - b.score);
-  void wantPut;
-  return pool[0]?.q ?? null;
+  const otm = quotes.filter((q) =>
+    q.right === "P" ? q.strike < m.underlying : q.strike > m.underlying
+  );
+  const pool = otm.length ? otm : quotes;
+  const scored = pool.map((q) => {
+    const deltaDist = Math.abs(Math.abs(q.delta) - Math.abs(target));
+    const vwapDist = Math.abs(q.strike - m.vwap) / m.underlying;
+    return { q, score: deltaDist + vwapDist * 0.25 };
+  });
+  scored.sort((a, b) => a.score - b.score);
+  return scored[0]?.q ?? null;
 }
 
 function findStrike(
@@ -219,7 +204,6 @@ function findStrike(
 ): OptionQuote | null {
   const exact = quotes.find((q) => q.strike === strike);
   if (exact && exact.strike !== opts?.excludeStrike) return exact;
-  // nearest distinct wing
   let best: OptionQuote | null = null;
   let bestDist = Infinity;
   const minDist = opts?.minDistance ?? 0;
@@ -237,8 +221,10 @@ function findStrike(
 
 function synthesizeWing(short: OptionQuote, strike: number): OptionQuote {
   const width = Math.abs(short.strike - strike);
-  // Wings decay vs short — keep ask clearly below short bid so credit stays positive
-  const mid = Math.max(0.05, short.mid * Math.max(0.15, Math.exp(-width / Math.max(8, short.strike * 0.008))));
+  const mid = Math.max(
+    0.05,
+    short.mid * Math.max(0.15, Math.exp(-width / Math.max(8, short.strike * 0.008)))
+  );
   return {
     strike,
     right: short.right,
@@ -246,40 +232,36 @@ function synthesizeWing(short: OptionQuote, strike: number): OptionQuote {
     bid: round2(Math.max(0.01, mid * 0.8)),
     ask: round2(mid * 1.1),
     mid: round2(mid),
-    delta: short.right === "P" ? short.delta * 0.45 : short.delta * 0.45,
+    delta: short.delta * 0.45,
   };
 }
 
-function defaultWidthForUnderlying(spot: number): number {
-  if (spot > 4000) return 10; // SPX — tighter wings keep 0DTE max-loss in retail risk budgets
-  if (spot > 400) return 2; // SPY / IWM-ish
+function defaultWidthFor(spot: number): number {
+  if (spot > 4000) return 10;
+  if (spot > 400) return 2;
   return 1;
 }
 
-/** Demo/synthetic chain when live quotes aren't wired. */
 export function synthesizeChain(m: MarketSnapshot): OptionQuote[] {
   const step = m.underlying > 4000 ? 5 : m.underlying > 400 ? 1 : 0.5;
   const out: OptionQuote[] = [];
-  // Wide enough for 0.16Δ shorts + 25–50pt wings on SPX
   for (let i = -60; i <= 60; i++) {
     const strike = roundTo(m.underlying + i * step, step);
     const moneyness = (strike - m.underlying) / m.underlying;
     const callDelta = clamp(0.5 - moneyness * 22, 0.01, 0.99);
-    // Put delta ≈ call delta − 1 (so 0.16Δ OTM puts sit below spot)
     const putDelta = clamp(callDelta - 1, -0.99, -0.01);
-    // Premium peaks near ATM and decays with OTM |delta|
     const callMid = Math.max(0.05, m.underlying * 0.0012 * Math.min(callDelta, 1 - callDelta) * 2);
     const putMid = Math.max(
       0.05,
       m.underlying * 0.0012 * Math.min(Math.abs(putDelta), 1 - Math.abs(putDelta)) * 2
     );
-    out.push(quote(strike, "C", callMid, callDelta));
-    out.push(quote(strike, "P", putMid, putDelta));
+    out.push(makeQuote(strike, "C", callMid, callDelta));
+    out.push(makeQuote(strike, "P", putMid, putDelta));
   }
   return out;
 }
 
-function quote(strike: number, right: "C" | "P", mid: number, delta: number): OptionQuote {
+function makeQuote(strike: number, right: "C" | "P", mid: number, delta: number): OptionQuote {
   const spread = Math.max(0.05, mid * 0.08);
   return {
     strike,

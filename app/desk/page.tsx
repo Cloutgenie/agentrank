@@ -1,120 +1,166 @@
 import Link from "next/link";
-import { scanForPlays } from "@/lib/desk";
+import { BRAND, SETTINGS, scanForPlays } from "@/lib/desk";
 
 export default function DeskLandingPage() {
-  const { primary } = scanForPlays();
+  const { primary, wire } = scanForPlays();
+  const tickerItems = [
+    ...(wire?.headlines ?? []).map((h) => ({ sym: "WIRE", text: h })),
+    {
+      sym: "VIX",
+      text: `Elevated ≥${SETTINGS.vixElevated} · Hot ≥${SETTINGS.vixHot}`,
+    },
+    {
+      sym: "RISK",
+      text: `${(SETTINGS.riskPerTrade * 100).toFixed(0)}% / trade · ${(SETTINGS.dailyLossLimit * 100).toFixed(0)}% daily hard stop`,
+    },
+    {
+      sym: "EXIT",
+      text: `${(SETTINGS.takeProfitPct * 100).toFixed(0)}% TP · ${SETTINGS.stopMultiple}× SL · flat by ${SETTINGS.timeExitEt}`,
+    },
+  ];
 
   return (
     <main>
-      <section className="mx-auto flex min-h-[88vh] max-w-[1100px] flex-col justify-center px-6 pb-16 pt-8">
-        <div className="desk-animate-in max-w-3xl">
-          <p className="desk-mono mb-4 text-xs uppercase tracking-[0.22em] text-[var(--desk-muted)]">
-            0DTE · Rules engine · Not a prediction model
-          </p>
-          <h1 className="desk-display text-[clamp(3.2rem,9vw,6.5rem)] font-extrabold leading-[0.92] tracking-tight text-[var(--desk-ink)]">
-            DESK
-          </h1>
-          <p className="mt-6 max-w-xl text-lg leading-relaxed text-[var(--desk-muted)] md:text-xl">
-            Scans the market. Picks the structure. Gives you one ticket:{" "}
-            <span className="text-[var(--desk-ink)]">entry, take profit, stop.</span>
-          </p>
-          <div className="mt-10 flex flex-wrap items-center gap-4">
-            <Link
-              href="/desk/app"
-              className="desk-display inline-flex items-center rounded-full bg-[var(--desk-ink)] px-7 py-3 text-sm font-semibold tracking-wide text-[#f3f5f0] transition hover:opacity-90"
-            >
-              Open today’s play
-            </Link>
-            <a
-              href="#rules"
-              className="text-sm font-medium text-[var(--desk-muted)] underline-offset-4 hover:text-[var(--desk-ink)] hover:underline"
-            >
-              How the rules work
-            </a>
-          </div>
+      <div className="rz-ticker" aria-label="Live market wire">
+        <div className="rz-ticker-live">
+          <span className="rz-dot" />
+          Live
         </div>
+        <div className="rz-ticker-track">
+          {[...tickerItems, ...tickerItems].map((item, i) => (
+            <span key={`${item.sym}-${i}`} className="rz-ticker-item">
+              <span className="sym">{item.sym}</span>
+              <span>{item.text}</span>
+            </span>
+          ))}
+        </div>
+      </div>
 
-        {primary && (
-          <div className="desk-animate-in-delay mt-16 max-w-xl border border-[var(--desk-line)] bg-[var(--desk-panel)] p-6 backdrop-blur-sm">
-            <div className="mb-4 flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-[var(--desk-muted)]">
-              <span className="desk-live-dot" />
-              Live desk ticket · {primary.asOf}
-            </div>
-            <p className="desk-display text-2xl font-bold tracking-tight">{primary.symbol}</p>
-            <p className="mt-1 text-sm text-[var(--desk-muted)]">{primary.title}</p>
-            <div className="mt-6 grid grid-cols-3 gap-3">
-              <TicketStat label="Entry" value={`$${primary.ticket.entry.toFixed(2)}`} tone="signal" />
-              <TicketStat label="TP" value={`$${primary.ticket.takeProfit.toFixed(2)}`} tone="signal" />
-              <TicketStat label="SL" value={`$${primary.ticket.stopLoss.toFixed(2)}`} tone="stop" />
-            </div>
-            <p className="desk-mono mt-4 text-xs text-[var(--desk-muted)]">
-              Flat by {primary.ticket.exitBy} · {primary.ticket.contracts} contracts · max loss $
-              {primary.ticket.maxLoss.toFixed(0)}
+      <section className="rz-hero">
+        <div className="rz-hero-inner">
+          <div className="rz-fade">
+            <p className="rz-kicker">0DTE · Rules desk · Not a prediction model</p>
+            <h1>{BRAND.name}</h1>
+            <p className="rz-hero-sub">
+              {BRAND.tagline} Scans regime, GEX, news, and sentiment — then hands you one ticket:
+              entry, take profit, stop.
             </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link href="/desk/app" className="rz-btn">
+                Today’s play
+              </Link>
+              <a href="#rules" className="rz-btn rz-btn-ghost">
+                How it calls plays
+              </a>
+            </div>
           </div>
-        )}
+
+          {primary && (
+            <div className="rz-box rz-fade-delay">
+              <div className="rz-box-head">
+                <span>Box score · {primary.asOf}</span>
+                <span className="rz-badge">{primary.regime.regime.replace("_", " ")}</span>
+              </div>
+              <div className="rz-box-body">
+                <p className="desk-display text-3xl font-bold text-[var(--rz-ink)]">
+                  {primary.symbol}
+                </p>
+                <p className="mt-1 text-sm text-[var(--rz-muted)]">{primary.title}</p>
+                <div className="rz-box-grid">
+                  <div className="rz-stat entry">
+                    <div className="rz-stat-label">Entry</div>
+                    <div className="rz-stat-value">${primary.ticket.entry.toFixed(2)}</div>
+                  </div>
+                  <div className="rz-stat tp">
+                    <div className="rz-stat-label">TP</div>
+                    <div className="rz-stat-value">${primary.ticket.takeProfit.toFixed(2)}</div>
+                  </div>
+                  <div className="rz-stat sl">
+                    <div className="rz-stat-label">SL</div>
+                    <div className="rz-stat-value">${primary.ticket.stopLoss.toFixed(2)}</div>
+                  </div>
+                </div>
+                <p className="desk-mono mt-3 text-xs text-[var(--rz-muted)]">
+                  Flat by {primary.ticket.exitBy} · {primary.ticket.contracts} ct · max loss $
+                  {primary.ticket.maxLoss.toFixed(0)}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
       </section>
 
-      <section id="rules" className="border-t border-[var(--desk-line)] bg-[var(--desk-panel-solid)]/70">
-        <div className="mx-auto grid max-w-[1100px] gap-10 px-6 py-20 md:grid-cols-2">
-          <div className="desk-animate-in">
-            <h2 className="desk-display text-3xl font-bold tracking-tight md:text-4xl">
-              Structure first.
-              <br />
-              Never guess.
-            </h2>
-            <p className="mt-4 max-w-md text-[var(--desk-muted)]">
-              Desk is a rules engine. It classifies the day, builds defined-risk only, sizes from
-              worst case, and exits mechanically — then shows you a ticket a human can execute.
+      <section id="wire" className="rz-section">
+        <h2 className="rz-section-title">The wire</h2>
+        <div className="grid gap-4 md:grid-cols-[1.4fr_1fr]">
+          <div className="rz-card">
+            <div className="rz-card-head">
+              <span>Headlines</span>
+              <span>P/C {wire?.putCallRatio?.toFixed(2) ?? "—"}</span>
+            </div>
+            {(wire?.headlines ?? []).map((h) => (
+              <div key={h} className="rz-wire-item">
+                <span className="rz-badge mr-2">News</span>
+                {h}
+              </div>
+            ))}
+          </div>
+          <div className="rz-card">
+            <div className="rz-card-head">
+              <span>Sentiment gate</span>
+              <span className="rz-badge-green rz-badge">{wire?.flowBias ?? "neutral"}</span>
+            </div>
+            <div className="rz-wire-item">
+              Headline score{" "}
+              <strong className="desk-mono">{wire?.headlineScore?.toFixed(2) ?? "0.00"}</strong>
+            </div>
+            {(wire?.events ?? []).map((ev) => (
+              <div key={ev.code} className="rz-wire-item">
+                <span className="rz-badge-dark rz-badge mr-2">{ev.impact}</span>
+                {ev.label} ·{" "}
+                {ev.minutesUntil > 0 ? `in ${ev.minutesUntil}m` : "printed"}
+              </div>
+            ))}
+            {(primary?.regime.sentimentNotes ?? []).map((n) => (
+              <div key={n} className="rz-wire-item text-[var(--rz-muted)]">
+                {n}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="rules" className="border-t border-[var(--rz-line)] bg-white">
+        <div className="rz-section grid gap-10 md:grid-cols-2">
+          <div>
+            <h2 className="rz-section-title">Call the play. Don’t guess.</h2>
+            <p className="text-[var(--rz-muted)]">
+              Settings from SpotGamma / FlashAlpha / tasty-style 0DTE desks and prop risk:
+              defined-risk only, 1% per trade, 3% daily stop, 50% TP, 2× SL, flat by 15:00 ET.
+              FOMC / CPI / NFP blackouts. Negative GEX + hot VIX = sit.
             </p>
           </div>
-          <ol className="space-y-5 text-sm">
+          <ol className="space-y-4 text-sm">
             {[
-              ["Regime", "VIX + opening range + GEX. Negative GEX cuts size or refuses premium sales."],
+              ["Regime + news", "VIX, opening range, GEX, headlines, put/call, event blackouts."],
               ["Defined risk", "Verticals or iron condors. Max loss = (width − credit) × 100."],
-              ["Strikes", "Short leg by delta / VWAP distance. Long wing caps the budgeted loss."],
-              ["Size", "1–2% of account per trade. Hard daily stop near 3% — then stop trading."],
-              ["Exits", "50% profit target. 2× credit stop. Flat before the final gamma spike."],
+              ["Strikes", "Short ~16Δ / VWAP distance. Long wing caps budgeted loss."],
+              ["Size", "1% of account per trade. Hard daily 3% — then shut it down."],
+              ["Exits", "50% profit. 2× credit stop. Flat before the final gamma spike."],
             ].map(([title, body], i) => (
-              <li key={title} className="flex gap-4 border-b border-[var(--desk-line)] pb-4">
-                <span className="desk-mono text-[var(--desk-muted)]">0{i + 1}</span>
+              <li key={title} className="flex gap-4 border-b border-[var(--rz-line)] pb-3">
+                <span className="desk-mono font-bold text-[var(--rz-red)]">0{i + 1}</span>
                 <div>
-                  <p className="font-semibold text-[var(--desk-ink)]">{title}</p>
-                  <p className="mt-1 text-[var(--desk-muted)]">{body}</p>
+                  <p className="font-extrabold uppercase tracking-wide text-[var(--rz-ink)]">
+                    {title}
+                  </p>
+                  <p className="mt-1 text-[var(--rz-muted)]">{body}</p>
                 </div>
               </li>
             ))}
           </ol>
         </div>
       </section>
-
-      <footer className="mx-auto flex max-w-[1100px] items-center justify-between px-6 py-10 text-xs text-[var(--desk-muted)]">
-        <span className="desk-display font-bold tracking-wide text-[var(--desk-ink)]">DESK</span>
-        <span>Paper first. Bid-ask backtests. Live small.</span>
-      </footer>
     </main>
-  );
-}
-
-function TicketStat({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: string;
-  tone: "signal" | "stop";
-}) {
-  const bg = tone === "signal" ? "var(--desk-signal-soft)" : "var(--desk-stop-soft)";
-  const fg = tone === "signal" ? "var(--desk-signal)" : "var(--desk-stop)";
-  return (
-    <div className="rounded-md px-3 py-3" style={{ background: bg }}>
-      <p className="text-[10px] uppercase tracking-[0.16em]" style={{ color: fg }}>
-        {label}
-      </p>
-      <p className="desk-mono mt-1 text-lg font-semibold" style={{ color: fg }}>
-        {value}
-      </p>
-    </div>
   );
 }

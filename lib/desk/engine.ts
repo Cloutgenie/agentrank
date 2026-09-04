@@ -17,10 +17,6 @@ export interface EngineResult {
   message: string;
 }
 
-/**
- * Logical core, in order:
- * 1. Regime  2. Structure  3. Strikes  4. Size  5. Exits
- */
 export function runRulesEngine(input: EngineInput): EngineResult {
   const risk = input.risk ?? DEFAULT_RISK;
   const regime = classifyRegime(input.market);
@@ -83,14 +79,25 @@ export function runRulesEngine(input: EngineInput): EngineResult {
   return { play, refused: false, message: plan.reason };
 }
 
-/** Scan the market for plays — returns zero or one desk pick (plus optional runners-up). */
 export function scanForPlays(opts?: {
   risk?: RiskLimits;
   includeDangerScenario?: boolean;
-}): { plays: DeskPlay[]; primary: DeskPlay | null; refusedMessage?: string } {
+}): {
+  plays: DeskPlay[];
+  primary: DeskPlay | null;
+  refusedMessage?: string;
+  wire: {
+    headlines: string[];
+    putCallRatio: number;
+    flowBias: string;
+    headlineScore: number;
+    events: { code: string; label: string; impact: string; minutesUntil: number }[];
+  };
+} {
   const risk = opts?.risk ?? DEFAULT_RISK;
+  const lead = demoMarket();
   const scenarios: MarketSnapshot[] = [
-    demoMarket(),
+    lead,
     demoMarket({
       symbol: "SPY",
       underlying: 562.4,
@@ -114,25 +121,38 @@ export function scanForPlays(opts?: {
     }),
   ];
 
-  if (opts?.includeDangerScenario) {
-    scenarios.push(demoDangerMarket());
-  }
+  if (opts?.includeDangerScenario) scenarios.push(demoDangerMarket());
 
   const plays: DeskPlay[] = [];
   let refusedMessage: string | undefined;
 
   for (const market of scenarios) {
     const result = runRulesEngine({ market, risk });
-    if (result.play) {
-      plays.push({ ...result.play, rank: plays.length + 1 });
-    } else if (!refusedMessage) {
-      refusedMessage = `${market.symbol}: ${result.message}`;
-    }
+    if (result.play) plays.push({ ...result.play, rank: plays.length + 1 });
+    else if (!refusedMessage) refusedMessage = `${market.symbol}: ${result.message}`;
   }
 
-  // Desk decides with one — primary is rank 1
+  const sentiment = lead.sentiment ?? {
+    headlines: [],
+    putCallRatio: 1,
+    flowBias: "neutral" as const,
+    headlineScore: 0,
+    events: [],
+  };
+
   const primary = plays[0] ?? null;
-  return { plays, primary, refusedMessage: primary ? undefined : refusedMessage };
+  return {
+    plays,
+    primary,
+    refusedMessage: primary ? undefined : refusedMessage,
+    wire: {
+      headlines: sentiment.headlines,
+      putCallRatio: sentiment.putCallRatio,
+      flowBias: sentiment.flowBias,
+      headlineScore: sentiment.headlineScore,
+      events: sentiment.events,
+    },
+  };
 }
 
 export { demoMarket, demoDangerMarket, DEFAULT_RISK };

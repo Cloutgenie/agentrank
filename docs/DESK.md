@@ -1,50 +1,49 @@
-# Desk
+# REDZONE
 
-**0DTE rules engine SaaS** — not a prediction model.
+**0DTE rules desk** — not a prediction model.
 
-The desk scans the market with explicit conditions, picks defined-risk structure, and hands you **one ticket**:
+ESPN-style desk that scans the market and returns **one play**:
 
 | | |
 |---|---|
 | **Entry** | Sell-to-open credit |
 | **Take profit** | 50% of credit |
 | **Stop loss** | 2× credit |
-| **Exit by** | Before the final gamma spike |
+| **Exit by** | Before the final gamma spike (15:00 ET) |
+
+## Brand
+
+- **Name:** REDZONE — only the play that matters (RedZone metaphor: scoring plays only)
+- **Logo:** `/public/desk/redzone-mark.svg` (+ generated mark asset)
+- **Look:** ESPN-inspired — black header, red accent `#E31837`, scoreboard ticker, box-score tickets
+
+## Rules (calibrated)
+
+Synthesized from SpotGamma / FlashAlpha / tasty-style 0DTE practice + prop risk:
+
+1. **Regime + news** — VIX, opening range, GEX, headlines, put/call, FOMC/CPI/NFP blackouts
+2. **Defined risk** — verticals / iron condors; max loss = `(width − credit) × 100`
+3. **Strikes** — short ~16Δ / VWAP distance; long wing caps budgeted loss
+4. **Size** — 1% of account per trade; hard daily 3% then stop
+5. **Exits** — 50% TP, 2× credit SL, flat by 15:00 ET
+
+Negative GEX + hot VIX → refuse premium sales.
 
 ## Run
 
 ```bash
 npm install
-npm run dev
-# open http://localhost:3000/desk
-# desk app: http://localhost:3000/desk/app
-```
-
-```bash
 npm run test:desk
-python -m desk_engine.engine   # from python/ with PYTHONPATH=.
+npm run dev
+# http://localhost:3000/desk
+# http://localhost:3000/desk/app
 ```
 
 ## Stack
 
 | Layer | Choice |
 |---|---|
-| SaaS UI | Next.js App Router · `/desk` |
-| Rules engine | TypeScript `lib/desk` |
-| Backtest | Python `python/desk_engine` on **bid/ask** (ThetaData / ORATS) |
-| Execution | Paper blotter now · IBKR / tastytrade adapters stubbed |
-| Auth / billing | Same Clerk + Stripe shell as the host app (optional) |
-
-## Rules (order)
-
-1. **Regime** — VIX, opening range, GEX. Negative GEX + 0DTE gamma → cut size or refuse.
-2. **Defined risk** — Verticals or iron condors. Max loss = `(width − credit) × 100`.
-3. **Strikes** — Short by delta / VWAP distance; long wing caps budgeted loss.
-4. **Size** — 1–2% of account; hard daily ≈3% then stop.
-5. **Exits** — 50% TP, 2× credit SL, time stop.
-
-## API
-
-`GET/POST /api/desk/scan` → `{ primary, plays, risk }`
-
-Demo mode synthesizes a quote chain when live feeds aren’t connected. Wire ThetaData/ORATS for backtests and IBKR/tastytrade for paper → live.
+| UI | Next.js `/desk` — ESPN broadcast layout |
+| Engine | TypeScript `lib/desk` |
+| Backtest | Python `python/desk_engine` on bid/ask |
+| API | `GET/POST /api/desk/scan` (+ `wire` headlines) |

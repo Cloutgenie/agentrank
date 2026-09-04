@@ -1,9 +1,5 @@
 import type { MarketSnapshot, RegimeResult, StructurePlan } from "./types";
 
-/**
- * Defined risk only. Vertical spreads or iron condors.
- * Ninety-two percent of SPX 0DTE volume is capped-risk for a reason.
- */
 export function selectStructure(m: MarketSnapshot, regime: RegimeResult): StructurePlan {
   if (regime.regime === "refuse" || !regime.allowPremiumSale) {
     return {
@@ -26,7 +22,6 @@ export function selectStructure(m: MarketSnapshot, regime: RegimeResult): Struct
   }
 
   if (regime.regime === "vol_expansion") {
-    // In vol expansion, prefer a single vertical with the trend / fade of extreme
     if (brokeHigh || aboveVwap) {
       return {
         kind: "bear_call_vertical",
@@ -41,7 +36,6 @@ export function selectStructure(m: MarketSnapshot, regime: RegimeResult): Struct
     };
   }
 
-  // Trend
   if (brokeLow || (!aboveVwap && m.underlying < m.orLow + (m.orHigh - m.orLow) * 0.25)) {
     return {
       kind: "bear_call_vertical",

@@ -8,10 +8,23 @@ export type {
   StructureKind,
   TradeStructure,
 } from "./types";
+export { BRAND, SETTINGS } from "./brand";
+export {
+  evaluateSentiment,
+  demoSentiment,
+  demoNewsBlackoutSentiment,
+  attachSentiment,
+} from "./sentiment";
 export { classifyRegime, inferGexSign } from "./regime";
 export { selectStructure } from "./structure";
 export { buildStructure, synthesizeChain } from "./strikes";
 export { sizePosition, maxLossDollars } from "./sizing";
 export { defineExits } from "./exits";
-export { runRulesEngine, scanForPlays, demoMarket, demoDangerMarket, DEFAULT_RISK } from "./engine";
+export {
+  runRulesEngine,
+  scanForPlays,
+  demoMarket,
+  demoDangerMarket,
+  DEFAULT_RISK,
+} from "./engine";
 export { structureLabel, legsSummary } from "./market";

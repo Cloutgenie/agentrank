@@ -44,6 +44,7 @@ export async function POST(req: Request) {
     primary: result.primary,
     plays: result.plays,
     refusedMessage: result.refusedMessage,
+    wire: result.wire,
     risk,
     generatedAt: new Date().toISOString(),
   });
@@ -55,6 +56,7 @@ export async function GET() {
     primary: result.primary,
     plays: result.plays,
     refusedMessage: result.refusedMessage,
+    wire: result.wire,
     risk: DEFAULT_RISK,
     generatedAt: new Date().toISOString(),
   });
