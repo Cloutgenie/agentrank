@@ -1,0 +1,45 @@
+@import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: "Barlow Condensed", sans-serif;
+  --font-sans: "Manrope", sans-serif;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  @apply bg-frost text-ink antialiased font-sans;
+  background-image:
+    radial-gradient(1200px 600px at 10% -10%, rgba(18, 184, 134, 0.18), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(18, 90, 184, 0.10), transparent 55%),
+    linear-gradient(180deg, #f7fafc 0%, #eef3f8 100%);
+  background-attachment: fixed;
+}
+
+.court-grid {
+  background-image:
+    linear-gradient(rgba(11, 18, 32, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(11, 18, 32, 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.hero-sheen {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.35) 48%, transparent 62%);
+  animation: sweep 2.8s ease-in-out infinite;
+  pointer-events: none;
+}
