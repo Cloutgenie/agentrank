@@ -1,8 +1,15 @@
 # EdgeSlate
 
-AI sports prediction & DFS lineup optimizer for NBA.
+**Beat the board.** NBA edge finder + DFS lineup lab with an Underdog-inspired dark UI.
 
-Aggregates sportsbook odds, prediction markets, and PrizePicks/Underdog boards; blends a consensus win model with Elo/efficiency; and outputs ranked game winners plus Monte Carlo–optimized pick’em lineups with one-tap deep links.
+| | |
+|---|---|
+| **Brand** | EdgeSlate |
+| **Mark** | Slate tile + lime slash (`frontend/public/logo.png`) |
+| **Wordmark** | `Edge` in mist + `Slate` in lime |
+| **Palette** | Void `#070707` · Lime `#C8FF00` · Mist `#E8E8E8` |
+| **UI** | Higher/Lower toggles, pick cards, lime CTAs |
+
 
 ## Stack
 
