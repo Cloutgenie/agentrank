@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { VisibilityTrendChart } from "@/components/dashboard/charts/visibility-trend-chart";
 import { CompetitorBarChart } from "@/components/dashboard/charts/competitor-bar-chart";
-import { TrendingUp, TrendingDown } from "lucide-react";
+import { TrendingUp, TrendingDown, Radar } from "lucide-react";
 import { getOverallScore, getEngineScores, getCompetitorComparison, getScoreTrend, getAlerts } from "@/lib/queries";
 import { getCurrentContext } from "@/lib/auth-context";
 
@@ -32,10 +32,30 @@ export default async function DashboardOverviewPage() {
     getAlerts(context.projectId),
   ]);
 
+  // A brand-new project has no visibility_scores rows until its first
+  // scheduled tracking run — showing charts full of zeros (or worse, demo
+  // data mislabeled as theirs) here would be actively misleading.
+  const hasTrackedSignal = trend.length > 0;
+
   return (
     <>
       <DashboardTopbar title="Overview" alertCount={alerts.length} showNewProject />
 
+      {!hasTrackedSignal ? (
+        <div className="p-6">
+          <Card>
+            <CardContent className="flex flex-col items-center gap-3 p-12 text-center">
+              <Radar className="h-8 w-8 text-muted-foreground" />
+              <h2 className="text-lg font-medium">Your first tracking run is coming</h2>
+              <p className="max-w-md text-sm text-muted-foreground">
+                We generate your buyer-intent prompts and run them against every AI engine on a daily schedule — your AI
+                Visibility Score and competitor comparison will appear here after the first run completes, usually within
+                24 hours of setup.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      ) : (
       <div className="space-y-6 p-6">
         <div className="grid gap-4 md:grid-cols-4">
           <Card>
@@ -153,6 +173,7 @@ export default async function DashboardOverviewPage() {
           </Card>
         </div>
       </div>
+      )}
     </>
   );
 }

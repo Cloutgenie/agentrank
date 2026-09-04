@@ -56,6 +56,8 @@ export async function getCompetitors(projectId = DEMO_PROJECT_ID) {
   });
 }
 
+const EMPTY_OVERALL_SCORE = { visibilityScore: 0, mentionFrequency: 0, shareOfVoice: 0, avgPosition: null as number | null, trend: 0 };
+
 export async function getOverallScore(projectId = DEMO_PROJECT_ID) {
   return withFallback(demo.demoOverallScore, async () => {
     const supabase = createServiceClient();
@@ -67,7 +69,11 @@ export async function getOverallScore(projectId = DEMO_PROJECT_ID) {
       .order("score_date", { ascending: false })
       .limit(2);
     if (error) throw error;
-    if (!rows?.length) return demo.demoOverallScore;
+    // A real project with no tracking run yet must show honest zeros, not
+    // the seeded demo project's numbers pretending to be theirs — this was
+    // a real bug: any brand-new customer's first-ever dashboard load showed
+    // fabricated data (see the "Agent Rank Radar (you)" investigation).
+    if (!rows?.length) return projectId === DEMO_PROJECT_ID ? demo.demoOverallScore : EMPTY_OVERALL_SCORE;
 
     const [latest, previous] = rows as [(typeof rows)[number], (typeof rows)[number] | undefined];
     return {
@@ -110,7 +116,8 @@ export async function getEngineScores(projectId = DEMO_PROJECT_ID) {
     );
 
     const rows = results.filter((r): r is NonNullable<typeof r> => r !== null);
-    return rows.length ? rows : demo.demoEngineScores;
+    if (rows.length) return rows;
+    return projectId === DEMO_PROJECT_ID ? demo.demoEngineScores : [];
   });
 }
 
@@ -126,7 +133,7 @@ export async function getScoreTrend(projectId = DEMO_PROJECT_ID, days = 60) {
       .gte("score_date", since)
       .order("score_date", { ascending: true });
     if (error) throw error;
-    if (!data?.length) return demo.demoTrend;
+    if (!data?.length) return projectId === DEMO_PROJECT_ID ? demo.demoTrend : [];
 
     return data.map((row: { score_date: string; visibility_score: number }) => ({
       date: new Date(row.score_date).toLocaleDateString("en-US", { month: "short", day: "2-digit" }),
@@ -162,7 +169,7 @@ export async function getPromptResults(projectId = DEMO_PROJECT_ID): Promise<Pro
       .eq("project_id", projectId)
       .eq("status", "active");
     if (promptError) throw promptError;
-    if (!prompts?.length) return fallback;
+    if (!prompts?.length) return projectId === DEMO_PROJECT_ID ? fallback : [];
 
     const { data: results, error: resultError } = await supabase
       .from("prompt_results")
@@ -190,7 +197,8 @@ export async function getPromptResults(projectId = DEMO_PROJECT_ID): Promise<Pro
       }
     );
 
-    return rows.length ? rows : fallback;
+    if (rows.length) return rows;
+    return projectId === DEMO_PROJECT_ID ? fallback : [];
   });
 }
 
@@ -199,7 +207,7 @@ export async function getCitationSummary(projectId = DEMO_PROJECT_ID) {
     const supabase = createServiceClient();
     const { data, error } = await supabase.from("citations").select("domain, source_type").eq("project_id", projectId);
     if (error) throw error;
-    if (!data?.length) return demo.demoCitations;
+    if (!data?.length) return projectId === DEMO_PROJECT_ID ? demo.demoCitations : [];
 
     const counts = new Map<string, { domain: string; sourceType: string; mentions: number }>();
     for (const row of data as { domain: string; source_type: string }[]) {
@@ -222,7 +230,7 @@ export async function getRecommendations(projectId = DEMO_PROJECT_ID) {
       .in("status", ["open", "in_progress"])
       .order("created_at", { ascending: false });
     if (error) throw error;
-    if (!data?.length) return demo.demoRecommendations;
+    if (!data?.length) return projectId === DEMO_PROJECT_ID ? demo.demoRecommendations : [];
 
     return data.map(
       (r: {
@@ -258,7 +266,7 @@ export async function getAlerts(projectId = DEMO_PROJECT_ID) {
       .order("created_at", { ascending: false })
       .limit(10);
     if (error) throw error;
-    if (!data?.length) return demo.demoAlerts;
+    if (!data?.length) return projectId === DEMO_PROJECT_ID ? demo.demoAlerts : [];
 
     return data.map((a: { id: string; alert_type: string; title: string; body: string; created_at: string }) => ({
       id: a.id,
@@ -285,7 +293,7 @@ export async function getCompetitorComparison(projectId = DEMO_PROJECT_ID) {
 
     const { data: prompts, error: promptError } = await supabase.from("prompts").select("id").eq("project_id", projectId);
     if (promptError) throw promptError;
-    if (!prompts?.length) return demo.demoCompetitorComparison;
+    if (!prompts?.length) return projectId === DEMO_PROJECT_ID ? demo.demoCompetitorComparison : [];
 
     const { data: results, error: resultError } = await supabase
       .from("prompt_results")
@@ -295,7 +303,7 @@ export async function getCompetitorComparison(projectId = DEMO_PROJECT_ID) {
         prompts.map((p: { id: string }) => p.id)
       );
     if (resultError) throw resultError;
-    if (!results?.length) return demo.demoCompetitorComparison;
+    if (!results?.length) return projectId === DEMO_PROJECT_ID ? demo.demoCompetitorComparison : [];
 
     const entitySets = (results as { mentioned_entities: MentionedEntity[] }[]).map((r) => r.mentioned_entities ?? []);
 
