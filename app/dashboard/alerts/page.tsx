@@ -29,20 +29,29 @@ export default async function AlertsPage() {
           We check daily and email a weekly summary. Configure channels in Settings.
         </p>
 
-        {alerts.map((alert) => (
-          <Card key={alert.id}>
-            <CardContent className="flex items-start justify-between gap-4 p-6">
-              <div>
-                <div className="mb-2">
-                  <Badge variant={TYPE_VARIANT[alert.type]}>{alert.type.replace(/_/g, " ")}</Badge>
-                </div>
-                <h3 className="font-medium">{alert.title}</h3>
-                <p className="mt-1 text-sm text-muted-foreground">{alert.body}</p>
-              </div>
-              <span className="shrink-0 text-xs text-muted-foreground">{alert.createdAt}</span>
+        {alerts.length === 0 ? (
+          <Card>
+            <CardContent className="p-8 text-center text-sm text-muted-foreground">
+              No alerts yet — we'll notify you here the moment your visibility changes materially, once we've tracked
+              at least a couple of days of data.
             </CardContent>
           </Card>
-        ))}
+        ) : (
+          alerts.map((alert) => (
+            <Card key={alert.id}>
+              <CardContent className="flex items-start justify-between gap-4 p-6">
+                <div>
+                  <div className="mb-2">
+                    <Badge variant={TYPE_VARIANT[alert.type]}>{alert.type.replace(/_/g, " ")}</Badge>
+                  </div>
+                  <h3 className="font-medium">{alert.title}</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">{alert.body}</p>
+                </div>
+                <span className="shrink-0 text-xs text-muted-foreground">{alert.createdAt}</span>
+              </CardContent>
+            </Card>
+          ))
+        )}
       </div>
     </>
   );

@@ -28,36 +28,44 @@ export default async function CompetitorsPage() {
           </Button>
         </div>
 
-        <Card>
-          <CardContent className="p-0">
-            <table className="w-full text-sm">
-              <thead className="border-b border-border/60 text-left text-xs text-muted-foreground">
-                <tr>
-                  <th className="px-6 py-3 font-medium">Competitor</th>
-                  <th className="px-6 py-3 font-medium">Visibility score</th>
-                  <th className="px-6 py-3 font-medium">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {competitors.map((competitor) => {
-                  const comparison = competitorComparison.find((c) => c.name === competitor.name);
-                  return (
-                    <tr key={competitor.id} className="border-b border-border/60 last:border-0">
-                      <td className="px-6 py-4">
-                        <p className="font-medium">{competitor.name}</p>
-                        <p className="text-xs text-muted-foreground">{competitor.website_url}</p>
-                      </td>
-                      <td className="px-6 py-4 tabular-nums">{comparison?.score ?? "—"}</td>
-                      <td className="px-6 py-4">
-                        {competitor.is_primary ? <Badge>Primary</Badge> : <Badge variant="outline">Tracked</Badge>}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </CardContent>
-        </Card>
+        {competitors.length === 0 ? (
+          <Card>
+            <CardContent className="p-8 text-center text-sm text-muted-foreground">
+              No competitors tracked yet. Add one to see how your visibility compares.
+            </CardContent>
+          </Card>
+        ) : (
+          <Card>
+            <CardContent className="p-0">
+              <table className="w-full text-sm">
+                <thead className="border-b border-border/60 text-left text-xs text-muted-foreground">
+                  <tr>
+                    <th className="px-6 py-3 font-medium">Competitor</th>
+                    <th className="px-6 py-3 font-medium">Visibility score</th>
+                    <th className="px-6 py-3 font-medium">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {competitors.map((competitor) => {
+                    const comparison = competitorComparison.find((c) => c.name === competitor.name);
+                    return (
+                      <tr key={competitor.id} className="border-b border-border/60 last:border-0">
+                        <td className="px-6 py-4">
+                          <p className="font-medium">{competitor.name}</p>
+                          <p className="text-xs text-muted-foreground">{competitor.website_url}</p>
+                        </td>
+                        <td className="px-6 py-4 tabular-nums">{comparison?.score ?? "—"}</td>
+                        <td className="px-6 py-4">
+                          {competitor.is_primary ? <Badge>Primary</Badge> : <Badge variant="outline">Tracked</Badge>}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </>
   );

@@ -33,6 +33,15 @@ export default async function RecommendationsPage() {
           visibility baseline so you can see whether it actually moved the needle.
         </p>
 
+        {recommendations.length === 0 && (
+          <Card>
+            <CardContent className="p-8 text-center text-sm text-muted-foreground">
+              No recommendations yet — these are generated from gaps found in your tracked prompts and citations, so
+              they'll appear here after your first tracking run.
+            </CardContent>
+          </Card>
+        )}
+
         {recommendations.map((rec) => {
           const outcome = outcomeByRecId.get(rec.id);
           const delta = outcome?.scoreAfter != null ? outcome.scoreAfter - outcome.scoreBefore : null;
