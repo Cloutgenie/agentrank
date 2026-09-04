@@ -1,0 +1,159 @@
+/* Desk product theme — scoped under .desk-theme so AgentRank stays untouched. */
+
+.desk-theme {
+  --desk-bg: #e8ebe4;
+  --desk-bg-deep: #d4d9d0;
+  --desk-ink: #12160f;
+  --desk-muted: #5a6354;
+  --desk-line: rgba(18, 22, 15, 0.12);
+  --desk-panel: rgba(255, 255, 255, 0.55);
+  --desk-panel-solid: #f3f5f0;
+  --desk-signal: #1f7a4c;
+  --desk-signal-soft: #d7f0e3;
+  --desk-stop: #b42318;
+  --desk-stop-soft: #f8d7d3;
+  --desk-amber: #9a6b12;
+  --desk-amber-soft: #f5e6c4;
+
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(31, 122, 76, 0.12), transparent 55%),
+    radial-gradient(900px 500px at 100% 0%, rgba(154, 107, 18, 0.1), transparent 50%),
+    linear-gradient(165deg, #eef1ea 0%, var(--desk-bg) 45%, var(--desk-bg-deep) 100%);
+  color: var(--desk-ink);
+  font-family: var(--font-desk-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+.desk-theme::before {
+  content: "";
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  opacity: 0.35;
+  background-image:
+    linear-gradient(rgba(18, 22, 15, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(18, 22, 15, 0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(to bottom, black, transparent 85%);
+  z-index: 0;
+}
+
+.desk-theme > * {
+  position: relative;
+  z-index: 1;
+}
+
+.desk-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.desk-brand {
+  font-family: var(--font-desk-display), sans-serif;
+  font-weight: 800;
+  font-size: 1.35rem;
+  letter-spacing: 0.04em;
+  color: var(--desk-ink);
+  text-decoration: none;
+}
+
+.desk-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  font-size: 0.9rem;
+  color: var(--desk-muted);
+}
+
+.desk-nav-links a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.desk-nav-links a:hover {
+  color: var(--desk-ink);
+}
+
+.desk-nav-cta {
+  background: var(--desk-ink) !important;
+  color: #f3f5f0 !important;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.desk-mono {
+  font-family: var(--font-desk-mono), ui-monospace, monospace;
+}
+
+.desk-display {
+  font-family: var(--font-desk-display), sans-serif;
+}
+
+@keyframes desk-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes desk-pulse-line {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes desk-scan {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.desk-animate-in {
+  animation: desk-fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.desk-animate-in-delay {
+  animation: desk-fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+}
+
+.desk-animate-in-delay-2 {
+  animation: desk-fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+}
+
+.desk-live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--desk-signal);
+  box-shadow: 0 0 0 0 rgba(31, 122, 76, 0.5);
+  animation: desk-pulse-line 2s ease-in-out infinite;
+}
+
+.desk-scan-bar {
+  position: relative;
+  overflow: hidden;
+}
+
+.desk-scan-bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(31, 122, 76, 0.25), transparent);
+  animation: desk-scan 2.4s ease-in-out infinite;
+}
