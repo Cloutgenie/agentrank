@@ -14,7 +14,7 @@ export default function Icon() {
           alignItems: "center",
           justifyContent: "center",
           borderRadius: 8,
-          backgroundColor: "#8163F8",
+          backgroundColor: "#0a0a0a",
           position: "relative",
         }}
       >
@@ -35,7 +35,7 @@ export default function Icon() {
             width: 6,
             height: 6,
             borderRadius: "50%",
-            backgroundColor: "#25D0A8",
+            backgroundColor: "#ffffff",
             display: "flex",
           }}
         />

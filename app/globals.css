@@ -5,67 +5,36 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 240 10% 4%;
+    --foreground: 0 0% 4%;
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 4%;
+    --card-foreground: 0 0% 4%;
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 4%;
-    --primary: 252 83% 60%;
+    --popover-foreground: 0 0% 4%;
+    --primary: 0 0% 4%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 240 5% 96%;
-    --secondary-foreground: 240 6% 10%;
-    --muted: 240 5% 96%;
-    --muted-foreground: 240 4% 46%;
-    --accent: 252 83% 96%;
-    --accent-foreground: 252 83% 30%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 0 0% 94%;
+    --accent-foreground: 0 0% 9%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
     --success: 142 71% 45%;
     --success-foreground: 0 0% 100%;
-    --teal: 166 76% 38%;
+    --teal: 0 0% 20%;
     --teal-foreground: 0 0% 100%;
-    --border: 240 6% 90%;
-    --input: 240 6% 90%;
-    --ring: 252 83% 60%;
-    --radius: 0.625rem;
-    --chart-1: 252 83% 60%;
-    --chart-2: 199 89% 48%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 0 0% 4%;
+    --radius: 0.75rem;
+    --chart-1: 0 0% 4%;
+    --chart-2: 0 0% 40%;
     --chart-3: 142 71% 45%;
     --chart-4: 38 92% 50%;
     --chart-5: 0 72% 51%;
-    --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --font-sans: var(--font-satoshi), ui-sans-serif, system-ui, -apple-system, sans-serif;
     --font-mono: "JetBrains Mono", ui-monospace, monospace;
-  }
-
-  .dark {
-    --background: 240 10% 4%;
-    --foreground: 0 0% 96%;
-    --card: 240 9% 7%;
-    --card-foreground: 0 0% 96%;
-    --popover: 240 9% 7%;
-    --popover-foreground: 0 0% 96%;
-    --primary: 252 91% 68%;
-    --primary-foreground: 240 10% 4%;
-    --secondary: 240 6% 12%;
-    --secondary-foreground: 0 0% 96%;
-    --muted: 240 6% 12%;
-    --muted-foreground: 240 5% 60%;
-    --accent: 252 40% 16%;
-    --accent-foreground: 252 91% 80%;
-    --destructive: 0 72% 55%;
-    --destructive-foreground: 0 0% 100%;
-    --success: 142 65% 50%;
-    --success-foreground: 240 10% 4%;
-    --teal: 166 70% 48%;
-    --teal-foreground: 240 10% 4%;
-    --border: 240 6% 15%;
-    --input: 240 6% 15%;
-    --ring: 252 91% 68%;
-    --chart-1: 252 91% 68%;
-    --chart-2: 199 89% 58%;
-    --chart-3: 142 65% 50%;
-    --chart-4: 38 92% 55%;
-    --chart-5: 0 72% 60%;
   }
 
   * {

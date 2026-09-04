@@ -15,8 +15,8 @@ export default function OpengraphImage() {
           alignItems: "flex-start",
           justifyContent: "center",
           padding: "80px",
-          backgroundColor: "#0a0a0a",
-          color: "#fafafa",
+          backgroundColor: "#ffffff",
+          color: "#0a0a0a",
           fontFamily: "sans-serif",
         }}
       >
@@ -29,7 +29,7 @@ export default function OpengraphImage() {
               width: 56,
               height: 56,
               borderRadius: 12,
-              backgroundColor: "#8163F8",
+              backgroundColor: "#0a0a0a",
               position: "relative",
             }}
           >
@@ -42,7 +42,7 @@ export default function OpengraphImage() {
                 width: 10,
                 height: 10,
                 borderRadius: "50%",
-                backgroundColor: "#25D0A8",
+                backgroundColor: "#ffffff",
                 display: "flex",
               }}
             />
@@ -52,7 +52,7 @@ export default function OpengraphImage() {
         <div style={{ fontSize: 56, fontWeight: 700, lineHeight: 1.15, maxWidth: 950 }}>
           The 24/7 Radar for Your AI Answer Visibility
         </div>
-        <div style={{ fontSize: 28, color: "#a1a1aa", marginTop: 32, maxWidth: 900 }}>
+        <div style={{ fontSize: 28, color: "#666666", marginTop: 32, maxWidth: 900 }}>
           Continuously scanning ChatGPT, Claude, Gemini &amp; Perplexity for how often they recommend you.
         </div>
       </div>

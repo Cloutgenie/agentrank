@@ -1,9 +1,17 @@
 import type { Metadata } from "next";
+import localFont from "next/font/local";
 import { ClerkProvider } from "@clerk/nextjs";
 import { isClerkConfigured } from "@/lib/clerk-configured";
 import { OrganizationJsonLd } from "@/components/seo/json-ld";
 import { SITE_NAME, SITE_URL, SITE_TAGLINE } from "@/lib/seo";
 import "./globals.css";
+
+const satoshi = localFont({
+  src: "./fonts/Satoshi-Variable.woff2",
+  variable: "--font-satoshi",
+  weight: "300 900",
+  display: "swap",
+});
 
 const DEFAULT_TITLE = `${SITE_NAME} — ${SITE_TAGLINE}`;
 const DEFAULT_DESCRIPTION =
@@ -31,7 +39,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const body = (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang="en" className={satoshi.variable} suppressHydrationWarning>
       <body className="min-h-screen bg-background font-sans">
         <OrganizationJsonLd />
         {children}
