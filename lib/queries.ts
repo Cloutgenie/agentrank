@@ -67,6 +67,7 @@ export async function getOverallScore(projectId = DEMO_PROJECT_ID) {
       .eq("project_id", projectId)
       .is("engine_id", null)
       .order("score_date", { ascending: false })
+      .order("created_at", { ascending: false })
       .limit(2);
     if (error) throw error;
     // A real project with no tracking run yet must show honest zeros, not
@@ -100,6 +101,7 @@ export async function getEngineScores(projectId = DEMO_PROJECT_ID) {
           .eq("project_id", projectId)
           .eq("engine_id", engine.id)
           .order("score_date", { ascending: false })
+          .order("created_at", { ascending: false })
           .limit(2);
         if (error) throw error;
         if (!rows?.length) return null;
