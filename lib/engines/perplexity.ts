@@ -1,9 +1,13 @@
 import type { EngineProvider, EngineQuery, EngineQueryResult } from "./types";
 import { extractMentionedEntities, extractCitedDomains } from "./extract";
 import { mockEngineQuery } from "./mock";
+import { fetchWithRetry } from "./fetch-with-retry";
 
 export const perplexityProvider: EngineProvider = {
   slug: "perplexity",
+  // Confirmed live: this account's Perplexity plan rate-limits hard under
+  // even modest concurrency.
+  maxConcurrency: 2,
 
   isConfigured() {
     return Boolean(process.env.PERPLEXITY_API_KEY);
@@ -13,7 +17,7 @@ export const perplexityProvider: EngineProvider = {
     if (!this.isConfigured()) return mockEngineQuery("perplexity", input);
 
     const start = Date.now();
-    const res = await fetch("https://api.perplexity.ai/chat/completions", {
+    const res = await fetchWithRetry("https://api.perplexity.ai/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

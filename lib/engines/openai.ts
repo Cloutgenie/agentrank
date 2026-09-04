@@ -1,9 +1,14 @@
 import type { EngineProvider, EngineQuery, EngineQueryResult } from "./types";
 import { extractMentionedEntities, extractCitedDomains } from "./extract";
 import { mockEngineQuery } from "./mock";
+import { fetchWithRetry } from "./fetch-with-retry";
 
 export const openaiProvider: EngineProvider = {
   slug: "chatgpt",
+  // gpt-5-search-api runs ~15-17k tokens per call against an 80k TPM org
+  // limit — confirmed live that concurrency of 5 exhausts it almost
+  // immediately, so this engine gets the most conservative limit.
+  maxConcurrency: 1,
 
   isConfigured() {
     return Boolean(process.env.OPENAI_API_KEY);
@@ -13,7 +18,7 @@ export const openaiProvider: EngineProvider = {
     if (!this.isConfigured()) return mockEngineQuery("chatgpt", input);
 
     const start = Date.now();
-    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    const res = await fetchWithRetry("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

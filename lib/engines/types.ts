@@ -19,4 +19,6 @@ export interface EngineProvider {
   slug: EngineSlug;
   isConfigured(): boolean;
   query(input: EngineQuery): Promise<EngineQueryResult>;
+  /** How many of this engine's prompts the runner may have in flight at once. Defaults to 5 if unset — see lib/runner.ts. */
+  maxConcurrency?: number;
 }

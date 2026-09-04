@@ -1,9 +1,11 @@
 import type { EngineProvider, EngineQuery, EngineQueryResult } from "./types";
 import { extractMentionedEntities, extractCitedDomains } from "./extract";
 import { mockEngineQuery } from "./mock";
+import { fetchWithRetry } from "./fetch-with-retry";
 
 export const googleProvider: EngineProvider = {
   slug: "gemini",
+  maxConcurrency: 3,
 
   isConfigured() {
     return Boolean(process.env.GOOGLE_AI_API_KEY);
@@ -13,7 +15,7 @@ export const googleProvider: EngineProvider = {
     if (!this.isConfigured()) return mockEngineQuery("gemini", input);
 
     const start = Date.now();
-    const res = await fetch(
+    const res = await fetchWithRetry(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${process.env.GOOGLE_AI_API_KEY}`,
       {
         method: "POST",

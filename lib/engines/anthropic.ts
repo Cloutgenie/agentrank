@@ -1,9 +1,11 @@
 import type { EngineProvider, EngineQuery, EngineQueryResult } from "./types";
 import { extractMentionedEntities, extractCitedDomains } from "./extract";
 import { mockEngineQuery } from "./mock";
+import { fetchWithRetry } from "./fetch-with-retry";
 
 export const anthropicProvider: EngineProvider = {
   slug: "claude",
+  maxConcurrency: 3,
 
   isConfigured() {
     return Boolean(process.env.ANTHROPIC_API_KEY);
@@ -13,7 +15,7 @@ export const anthropicProvider: EngineProvider = {
     if (!this.isConfigured()) return mockEngineQuery("claude", input);
 
     const start = Date.now();
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
+    const res = await fetchWithRetry("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

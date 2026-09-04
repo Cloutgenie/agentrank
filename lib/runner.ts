@@ -34,7 +34,7 @@ async function mapWithConcurrency<T, R>(items: T[], limit: number, fn: (item: T)
   return results;
 }
 
-const PROMPT_CONCURRENCY_PER_ENGINE = 5;
+const DEFAULT_PROMPT_CONCURRENCY = 5;
 
 /**
  * Runs every active prompt for a project against every configured engine,
@@ -115,7 +115,7 @@ export async function runProjectPrompts({ project, prompts, competitors }: RunPr
       const engineId = engineIdBySlug.get(provider.slug);
       if (!engineId) return [provider.slug, []] as [EngineSlug, { mentionedEntities: MentionedEntity[] }[]];
 
-      const outcomes = await mapWithConcurrency(prompts, PROMPT_CONCURRENCY_PER_ENGINE, (prompt) =>
+      const outcomes = await mapWithConcurrency(prompts, provider.maxConcurrency ?? DEFAULT_PROMPT_CONCURRENCY, (prompt) =>
         runOnePrompt(provider, engineId, prompt)
       );
       const results = outcomes.filter((r): r is { mentionedEntities: MentionedEntity[] } => r !== null);
