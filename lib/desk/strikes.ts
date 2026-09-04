@@ -47,6 +47,10 @@ function buildVertical(
   let long =
     findStrike(side, wingStrike, { excludeStrike: short.strike, minDistance: 1 }) ??
     synthesizeWing(short, wingStrike);
+  // Keep a real credit edge on tight widths (common for small starting bankrolls).
+  if (long.ask >= short.bid * 0.9) {
+    long = synthesizeWing(short, long.strike);
+  }
 
   let legs = toCreditLegs(short, long);
   let credit = netCredit(legs);
@@ -55,8 +59,9 @@ function buildVertical(
   if (budgetMaxLoss && budgetMaxLoss > 0) {
     for (let i = 0; i < 5; i++) {
       const maxLoss = Math.max(0, (usedWidth - credit) * MULTIPLIER);
-      if (maxLoss <= budgetMaxLoss || usedWidth <= 5) break;
-      const targetWidth = Math.max(5, Math.floor(budgetMaxLoss / MULTIPLIER + credit));
+      const minWidth = minWidthFor(m.underlying);
+      if (maxLoss <= budgetMaxLoss || usedWidth <= minWidth) break;
+      const targetWidth = Math.max(minWidth, Math.floor(budgetMaxLoss / MULTIPLIER + credit));
       if (targetWidth >= usedWidth) break;
       const cappedWing = right === "P" ? short.strike - targetWidth : short.strike + targetWidth;
       long =
@@ -111,8 +116,9 @@ function buildIronCondor(
   if (budgetMaxLoss && budgetMaxLoss > 0) {
     for (let i = 0; i < 5; i++) {
       const maxLoss = Math.max(0, (usedWidth - credit) * MULTIPLIER);
-      if (maxLoss <= budgetMaxLoss || usedWidth <= 5) break;
-      const targetWidth = Math.max(5, Math.floor(budgetMaxLoss / MULTIPLIER + credit));
+      const minWidth = minWidthFor(m.underlying);
+      if (maxLoss <= budgetMaxLoss || usedWidth <= minWidth) break;
+      const targetWidth = Math.max(minWidth, Math.floor(budgetMaxLoss / MULTIPLIER + credit));
       if (targetWidth >= usedWidth) break;
       longPut =
         findStrike(puts, shortPut.strike - targetWidth, {
@@ -221,24 +227,29 @@ function findStrike(
 
 function synthesizeWing(short: OptionQuote, strike: number): OptionQuote {
   const width = Math.abs(short.strike - strike);
-  const mid = Math.max(
-    0.05,
-    short.mid * Math.max(0.15, Math.exp(-width / Math.max(8, short.strike * 0.008)))
-  );
+  // Wings must be clearly cheaper than the short so credit stays realistic on $1-wide spreads.
+  const decay = Math.max(0.25, Math.exp(-width / Math.max(2, short.strike * 0.004)));
+  const mid = Math.max(0.05, short.mid * decay * 0.55);
   return {
     strike,
     right: short.right,
     dte: 0,
-    bid: round2(Math.max(0.01, mid * 0.8)),
-    ask: round2(mid * 1.1),
+    bid: round2(Math.max(0.01, mid * 0.75)),
+    ask: round2(mid * 1.05),
     mid: round2(mid),
-    delta: short.delta * 0.45,
+    delta: short.delta * 0.4,
   };
 }
 
 function defaultWidthFor(spot: number): number {
-  if (spot > 4000) return 10;
-  if (spot > 400) return 2;
+  // Tight wings so small starting bankrolls (e.g. $100) can still size 1 contract.
+  if (spot > 4000) return 5;
+  if (spot > 400) return 1;
+  return 1;
+}
+
+function minWidthFor(spot: number): number {
+  if (spot > 4000) return 5;
   return 1;
 }
 

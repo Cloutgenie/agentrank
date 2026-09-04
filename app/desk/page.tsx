@@ -10,8 +10,8 @@ export default function DeskLandingPage() {
       text: `Elevated ≥${SETTINGS.vixElevated} · Hot ≥${SETTINGS.vixHot}`,
     },
     {
-      sym: "RISK",
-      text: `${(SETTINGS.riskPerTrade * 100).toFixed(0)}% / trade · ${(SETTINGS.dailyLossLimit * 100).toFixed(0)}% daily hard stop`,
+      sym: "START",
+      text: "Enter starting money · desk finds one play (try $100)",
     },
     {
       sym: "EXIT",
@@ -39,15 +39,15 @@ export default function DeskLandingPage() {
       <section className="rz-hero">
         <div className="rz-hero-inner">
           <div className="rz-fade">
-            <p className="rz-kicker">0DTE · Rules desk · Not a prediction model</p>
+            <p className="rz-kicker">0DTE · Enter money · Get the play</p>
             <h1>{BRAND.name}</h1>
             <p className="rz-hero-sub">
-              {BRAND.tagline} Scans regime, GEX, news, and sentiment — then hands you one ticket:
-              entry, take profit, stop.
+              Put in starting money (try $100). The desk scans the market and hands you one ticket:
+              when to buy, take profit, and stop.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/desk/app" className="rz-btn">
-                Today’s play
+                Start with $100
               </Link>
               <a href="#rules" className="rz-btn rz-btn-ghost">
                 How it calls plays

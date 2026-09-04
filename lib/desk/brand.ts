@@ -4,10 +4,14 @@ export const BRAND = {
   domainHint: "redzone.desk",
 } as const;
 
+/** Default bankroll shown in the desk — enter starting money, get the play. */
+export const DEFAULT_STARTING_MONEY = 100;
+
 /** Calibrated from SpotGamma / FlashAlpha / tasty-style 0DTE + prop risk. */
 export const SETTINGS = {
-  riskPerTrade: 0.01,
-  dailyLossLimit: 0.03,
+  /** Starter mode: the whole starting bankroll is the risk budget for the one play. */
+  riskPerTrade: 1,
+  dailyLossLimit: 1,
   shortDelta: 0.16,
   takeProfitPct: 0.5,
   stopMultiple: 2,

@@ -29,7 +29,9 @@ export function runRulesEngine(input: EngineInput): EngineResult {
     };
   }
 
-  const plan = selectStructure(input.market, regime);
+  const plan = selectStructure(input.market, regime, {
+    preferVertical: risk.accountEquity < 2500,
+  });
   if (plan.kind === "no_trade") {
     return { play: null, refused: true, message: plan.reason };
   }
@@ -95,31 +97,32 @@ export function scanForPlays(opts?: {
   };
 } {
   const risk = opts?.risk ?? DEFAULT_RISK;
-  const lead = demoMarket();
-  const scenarios: MarketSnapshot[] = [
-    lead,
-    demoMarket({
-      symbol: "SPY",
-      underlying: 562.4,
-      vwap: 561.9,
-      orHigh: 563.2,
-      orLow: 560.8,
-      vix: 14.8,
-      gex: 1.8e9,
-      asOf: "10:42 ET",
-    }),
-    demoMarket({
-      symbol: "SPX",
-      underlying: 5602,
-      vwap: 5618,
-      orHigh: 5625,
-      orLow: 5600,
-      vix: 16.2,
-      gex: 0.9e9,
-      asOf: "10:55 ET",
-      sessionProgress: 0.4,
-    }),
-  ];
+  // Small starting money → prefer SPY (tighter dollar risk). Larger bankrolls can take SPX.
+  const spy = demoMarket({
+    symbol: "SPY",
+    underlying: 562.4,
+    vwap: 561.9,
+    orHigh: 563.2,
+    orLow: 560.8,
+    vix: 14.8,
+    gex: 1.8e9,
+    asOf: "10:42 ET",
+  });
+  const spx = demoMarket();
+  const spxAlt = demoMarket({
+    symbol: "SPX",
+    underlying: 5602,
+    vwap: 5618,
+    orHigh: 5625,
+    orLow: 5600,
+    vix: 16.2,
+    gex: 0.9e9,
+    asOf: "10:55 ET",
+    sessionProgress: 0.4,
+  });
+  const lead = risk.accountEquity < 5000 ? spy : spx;
+  const scenarios: MarketSnapshot[] =
+    risk.accountEquity < 5000 ? [spy, spx, spxAlt] : [spx, spy, spxAlt];
 
   if (opts?.includeDangerScenario) scenarios.push(demoDangerMarket());
 

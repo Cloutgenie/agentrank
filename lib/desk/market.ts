@@ -41,11 +41,22 @@ export function demoDangerMarket(): MarketSnapshot {
 }
 
 export const DEFAULT_RISK: RiskLimits = {
-  accountEquity: 100_000,
+  accountEquity: 100, // starting money example — desk sizes the play to this
   riskPerTrade: SETTINGS.riskPerTrade,
   dailyLossLimit: SETTINGS.dailyLossLimit,
   dayPnl: 0,
 };
+
+/** Build risk limits from the user's starting money. */
+export function riskFromStartingMoney(startingMoney: number): RiskLimits {
+  const bankroll = Math.max(25, startingMoney);
+  return {
+    accountEquity: bankroll,
+    riskPerTrade: SETTINGS.riskPerTrade,
+    dailyLossLimit: SETTINGS.dailyLossLimit,
+    dayPnl: 0,
+  };
+}
 
 export function structureLabel(kind: string): string {
   switch (kind) {

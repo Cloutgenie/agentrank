@@ -8,7 +8,7 @@ export type {
   StructureKind,
   TradeStructure,
 } from "./types";
-export { BRAND, SETTINGS } from "./brand";
+export { BRAND, SETTINGS, DEFAULT_STARTING_MONEY } from "./brand";
 export {
   evaluateSentiment,
   demoSentiment,
@@ -27,4 +27,4 @@ export {
   demoDangerMarket,
   DEFAULT_RISK,
 } from "./engine";
-export { structureLabel, legsSummary } from "./market";
+export { structureLabel, legsSummary, riskFromStartingMoney } from "./market";

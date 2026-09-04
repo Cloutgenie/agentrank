@@ -1,20 +1,22 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { DEFAULT_RISK, scanForPlays } from "@/lib/desk";
+import { DEFAULT_RISK, DEFAULT_STARTING_MONEY, riskFromStartingMoney, scanForPlays } from "@/lib/desk";
 
 export const dynamic = "force-dynamic";
 
 const BodySchema = z.object({
+  /** Starting money — what the user puts in (e.g. 100). Sizes the one play. */
+  startingMoney: z.number().positive().optional(),
   accountEquity: z.number().positive().optional(),
-  riskPerTrade: z.number().min(0.005).max(0.05).optional(),
-  dailyLossLimit: z.number().min(0.01).max(0.1).optional(),
+  riskPerTrade: z.number().min(0.005).max(1).optional(),
+  dailyLossLimit: z.number().min(0.01).max(1).optional(),
   dayPnl: z.number().optional(),
   includeDangerScenario: z.boolean().optional(),
 });
 
 /**
  * POST /api/desk/scan
- * Runs the rules engine and returns desk plays (entry / TP / SL / exit-by).
+ * Enter starting money → desk finds the play (entry / TP / SL).
  */
 export async function POST(req: Request) {
   let body: z.infer<typeof BodySchema> = {};
@@ -28,11 +30,12 @@ export async function POST(req: Request) {
     );
   }
 
+  const startingMoney = body.startingMoney ?? body.accountEquity ?? DEFAULT_STARTING_MONEY;
   const risk = {
-    accountEquity: body.accountEquity ?? DEFAULT_RISK.accountEquity,
-    riskPerTrade: body.riskPerTrade ?? DEFAULT_RISK.riskPerTrade,
-    dailyLossLimit: body.dailyLossLimit ?? DEFAULT_RISK.dailyLossLimit,
-    dayPnl: body.dayPnl ?? DEFAULT_RISK.dayPnl,
+    ...riskFromStartingMoney(startingMoney),
+    ...(body.riskPerTrade !== undefined ? { riskPerTrade: body.riskPerTrade } : {}),
+    ...(body.dailyLossLimit !== undefined ? { dailyLossLimit: body.dailyLossLimit } : {}),
+    dayPnl: body.dayPnl ?? 0,
   };
 
   const result = scanForPlays({
@@ -45,19 +48,23 @@ export async function POST(req: Request) {
     plays: result.plays,
     refusedMessage: result.refusedMessage,
     wire: result.wire,
+    startingMoney,
     risk,
     generatedAt: new Date().toISOString(),
   });
 }
 
 export async function GET() {
-  const result = scanForPlays({ risk: DEFAULT_RISK });
+  const startingMoney = DEFAULT_STARTING_MONEY;
+  const risk = riskFromStartingMoney(startingMoney);
+  const result = scanForPlays({ risk });
   return NextResponse.json({
     primary: result.primary,
     plays: result.plays,
     refusedMessage: result.refusedMessage,
     wire: result.wire,
-    risk: DEFAULT_RISK,
+    startingMoney,
+    risk,
     generatedAt: new Date().toISOString(),
   });
 }
