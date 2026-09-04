@@ -1,62 +1,99 @@
 import Link from "next/link";
-import { Nav } from "@/components/Nav";
+import { Logo, LogoMark } from "@/components/Logo";
 import { PrimaryButton } from "@/components/ui";
 
 export default function HomePage() {
   return (
-    <main className="court-grid min-h-screen">
-      <Nav />
-      <section className="relative mx-auto grid min-h-[calc(100vh-5.5rem)] max-w-6xl items-center gap-10 px-6 pb-16 pt-4 md:grid-cols-2 md:px-10">
+    <main className="relative min-h-screen overflow-hidden noise">
+      <div className="pointer-events-none absolute -left-24 top-10 h-72 w-72 rounded-full bg-lime/20 blur-3xl" />
+      <div className="pointer-events-none absolute -right-16 bottom-0 h-80 w-80 rounded-full bg-lime/10 blur-3xl" />
+
+      <header className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 md:px-8">
+        <Logo size="md" />
+        <Link
+          href="/picks"
+          className="rounded-full border border-line bg-surface px-4 py-2 text-xs font-bold uppercase tracking-wide text-mist hover:border-lime/50"
+        >
+          Enter app
+        </Link>
+      </header>
+
+      <section className="mx-auto grid max-w-6xl items-center gap-12 px-4 pb-20 pt-8 md:grid-cols-2 md:px-8 md:pt-16">
         <div className="animate-rise">
-          <p className="font-display text-5xl leading-none tracking-tight text-ink md:text-7xl">
-            Edge<span className="text-edge">Slate</span>
+          <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-lime/30 bg-lime/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-lime">
+            <LogoMark className="h-4 w-4" /> NBA · Live edge
           </p>
-          <h1 className="mt-5 max-w-md text-2xl font-semibold leading-snug text-ink/90 md:text-3xl">
-            Beat the board. Ship the lineup.
+          <h1 className="font-display text-5xl uppercase leading-[0.9] tracking-tight text-mist md:text-7xl">
+            Beat the
+            <br />
+            <span className="text-lime">board.</span>
           </h1>
-          <p className="mt-4 max-w-md text-base text-ink/65">
-            Consensus model over sportsbooks and prediction markets — ranked NBA winners plus
-            Monte Carlo–optimized PrizePicks and Underdog slips.
+          <p className="mt-5 max-w-md text-base leading-relaxed text-mute md:text-lg">
+            Consensus model over books + prediction markets. Ranked winners and Monte Carlo
+            lineups for PrizePicks &amp; Underdog — one tap to the slip.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href="/picks">
-              <PrimaryButton>Open today&apos;s slate</PrimaryButton>
+              <PrimaryButton className="animate-pulse-lime px-7 py-3">Today&apos;s picks</PrimaryButton>
             </Link>
             <Link
               href="/lineups"
-              className="inline-flex items-center rounded-md border border-ink/15 bg-white/70 px-5 py-2.5 text-sm font-semibold text-ink"
+              className="inline-flex items-center rounded-full border border-line px-6 py-3 text-sm font-bold uppercase tracking-wide text-mist hover:border-lime/40"
             >
-              Optimize lineups
+              Build lineups
             </Link>
           </div>
         </div>
 
-        <div className="hero-sheen animate-rise-delay relative aspect-[4/5] overflow-hidden rounded-2xl bg-slateboard text-white shadow-glow md:aspect-square">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(18,184,134,0.45),transparent_45%),radial-gradient(circle_at_80%_80%,rgba(40,90,200,0.35),transparent_40%)]" />
-          <div className="absolute inset-0 court-grid opacity-40" />
-          <div className="relative z-10 flex h-full flex-col justify-between p-8">
-            <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-white/50">Live edge feed</p>
-              <p className="mt-3 font-display text-5xl leading-none">+4.2 pp</p>
-              <p className="mt-2 text-sm text-white/70">OKC vs market after vig</p>
+        <div className="animate-rise-2 relative">
+          <div className="pick-card relative overflow-hidden p-6 shadow-lime">
+            <div className="absolute right-0 top-0 h-32 w-32 translate-x-8 -translate-y-8 rounded-full bg-lime/20 blur-2xl" />
+            <div className="relative flex items-start justify-between">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-mute">
+                  Featured edge
+                </p>
+                <p className="mt-2 font-display text-4xl uppercase text-mist">OKC</p>
+                <p className="text-sm text-mute">vs DEN · Moneyline</p>
+              </div>
+              <div className="rounded-2xl bg-lime px-4 py-3 text-center text-void">
+                <p className="text-[10px] font-bold uppercase tracking-wider">Edge</p>
+                <p className="font-display text-3xl leading-none">+4.2</p>
+              </div>
             </div>
-            <div className="space-y-3">
+
+            <div className="side-toggle mt-6">
+              <button type="button" data-active="true">
+                Higher edge
+              </button>
+              <button type="button" data-active="false">
+                Market
+              </button>
+            </div>
+
+            <div className="mt-6 space-y-3">
               {[
-                ["BOS", "56% model · 52% market"],
-                ["CLE", "61% model · 57% market"],
-                ["MIN", "58% model · 54% market"],
-              ].map(([team, meta]) => (
+                ["Model", "62%"],
+                ["Market", "57%"],
+                ["Elo blend", "64%"],
+              ].map(([k, v]) => (
                 <div
-                  key={team}
-                  className="flex items-center justify-between border-t border-white/10 pt-3 text-sm"
+                  key={k}
+                  className="flex items-center justify-between border-t border-line pt-3 text-sm"
                 >
-                  <span className="font-display text-2xl tracking-wide">{team}</span>
-                  <span className="text-white/60">{meta}</span>
+                  <span className="text-mute">{k}</span>
+                  <span className="font-bold text-mist">{v}</span>
                 </div>
               ))}
             </div>
+
+            <PrimaryButton
+              href="https://robinhood.com/us/en/prediction-markets/"
+              className="mt-6 w-full"
+            >
+              Open on Robinhood
+            </PrimaryButton>
           </div>
-          <div className="absolute -right-8 bottom-16 h-40 w-40 animate-pulse-edge rounded-full border-2 border-edge/40" />
         </div>
       </section>
     </main>

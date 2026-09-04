@@ -60,9 +60,7 @@ async function api<T>(path: string, init?: RequestInit): Promise<T> {
     },
     cache: "no-store",
   });
-  if (!res.ok) {
-    throw new Error(`API ${path} failed: ${res.status}`);
-  }
+  if (!res.ok) throw new Error(`API ${path} failed: ${res.status}`);
   return res.json() as Promise<T>;
 }
 
@@ -89,5 +87,5 @@ export function pct(n: number, digits = 1) {
 }
 
 export function edgeLabel(pp: number) {
-  return `+${pp.toFixed(1)} pp`;
+  return `+${pp.toFixed(1)}`;
 }

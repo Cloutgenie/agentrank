@@ -1,13 +1,20 @@
 import { clsx } from "clsx";
 
-export function EdgeBadge({ children, tone = "edge" }: { children: React.ReactNode; tone?: "edge" | "warn" | "ink" }) {
+export function EdgePill({
+  children,
+  tone = "lime",
+}: {
+  children: React.ReactNode;
+  tone?: "lime" | "warn" | "mute" | "danger";
+}) {
   return (
     <span
       className={clsx(
-        "inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold tracking-wide",
-        tone === "edge" && "bg-edge/15 text-edge-dim",
-        tone === "warn" && "bg-warn/20 text-amber-800",
-        tone === "ink" && "bg-ink/10 text-ink"
+        "inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide",
+        tone === "lime" && "bg-lime text-void",
+        tone === "warn" && "bg-warn/20 text-warn",
+        tone === "mute" && "bg-line text-mute",
+        tone === "danger" && "bg-danger/15 text-danger"
       )}
     >
       {children}
@@ -20,23 +27,27 @@ export function PrimaryButton({
   href,
   onClick,
   disabled,
+  className,
 }: {
   children: React.ReactNode;
   href?: string;
   onClick?: () => void;
   disabled?: boolean;
+  className?: string;
 }) {
-  const className =
-    "inline-flex items-center justify-center rounded-md bg-edge px-5 py-2.5 text-sm font-semibold text-white shadow-glow transition hover:bg-edge-dim disabled:cursor-not-allowed disabled:opacity-50";
+  const styles = clsx(
+    "inline-flex items-center justify-center rounded-full bg-lime px-5 py-2.5 text-sm font-bold uppercase tracking-wide text-void transition hover:bg-lime-dim disabled:cursor-not-allowed disabled:opacity-40",
+    className
+  );
   if (href) {
     return (
-      <a href={href} target="_blank" rel="noreferrer" className={className}>
+      <a href={href} target="_blank" rel="noreferrer" className={styles}>
         {children}
       </a>
     );
   }
   return (
-    <button type="button" onClick={onClick} disabled={disabled} className={className}>
+    <button type="button" onClick={onClick} disabled={disabled} className={styles}>
       {children}
     </button>
   );
@@ -56,9 +67,37 @@ export function GhostButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="inline-flex items-center justify-center rounded-md border border-ink/15 bg-white/70 px-5 py-2.5 text-sm font-semibold text-ink transition hover:border-ink/30 disabled:opacity-50"
+      className="inline-flex items-center justify-center rounded-full border border-line bg-surface px-5 py-2.5 text-sm font-bold uppercase tracking-wide text-mist transition hover:border-lime/40 hover:text-lime disabled:opacity-40"
     >
       {children}
     </button>
+  );
+}
+
+export function Segmented<T extends string>({
+  value,
+  onChange,
+  options,
+}: {
+  value: T;
+  onChange: (v: T) => void;
+  options: { id: T; label: string }[];
+}) {
+  return (
+    <div className="inline-flex rounded-full border border-line bg-surface p-1">
+      {options.map((o) => (
+        <button
+          key={o.id}
+          type="button"
+          onClick={() => onChange(o.id)}
+          className={clsx(
+            "rounded-full px-3.5 py-1.5 text-xs font-bold uppercase tracking-wide transition",
+            value === o.id ? "bg-lime text-void" : "text-mute hover:text-mist"
+          )}
+        >
+          {o.label}
+        </button>
+      ))}
+    </div>
   );
 }

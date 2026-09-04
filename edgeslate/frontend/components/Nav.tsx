@@ -1,32 +1,34 @@
 import Link from "next/link";
+import { Logo } from "@/components/Logo";
 
 const links = [
-  { href: "/picks", label: "Game Picker" },
+  { href: "/picks", label: "Picks" },
   { href: "/lineups", label: "Lineups" },
   { href: "/backtest", label: "Backtest" },
 ];
 
 export function Nav({ active }: { active?: string }) {
   return (
-    <header className="relative z-20 flex items-center justify-between px-6 py-5 md:px-10">
-      <Link href="/" className="font-display text-2xl tracking-tight text-ink md:text-3xl">
-        Edge<span className="text-edge">Slate</span>
-      </Link>
-      <nav className="flex items-center gap-1 text-sm md:gap-2">
-        {links.map((l) => (
-          <Link
-            key={l.href}
-            href={l.href}
-            className={`rounded-md px-3 py-2 transition ${
-              active === l.href
-                ? "bg-ink text-white"
-                : "text-ink/70 hover:bg-ink/5 hover:text-ink"
-            }`}
-          >
-            {l.label}
-          </Link>
-        ))}
-      </nav>
+    <header className="sticky top-0 z-30 border-b border-line/80 bg-void/90 backdrop-blur-md">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 md:px-8">
+        <Logo size="sm" />
+        <nav className="flex items-center gap-1 overflow-x-auto rounded-full border border-line bg-surface p-1">
+          {links.map((l) => {
+            const on = active === l.href;
+            return (
+              <Link
+                key={l.href}
+                href={l.href}
+                className={`whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-bold uppercase tracking-wide transition md:text-sm ${
+                  on ? "bg-lime text-void" : "text-mute hover:text-mist"
+                }`}
+              >
+                {l.label}
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
     </header>
   );
 }
