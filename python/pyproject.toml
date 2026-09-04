@@ -1,0 +1,17 @@
+[project]
+name = "desk-engine"
+version = "0.1.0"
+description = "0DTE rules engine — bid/ask backtests, defined-risk only"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+desk-demo = "desk_engine:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["desk_engine*"]
