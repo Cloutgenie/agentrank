@@ -1,4 +1,6 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+import { DEMO_BACKTEST, DEMO_LINEUPS, DEMO_PICKS } from "@/lib/demo";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
 export type GamePick = {
   game_id: number;
@@ -52,6 +54,7 @@ export type BacktestSummary = {
 };
 
 async function api<T>(path: string, init?: RequestInit): Promise<T> {
+  if (!API_URL) throw new Error("API not configured");
   const res = await fetch(`${API_URL}${path}`, {
     ...init,
     headers: {
@@ -64,22 +67,49 @@ async function api<T>(path: string, init?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+async function withDemo<T>(fn: () => Promise<T>, demo: T): Promise<T> {
+  try {
+    return await fn();
+  } catch {
+    return demo;
+  }
+}
+
 export const client = {
-  health: () => api<{ status: string; demo_mode: boolean }>("/health"),
-  gamePicks: () => api<GamePick[]>("/api/picks/games"),
-  lineups: (platform: string) => api<Lineup[]>(`/api/lineups?platform=${platform}`),
+  health: () =>
+    withDemo(
+      () => api<{ status: string; demo_mode: boolean }>("/health"),
+      { status: "ok", demo_mode: true }
+    ),
+  gamePicks: () => withDemo(() => api<GamePick[]>("/api/picks/games"), DEMO_PICKS),
+  lineups: (platform: string) =>
+    withDemo(
+      () => api<Lineup[]>(`/api/lineups?platform=${platform}`),
+      DEMO_LINEUPS.map((l) => ({ ...l, platform }))
+    ),
   optimize: (platform: string, slate_size = 5) =>
-    api<Lineup[]>("/api/lineups/optimize", {
-      method: "POST",
-      body: JSON.stringify({ platform, slate_size, top_n: 5, max_from_team: 3 }),
-    }),
-  backtest: () => api<BacktestSummary>("/api/backtest/summary"),
+    withDemo(
+      () =>
+        api<Lineup[]>("/api/lineups/optimize", {
+          method: "POST",
+          body: JSON.stringify({ platform, slate_size, top_n: 5, max_from_team: 3 }),
+        }),
+      DEMO_LINEUPS.map((l) => ({ ...l, platform }))
+    ),
+  backtest: () => withDemo(() => api<BacktestSummary>("/api/backtest/summary"), DEMO_BACKTEST),
   seedDemo: () =>
-    api<{ ok: boolean; message: string }>("/api/ingest/demo", { method: "POST" }),
+    withDemo(
+      () => api<{ ok: boolean; message: string }>("/api/ingest/demo", { method: "POST" }),
+      { ok: true, message: "Demo mode — using local slate" }
+    ),
   runPipeline: () =>
-    api<{ ok: boolean; message: string; stats: Record<string, unknown> }>("/api/ingest/run", {
-      method: "POST",
-    }),
+    withDemo(
+      () =>
+        api<{ ok: boolean; message: string; stats: Record<string, unknown> }>("/api/ingest/run", {
+          method: "POST",
+        }),
+      { ok: true, message: "Demo mode", stats: {} }
+    ),
 };
 
 export function pct(n: number, digits = 1) {
