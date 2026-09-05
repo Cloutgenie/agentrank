@@ -12,7 +12,7 @@ TypeScript rules engine for `/desk` and `POST /api/desk/scan`.
 
 ## Live data
 
-See `feed.ts`. Demo by default; set `THETADATA_HOST` or `ORATS_API_KEY` for live.
+See `feed.ts`. **Live only.** Public tape by default (Nasdaq/CBOE/Yahoo); optional ThetaData/ORATS when wired. No demo fallback on scan.
 
 ## Brand
 

@@ -15,7 +15,6 @@ const BodySchema = z.object({
   riskPerTrade: z.number().min(0.005).max(1).optional(),
   dailyLossLimit: z.number().min(0.01).max(1).optional(),
   dayPnl: z.number().optional(),
-  includeDangerScenario: z.boolean().optional(),
 });
 
 /**
@@ -42,9 +41,9 @@ export async function POST(req: Request) {
     dayPnl: body.dayPnl ?? 0,
   };
 
-  const result = scanForPlays({
+  const result = await scanForPlays({
     risk,
-    includeDangerScenario: body.includeDangerScenario,
+    
   });
 
   return NextResponse.json({
@@ -53,6 +52,7 @@ export async function POST(req: Request) {
     refusedMessage: result.refusedMessage,
     wire: result.wire,
     feed: result.feed,
+    feedError: result.feedError,
     liveDataExplainer: result.liveDataExplainer,
     startingMoney,
     risk,
@@ -63,13 +63,14 @@ export async function POST(req: Request) {
 export async function GET() {
   const startingMoney = DEFAULT_STARTING_MONEY;
   const risk = riskFromStartingMoney(startingMoney);
-  const result = scanForPlays({ risk });
+  const result = await scanForPlays({ risk });
   return NextResponse.json({
     primary: result.primary,
     plays: result.plays,
     refusedMessage: result.refusedMessage,
     wire: result.wire,
     feed: result.feed,
+    feedError: result.feedError,
     liveDataExplainer: result.liveDataExplainer,
     startingMoney,
     risk,

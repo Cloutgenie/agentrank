@@ -1,5 +1,10 @@
 import { defineExits } from "./exits";
-import { demoFeedStatus, explainLiveData, type FeedStatus } from "./feed";
+import {
+  explainLiveData,
+  fetchLiveMarket,
+  LiveFeedError,
+  type FeedStatus,
+} from "./feed";
 import { demoDangerMarket, demoMarket, DEFAULT_RISK, structureLabel } from "./market";
 import { classifyRegime } from "./regime";
 import { sizePosition } from "./sizing";
@@ -55,6 +60,13 @@ export function runRulesEngine(input: EngineInput): EngineResult {
   }
 
   const exits = defineExits(structure, input.market.sessionProgress, input.market.asOf);
+  if (exits.takeAt.startsWith("Too late")) {
+    return {
+      play: null,
+      refused: true,
+      message: exits.takeAt + " — no new 0DTE entries",
+    };
+  }
   const maxLoss = structure.maxLossPerContract * size.contracts;
   const strike = structure.legs[0]?.strike ?? 0;
   const title = `${structureLabel(structure.kind)} · $${strike}`;
@@ -89,14 +101,12 @@ export function runRulesEngine(input: EngineInput): EngineResult {
   return { play, refused: false, message: plan.reason };
 }
 
-export function scanForPlays(opts?: {
-  risk?: RiskLimits;
-  includeDangerScenario?: boolean;
-}): {
+export type ScanResult = {
   plays: DeskPlay[];
   primary: DeskPlay | null;
   refusedMessage?: string;
-  feed: FeedStatus;
+  feed: FeedStatus | null;
+  feedError?: string;
   liveDataExplainer: string;
   wire: {
     headlines: string[];
@@ -105,66 +115,67 @@ export function scanForPlays(opts?: {
     headlineScore: number;
     events: { code: string; label: string; impact: string; minutesUntil: number }[];
   };
-} {
+};
+
+/**
+ * LIVE-ONLY scan. Fetches the public/vendor tape and runs the Call/Put engine.
+ * Never falls back to demo quotes.
+ */
+export async function scanForPlays(opts?: {
+  risk?: RiskLimits;
+  symbol?: string;
+}): Promise<ScanResult> {
   const risk = opts?.risk ?? DEFAULT_RISK;
-  const spy = demoMarket({
-    symbol: "SPY",
-    underlying: 562.4,
-    vwap: 561.9,
-    orHigh: 563.2,
-    orLow: 560.8,
-    vix: 14.8,
-    gex: 1.8e9,
-    asOf: "10:42 ET",
-  });
-  const spx = demoMarket();
-  const spxAlt = demoMarket({
-    symbol: "SPX",
-    underlying: 5602,
-    vwap: 5618,
-    orHigh: 5625,
-    orLow: 5600,
-    vix: 16.2,
-    gex: 0.9e9,
-    asOf: "10:55 ET",
-    sessionProgress: 0.4,
-  });
-  const lead = risk.accountEquity < 5000 ? spy : spx;
-  const scenarios: MarketSnapshot[] =
-    risk.accountEquity < 5000 ? [spy, spx, spxAlt] : [spx, spy, spxAlt];
+  const symbol = opts?.symbol ?? "SPY";
+  const liveDataExplainer = explainLiveData();
 
-  if (opts?.includeDangerScenario) scenarios.push(demoDangerMarket());
+  let market: MarketSnapshot;
+  let feed: FeedStatus;
 
-  const plays: DeskPlay[] = [];
-  let refusedMessage: string | undefined;
-
-  for (const market of scenarios) {
-    const result = runRulesEngine({ market, risk });
-    if (result.play) plays.push({ ...result.play, rank: plays.length + 1 });
-    else if (!refusedMessage) refusedMessage = `${market.symbol}: ${result.message}`;
+  try {
+    const live = await fetchLiveMarket(symbol);
+    market = live.market;
+    feed = live.feed;
+  } catch (err) {
+    const message =
+      err instanceof LiveFeedError
+        ? err.message
+        : err instanceof Error
+          ? err.message
+          : "Live tape unavailable";
+    return {
+      plays: [],
+      primary: null,
+      refusedMessage: message,
+      feed: null,
+      feedError: message,
+      liveDataExplainer,
+      wire: {
+        headlines: [message],
+        putCallRatio: 1,
+        flowBias: "neutral",
+        headlineScore: 0,
+        events: [],
+      },
+    };
   }
 
-  const sentiment = lead.sentiment ?? {
-    headlines: [],
-    putCallRatio: 1,
-    flowBias: "neutral" as const,
-    headlineScore: 0,
-    events: [],
-  };
+  const result = runRulesEngine({ market, risk });
+  const plays = result.play ? [{ ...result.play, rank: 1 }] : [];
+  const sentiment = market.sentiment;
 
-  const primary = plays[0] ?? null;
   return {
     plays,
-    primary,
-    refusedMessage: primary ? undefined : refusedMessage,
-    feed: demoFeedStatus(lead.asOf),
-    liveDataExplainer: explainLiveData(),
+    primary: plays[0] ?? null,
+    refusedMessage: result.play ? undefined : result.message,
+    feed,
+    liveDataExplainer,
     wire: {
-      headlines: sentiment.headlines,
-      putCallRatio: sentiment.putCallRatio,
-      flowBias: sentiment.flowBias,
-      headlineScore: sentiment.headlineScore,
-      events: sentiment.events,
+      headlines: sentiment?.headlines ?? [`Live ${market.symbol} ${market.underlying}`],
+      putCallRatio: sentiment?.putCallRatio ?? 1,
+      flowBias: sentiment?.flowBias ?? "neutral",
+      headlineScore: sentiment?.headlineScore ?? 0,
+      events: sentiment?.events ?? [],
     },
   };
 }

@@ -60,22 +60,32 @@ function pickAffordable(
 ): OptionQuote | null {
   if (!quotes.length) return null;
 
-  const otm = quotes.filter((q) =>
+  const MIN_ASK = 0.2;
+  const liquid = quotes.filter((q) => {
+    if (!(q.ask >= MIN_ASK)) return false;
+    if (q.bid <= 0) return false;
+    const mid = q.mid > 0 ? q.mid : (q.bid + q.ask) / 2;
+    const spread = q.ask - q.bid;
+    // Reject absurdly wide pennies / ghost quotes.
+    if (spread > Math.max(0.5, mid * 0.5)) return false;
+    return true;
+  });
+  if (!liquid.length) return null;
+
+  const otm = liquid.filter((q) =>
     right === "P" ? q.strike < m.underlying : q.strike > m.underlying
   );
-  const pool = (otm.length ? otm : quotes).slice().sort((a, b) => {
+  const pool = (otm.length ? otm : liquid).slice().sort((a, b) => {
     const da = Math.abs(Math.abs(a.delta) - deltaTarget);
     const db = Math.abs(Math.abs(b.delta) - deltaTarget);
     return da - db;
   });
 
-  const byDebit = pool.slice().sort((a, b) => a.ask - b.ask);
-
   if (budgetMaxLoss && budgetMaxLoss > 0) {
     const maxDebit = budgetMaxLoss / MULTIPLIER;
-    const nearTarget = pool.find((q) => q.ask <= maxDebit);
-    if (nearTarget) return nearTarget;
-    return byDebit.find((q) => q.ask <= maxDebit) ?? null;
+    // Prefer delta-target among liquid names that fit the bankroll — not the cheapest junk.
+    const fit = pool.filter((q) => q.ask <= maxDebit);
+    return fit[0] ?? null;
   }
 
   return pool[0] ?? null;

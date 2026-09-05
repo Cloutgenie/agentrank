@@ -1,11 +1,13 @@
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 import { BRAND, SETTINGS, scanForPlays } from "@/lib/desk";
 
-export default function DeskLandingPage() {
-  const { primary, wire, feed, liveDataExplainer } = scanForPlays();
+export default async function DeskLandingPage() {
+  const { primary, wire, feed, liveDataExplainer , feedError} = await scanForPlays();
   const tickerItems = [
     ...(wire?.headlines ?? []).map((h) => ({ sym: "WIRE", text: h })),
-    { sym: "FEED", text: feed.message },
+    { sym: "FEED", text: feed?.message ?? feedError ?? "Live tape required" },
     {
       sym: "PLAY",
       text: "Only Call or Put — Buy · Take profit · Stop",
@@ -23,9 +25,9 @@ export default function DeskLandingPage() {
   return (
     <main>
       <div className="rz-ticker" aria-label="Market wire">
-        <div className={`rz-ticker-live ${feed.mode === "live" ? "" : "rz-ticker-demo"}`}>
+        <div className={`rz-ticker-live ${feed?.mode === "live" ? "" : "rz-ticker-demo"}`}>
           <span className="rz-dot" />
-          {feed.mode === "live" ? "Live" : "Demo"}
+          {feed?.mode === "live" ? "Live" : "Offline"}
         </div>
         <div className="rz-ticker-track">
           {[...tickerItems, ...tickerItems].map((item, i) => (
@@ -40,7 +42,7 @@ export default function DeskLandingPage() {
       <section className="rz-hero">
         <div className="rz-hero-inner">
           <div className="rz-fade">
-            <p className="rz-kicker">0DTE · Call or Put · Nothing else</p>
+            <p className="rz-kicker">0DTE · Call or Put · Live tape only</p>
             <h1>{BRAND.name}</h1>
             <p className="rz-hero-sub">
               Put in starting money (try $100). The desk hands you one ticket:{" "}
@@ -112,8 +114,8 @@ export default function DeskLandingPage() {
         <div className="grid gap-6 md:grid-cols-3">
           {[
             [
-              "1 · Vendor",
-              "ThetaData (local terminal) or ORATS (API key) streams underlying + 0DTE bid/ask/delta.",
+              "1 · Live tape",
+              "Nasdaq option chain + CBOE VIX + Yahoo session bars (or ThetaData / ORATS when wired).",
             ],
             [
               "2 · Snapshot",
@@ -132,8 +134,8 @@ export default function DeskLandingPage() {
         </div>
         <p className="mt-6 max-w-3xl text-sm text-[var(--rz-muted)]">{liveDataExplainer}</p>
         <p className="desk-mono mt-3 text-xs text-[var(--rz-muted)]">
-          Now: <strong className="text-[var(--rz-ink)]">{feed.mode.toUpperCase()}</strong> via{" "}
-          {feed.provider}. Set <code>THETADATA_HOST</code> or <code>ORATS_API_KEY</code> to go live.
+          Now: <strong className="text-[var(--rz-ink)]">{feed?.mode === "live" ? "LIVE" : "OFFLINE"}</strong>
+          {feed ? <> via {feed.provider}</> : null}. Live tape only — no demo quotes.
         </p>
       </section>
 

@@ -30,10 +30,11 @@ export {
 } from "./engine";
 export { structureLabel, legsSummary, riskFromStartingMoney } from "./market";
 export {
-  demoFeedStatus,
   detectFeedConfig,
   explainLiveData,
+  fetchLiveMarket,
   fetchLiveSnapshot,
+  LiveFeedError,
   type FeedStatus,
   type FeedMode,
 } from "./feed";

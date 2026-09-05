@@ -24,12 +24,11 @@ The rules engine always needs a **MarketSnapshot**: underlying, VWAP, VIX, GEX, 
 
 | Mode | What happens |
 |---|---|
-| **Demo** (default) | Synthetic SPY/SPX quotes + demo headlines. No API keys needed. |
-| **Live** | ThetaData (`THETADATA_HOST`) or ORATS (`ORATS_API_KEY`) → same snapshot → same Call/Put engine. |
+| **Live (only)** | Nasdaq option chain + CBOE VIX + Yahoo bars (or ThetaData/ORATS). If fetch fails, desk refuses — no demo quotes. |
 
 - Quote age shows as `asOf` / optional `latencyMs`.
 - Broker fills stay in your broker — REDZONE prints the ticket only.
-- UI badge reads `feed.mode` (`demo` | `live`) so it never pretends to be live.
+- UI badge is **Live** or **Offline** only — never Demo.
 
 Wire up:
 

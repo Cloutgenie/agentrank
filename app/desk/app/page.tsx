@@ -19,6 +19,7 @@ interface ScanResponse {
   wire?: Wire;
   feed?: FeedStatus;
   liveDataExplainer?: string;
+  feedError?: string;
   startingMoney?: number;
   generatedAt: string;
 }
@@ -66,17 +67,17 @@ export default function DeskAppPage() {
     setStartingMoney(n);
   };
 
-  const feedMode = data?.feed?.mode ?? "demo";
+  const live = data?.feed?.mode === "live";
 
   return (
     <main>
       <div className="rz-ticker">
-        <div className={`rz-ticker-live ${feedMode === "live" ? "" : "rz-ticker-demo"}`}>
+        <div className={`rz-ticker-live ${live ? "" : "rz-ticker-demo"}`}>
           <span className="rz-dot" />
-          {feedMode === "live" ? "Live" : "Demo"}
+          {live ? "Live" : data ? "Offline" : "…"}
         </div>
         <div className="rz-ticker-track">
-          {(data?.feed?.message ? [data.feed.message] : [])
+          {(data?.feed?.message ? [data.feed.message] : data?.feedError ? [data.feedError] : ["Fetching live tape…"])
             .concat(
               data?.wire?.headlines?.length
                 ? data.wire.headlines
@@ -174,7 +175,7 @@ export default function DeskAppPage() {
                 {" "}
                 · Feed{" "}
                 <span className="desk-mono font-bold text-[var(--rz-ink)]">
-                  {data.feed.mode.toUpperCase()}
+                  "LIVE"
                 </span>
                 {" / "}
                 {data.feed.provider}
@@ -216,7 +217,7 @@ export default function DeskAppPage() {
             <div className="p-6">
               <p className="desk-display text-2xl font-bold">Hands off</p>
               <p className="mt-3 text-[var(--rz-muted)]">
-                {data.refusedMessage ?? "Regime refused. Keep your money."}
+                {data.feedError ?? data.refusedMessage ?? "Regime refused. Keep your money."}
               </p>
             </div>
           </div>
