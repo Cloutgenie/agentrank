@@ -3,7 +3,7 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
 const isProtectedRoute = createRouteMatcher([
   "/dashboard(.*)",
-  "/api/((?!webhooks|prompts/generate|cron|reports/render-pdf|v1).*)",
+  "/api/((?!webhooks|prompts/generate|cron|reports/render-pdf|v1|desk).*)",
 ]);
 
 // Clerk isn't wired to real keys until you add them to .env — running the
