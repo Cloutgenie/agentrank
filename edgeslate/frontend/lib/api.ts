@@ -143,5 +143,3 @@ export function pct(n: number, digits = 1) {
 export function edgeLabel(pp: number) {
   return `+${pp.toFixed(1)}`;
 }
-
-export const edgeLabel = edgeLabel;
