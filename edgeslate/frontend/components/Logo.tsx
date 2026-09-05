@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 
 /** Sharp slate / lime slash mark */
@@ -20,13 +19,13 @@ export function Logo({
   size?: "sm" | "md" | "lg";
   href?: string | null;
 }) {
-  const px = size === "sm" ? 28 : size === "lg" ? 48 : 36;
+  const mark = size === "sm" ? "h-7 w-7" : size === "lg" ? "h-12 w-12" : "h-9 w-9";
   const text = size === "sm" ? "text-lg" : size === "lg" ? "text-3xl" : "text-2xl";
 
   const inner = (
     <span className="inline-flex items-center gap-2.5">
-      <span className="relative overflow-hidden rounded-[10px] ring-1 ring-lime/30">
-        <Image src="/logo.png" alt="" width={px} height={px} className="block" priority />
+      <span className="overflow-hidden rounded-[10px] ring-1 ring-lime/30">
+        <LogoMark className={mark} />
       </span>
       <span className={`font-display uppercase tracking-tight text-mist ${text}`}>
         Edge<span className="text-lime">Slate</span>
