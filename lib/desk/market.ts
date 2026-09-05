@@ -20,10 +20,14 @@ export function demoMarket(overrides?: Partial<MarketSnapshot>): MarketSnapshot 
     asOf: overrides?.asOf ?? "10:42 ET",
     chain: [],
     sentiment: overrides?.sentiment ?? demoSentiment(),
+    feedMode: "demo",
+    feedProvider: "demo",
   };
   const merged = { ...base, ...overrides, gexSign: inferGexSign(overrides?.gex ?? gex) };
   if (!merged.chain.length) merged.chain = synthesizeChain(merged);
   if (!merged.sentiment) merged.sentiment = demoSentiment();
+  merged.feedMode = merged.feedMode ?? "demo";
+  merged.feedProvider = merged.feedProvider ?? "demo";
   return merged;
 }
 
@@ -41,7 +45,7 @@ export function demoDangerMarket(): MarketSnapshot {
 }
 
 export const DEFAULT_RISK: RiskLimits = {
-  accountEquity: 100, // starting money example — desk sizes the play to this
+  accountEquity: 100,
   riskPerTrade: SETTINGS.riskPerTrade,
   dailyLossLimit: SETTINGS.dailyLossLimit,
   dayPnl: 0,
@@ -60,19 +64,17 @@ export function riskFromStartingMoney(startingMoney: number): RiskLimits {
 
 export function structureLabel(kind: string): string {
   switch (kind) {
-    case "bull_put_vertical":
-      return "Bull put vertical";
-    case "bear_call_vertical":
-      return "Bear call vertical";
-    case "iron_condor":
-      return "Iron condor";
+    case "call":
+      return "Call";
+    case "put":
+      return "Put";
     default:
       return "No trade";
   }
 }
 
 export function legsSummary(legs: { side: string; right: string; strike: number }[]): string {
-  return legs
-    .map((l) => `${l.side === "short" ? "−" : "+"}${l.right}${l.strike}`)
-    .join(" / ");
+  const leg = legs[0];
+  if (!leg) return "";
+  return `${leg.right === "C" ? "Call" : "Put"} $${leg.strike}`;
 }

@@ -1,12 +1,18 @@
 import { SETTINGS } from "./brand";
 import type { ExitPlan, TradeStructure } from "./types";
 
+/**
+ * Long Call / Put exits (Robinhood-simple):
+ * - Take profit when premium is up ~takeProfitPct
+ * - Stop when premium is down ~stopLossPct
+ * - Flat by timeExitEt
+ */
 export function defineExits(structure: TradeStructure, sessionProgress = 0.4): ExitPlan {
-  const credit = structure.credit;
+  const entry = structure.debit;
   const takeProfitPct = SETTINGS.takeProfitPct;
-  const takeProfitPrice = round2(credit * (1 - takeProfitPct));
-  const stopMultiple = SETTINGS.stopMultiple;
-  const stopLossPrice = round2(credit * stopMultiple);
+  const stopLossPct = SETTINGS.stopLossPct;
+  const takeProfitPrice = round2(entry * (1 + takeProfitPct));
+  const stopLossPrice = round2(Math.max(0.01, entry * (1 - stopLossPct)));
   const timeExitEt =
     sessionProgress > SETTINGS.lateSessionProgress
       ? SETTINGS.lateSessionExitEt
@@ -16,12 +22,12 @@ export function defineExits(structure: TradeStructure, sessionProgress = 0.4): E
     takeProfitPrice,
     stopLossPrice,
     takeProfitPct,
-    stopMultiple,
+    stopMultiple: stopLossPct,
     timeExitEt,
     notes: [
-      `Close at ~${(takeProfitPct * 100).toFixed(0)}% of credit (BTC ${takeProfitPrice.toFixed(2)})`,
-      `Stop if mark reaches ${stopMultiple}× credit (BTC ${stopLossPrice.toFixed(2)})`,
-      `Flat by ${timeExitEt} — before the final gamma spike`,
+      `Sell when up ~${(takeProfitPct * 100).toFixed(0)}% ($${takeProfitPrice.toFixed(2)})`,
+      `Cut when down ~${(stopLossPct * 100).toFixed(0)}% ($${stopLossPrice.toFixed(2)})`,
+      `Flat by ${timeExitEt} — 0DTE dies into the close`,
     ],
   };
 }

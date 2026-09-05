@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { DEFAULT_RISK, DEFAULT_STARTING_MONEY, riskFromStartingMoney, scanForPlays } from "@/lib/desk";
+import {
+  DEFAULT_STARTING_MONEY,
+  riskFromStartingMoney,
+  scanForPlays,
+} from "@/lib/desk";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +20,7 @@ const BodySchema = z.object({
 
 /**
  * POST /api/desk/scan
- * Enter starting money → desk finds the play (entry / TP / SL).
+ * Enter starting money → desk finds Call or Put (Buy · TP · SL).
  */
 export async function POST(req: Request) {
   let body: z.infer<typeof BodySchema> = {};
@@ -48,6 +52,8 @@ export async function POST(req: Request) {
     plays: result.plays,
     refusedMessage: result.refusedMessage,
     wire: result.wire,
+    feed: result.feed,
+    liveDataExplainer: result.liveDataExplainer,
     startingMoney,
     risk,
     generatedAt: new Date().toISOString(),
@@ -63,6 +69,8 @@ export async function GET() {
     plays: result.plays,
     refusedMessage: result.refusedMessage,
     wire: result.wire,
+    feed: result.feed,
+    liveDataExplainer: result.liveDataExplainer,
     startingMoney,
     risk,
     generatedAt: new Date().toISOString(),

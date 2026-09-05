@@ -1,12 +1,10 @@
-/** REDZONE — 0DTE rules-engine types. */
+/** REDZONE — Robinhood-simple Call / Put desk types. */
 
 export type Regime = "trend" | "range" | "vol_expansion" | "refuse";
-export type StructureKind =
-  | "bull_put_vertical"
-  | "bear_call_vertical"
-  | "iron_condor"
-  | "no_trade";
+/** Only two plays — Call or Put. */
+export type StructureKind = "call" | "put" | "no_trade";
 export type GexSign = "positive" | "negative" | "neutral";
+export type Side = "Call" | "Put";
 
 export interface OptionQuote {
   strike: number;
@@ -31,6 +29,8 @@ export interface MarketSnapshot {
   asOf: string;
   chain: OptionQuote[];
   sentiment?: import("./sentiment").SentimentSnapshot;
+  feedMode?: "demo" | "live";
+  feedProvider?: string;
 }
 
 export interface RiskLimits {
@@ -67,7 +67,10 @@ export interface Leg {
 
 export interface TradeStructure {
   kind: Exclude<StructureKind, "no_trade">;
+  side: Side;
   legs: Leg[];
+  debit: number;
+  /** Alias of debit for older helpers. */
   credit: number;
   width: number;
   maxLossPerContract: number;
@@ -95,6 +98,7 @@ export interface ExitPlan {
 export interface DeskPlay {
   id: string;
   symbol: string;
+  side: Side;
   title: string;
   structure: TradeStructure;
   size: PositionSize;
@@ -102,13 +106,14 @@ export interface DeskPlay {
   regime: RegimeResult;
   plan: StructurePlan;
   ticket: {
-    action: "SELL_TO_OPEN";
+    action: "BUY_TO_OPEN";
     entry: number;
     takeProfit: number;
     stopLoss: number;
     exitBy: string;
     contracts: number;
     maxLoss: number;
+    strike: number;
     summary: string;
   };
   asOf: string;

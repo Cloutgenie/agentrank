@@ -5,6 +5,7 @@ export type {
   Regime,
   RegimeResult,
   RiskLimits,
+  Side,
   StructureKind,
   TradeStructure,
 } from "./types";
@@ -28,3 +29,11 @@ export {
   DEFAULT_RISK,
 } from "./engine";
 export { structureLabel, legsSummary, riskFromStartingMoney } from "./market";
+export {
+  demoFeedStatus,
+  detectFeedConfig,
+  explainLiveData,
+  fetchLiveSnapshot,
+  type FeedStatus,
+  type FeedMode,
+} from "./feed";

@@ -47,6 +47,7 @@ function round2(n: number): number {
   return Math.round(n * 100) / 100;
 }
 
-export function maxLossDollars(width: number, credit: number, contracts: number): number {
-  return Math.max(0, (width - credit) * 100 * contracts);
+/** Max loss for a long Call/Put = debit × 100 × contracts. */
+export function maxLossDollars(debit: number, contracts: number, _ignored?: number): number {
+  return Math.max(0, debit * 100 * contracts);
 }

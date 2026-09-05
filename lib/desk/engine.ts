@@ -1,5 +1,6 @@
 import { defineExits } from "./exits";
-import { demoDangerMarket, demoMarket, DEFAULT_RISK, legsSummary, structureLabel } from "./market";
+import { demoFeedStatus, explainLiveData, type FeedStatus } from "./feed";
+import { demoDangerMarket, demoMarket, DEFAULT_RISK, structureLabel } from "./market";
 import { classifyRegime } from "./regime";
 import { sizePosition } from "./sizing";
 import { selectStructure } from "./structure";
@@ -29,9 +30,7 @@ export function runRulesEngine(input: EngineInput): EngineResult {
     };
   }
 
-  const plan = selectStructure(input.market, regime, {
-    preferVertical: risk.accountEquity < 2500,
-  });
+  const plan = selectStructure(input.market, regime);
   if (plan.kind === "no_trade") {
     return { play: null, refused: true, message: plan.reason };
   }
@@ -39,7 +38,11 @@ export function runRulesEngine(input: EngineInput): EngineResult {
   const budgetMaxLoss = risk.accountEquity * risk.riskPerTrade * regime.sizeMultiplier;
   const structure = buildStructure(input.market, plan, { budgetMaxLoss });
   if (!structure) {
-    return { play: null, refused: true, message: "Could not build defined-risk structure from chain" };
+    return {
+      play: null,
+      refused: true,
+      message: "No Call/Put fits this bankroll on today’s chain",
+    };
   }
 
   const size = sizePosition(structure, risk, regime.sizeMultiplier);
@@ -53,11 +56,13 @@ export function runRulesEngine(input: EngineInput): EngineResult {
 
   const exits = defineExits(structure, input.market.sessionProgress);
   const maxLoss = structure.maxLossPerContract * size.contracts;
-  const title = `${structureLabel(structure.kind)} · ${legsSummary(structure.legs)}`;
+  const strike = structure.legs[0]?.strike ?? 0;
+  const title = `${structureLabel(structure.kind)} · $${strike}`;
 
   const play: DeskPlay = {
-    id: `play-${input.market.symbol}-${structure.kind}-${structure.legs.map((l) => l.strike).join("-")}`,
+    id: `play-${input.market.symbol}-${structure.kind}-${strike}`,
     symbol: input.market.symbol,
+    side: structure.side,
     title,
     structure,
     size,
@@ -65,14 +70,15 @@ export function runRulesEngine(input: EngineInput): EngineResult {
     regime,
     plan,
     ticket: {
-      action: "SELL_TO_OPEN",
-      entry: structure.credit,
+      action: "BUY_TO_OPEN",
+      entry: structure.debit,
       takeProfit: exits.takeProfitPrice,
       stopLoss: exits.stopLossPrice,
       exitBy: exits.timeExitEt,
       contracts: size.contracts,
       maxLoss: Math.round(maxLoss * 100) / 100,
-      summary: `Sell ${size.contracts}× for $${structure.credit.toFixed(2)} credit · TP $${exits.takeProfitPrice.toFixed(2)} · SL $${exits.stopLossPrice.toFixed(2)} · flat by ${exits.timeExitEt}`,
+      strike,
+      summary: `Buy ${size.contracts}× ${input.market.symbol} ${structure.side} $${strike} @ $${structure.debit.toFixed(2)} · TP $${exits.takeProfitPrice.toFixed(2)} · SL $${exits.stopLossPrice.toFixed(2)} · flat by ${exits.timeExitEt}`,
     },
     asOf: input.market.asOf,
     rank: 1,
@@ -88,6 +94,8 @@ export function scanForPlays(opts?: {
   plays: DeskPlay[];
   primary: DeskPlay | null;
   refusedMessage?: string;
+  feed: FeedStatus;
+  liveDataExplainer: string;
   wire: {
     headlines: string[];
     putCallRatio: number;
@@ -97,7 +105,6 @@ export function scanForPlays(opts?: {
   };
 } {
   const risk = opts?.risk ?? DEFAULT_RISK;
-  // Small starting money → prefer SPY (tighter dollar risk). Larger bankrolls can take SPX.
   const spy = demoMarket({
     symbol: "SPY",
     underlying: 562.4,
@@ -148,6 +155,8 @@ export function scanForPlays(opts?: {
     plays,
     primary,
     refusedMessage: primary ? undefined : refusedMessage,
+    feed: demoFeedStatus(lead.asOf),
+    liveDataExplainer: explainLiveData(),
     wire: {
       headlines: sentiment.headlines,
       putCallRatio: sentiment.putCallRatio,

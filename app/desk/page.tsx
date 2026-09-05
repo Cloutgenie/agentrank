@@ -2,12 +2,13 @@ import Link from "next/link";
 import { BRAND, SETTINGS, scanForPlays } from "@/lib/desk";
 
 export default function DeskLandingPage() {
-  const { primary, wire } = scanForPlays();
+  const { primary, wire, feed, liveDataExplainer } = scanForPlays();
   const tickerItems = [
     ...(wire?.headlines ?? []).map((h) => ({ sym: "WIRE", text: h })),
+    { sym: "FEED", text: feed.message },
     {
-      sym: "VIX",
-      text: `Elevated ≥${SETTINGS.vixElevated} · Hot ≥${SETTINGS.vixHot}`,
+      sym: "PLAY",
+      text: "Only Call or Put — Buy · Take profit · Stop",
     },
     {
       sym: "START",
@@ -15,16 +16,16 @@ export default function DeskLandingPage() {
     },
     {
       sym: "EXIT",
-      text: `${(SETTINGS.takeProfitPct * 100).toFixed(0)}% TP · ${SETTINGS.stopMultiple}× SL · flat by ${SETTINGS.timeExitEt}`,
+      text: `+${(SETTINGS.takeProfitPct * 100).toFixed(0)}% TP · −${(SETTINGS.stopLossPct * 100).toFixed(0)}% SL · flat by ${SETTINGS.timeExitEt}`,
     },
   ];
 
   return (
     <main>
-      <div className="rz-ticker" aria-label="Live market wire">
-        <div className="rz-ticker-live">
+      <div className="rz-ticker" aria-label="Market wire">
+        <div className={`rz-ticker-live ${feed.mode === "live" ? "" : "rz-ticker-demo"}`}>
           <span className="rz-dot" />
-          Live
+          {feed.mode === "live" ? "Live" : "Demo"}
         </div>
         <div className="rz-ticker-track">
           {[...tickerItems, ...tickerItems].map((item, i) => (
@@ -39,18 +40,18 @@ export default function DeskLandingPage() {
       <section className="rz-hero">
         <div className="rz-hero-inner">
           <div className="rz-fade">
-            <p className="rz-kicker">0DTE · Enter money · Get the play</p>
+            <p className="rz-kicker">0DTE · Call or Put · Nothing else</p>
             <h1>{BRAND.name}</h1>
             <p className="rz-hero-sub">
-              Put in starting money (try $100). The desk scans the market and hands you one ticket:
-              when to buy, take profit, and stop.
+              Put in starting money (try $100). The desk hands you one ticket:{" "}
+              <strong>Call</strong> or <strong>Put</strong> — when to buy, take profit, and stop.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/desk/app" className="rz-btn">
                 Start with $100
               </Link>
-              <a href="#rules" className="rz-btn rz-btn-ghost">
-                How it calls plays
+              <a href="#live-data" className="rz-btn rz-btn-ghost">
+                How live data works
               </a>
             </div>
           </div>
@@ -58,17 +59,25 @@ export default function DeskLandingPage() {
           {primary && (
             <div className="rz-box rz-fade-delay">
               <div className="rz-box-head">
-                <span>Box score · {primary.asOf}</span>
-                <span className="rz-badge">{primary.regime.regime.replace("_", " ")}</span>
+                <span>
+                  {primary.symbol} · {primary.asOf}
+                </span>
+                <span className={`rz-side-pill ${primary.side === "Call" ? "call" : "put"}`}>
+                  {primary.side}
+                </span>
               </div>
               <div className="rz-box-body">
-                <p className="desk-display text-3xl font-bold text-[var(--rz-ink)]">
-                  {primary.symbol}
+                <p
+                  className={`desk-display text-5xl font-bold ${
+                    primary.side === "Call" ? "text-[var(--rz-green)]" : "text-[var(--rz-red)]"
+                  }`}
+                >
+                  {primary.side}
                 </p>
-                <p className="mt-1 text-sm text-[var(--rz-muted)]">{primary.title}</p>
+                <p className="desk-mono mt-1 text-lg font-bold">${primary.ticket.strike}</p>
                 <div className="rz-box-grid">
                   <div className="rz-stat entry">
-                    <div className="rz-stat-label">Entry</div>
+                    <div className="rz-stat-label">Buy</div>
                     <div className="rz-stat-value">${primary.ticket.entry.toFixed(2)}</div>
                   </div>
                   <div className="rz-stat tp">
@@ -88,6 +97,36 @@ export default function DeskLandingPage() {
             </div>
           )}
         </div>
+      </section>
+
+      <section id="live-data" className="rz-section border-t border-[var(--rz-line)] bg-white">
+        <h2 className="rz-section-title">How live real-time data works</h2>
+        <div className="grid gap-6 md:grid-cols-3">
+          {[
+            [
+              "1 · Vendor",
+              "ThetaData (local terminal) or ORATS (API key) streams underlying + 0DTE bid/ask/delta.",
+            ],
+            [
+              "2 · Snapshot",
+              "We map that into one MarketSnapshot (spot, VWAP, VIX, GEX, opening range, chain).",
+            ],
+            [
+              "3 · Ticket",
+              "Same Call/Put rules engine prints Buy · TP · SL. Broker fills stay in your broker.",
+            ],
+          ].map(([t, b]) => (
+            <div key={t}>
+              <p className="font-extrabold uppercase tracking-wide">{t}</p>
+              <p className="mt-2 text-sm text-[var(--rz-muted)]">{b}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-6 max-w-3xl text-sm text-[var(--rz-muted)]">{liveDataExplainer}</p>
+        <p className="desk-mono mt-3 text-xs text-[var(--rz-muted)]">
+          Now: <strong className="text-[var(--rz-ink)]">{feed.mode.toUpperCase()}</strong> via{" "}
+          {feed.provider}. Set <code>THETADATA_HOST</code> or <code>ORATS_API_KEY</code> to go live.
+        </p>
       </section>
 
       <section id="wire" className="rz-section">
@@ -117,8 +156,7 @@ export default function DeskLandingPage() {
             {(wire?.events ?? []).map((ev) => (
               <div key={ev.code} className="rz-wire-item">
                 <span className="rz-badge-dark rz-badge mr-2">{ev.impact}</span>
-                {ev.label} ·{" "}
-                {ev.minutesUntil > 0 ? `in ${ev.minutesUntil}m` : "printed"}
+                {ev.label} · {ev.minutesUntil > 0 ? `in ${ev.minutesUntil}m` : "printed"}
               </div>
             ))}
             {(primary?.regime.sentimentNotes ?? []).map((n) => (
@@ -133,20 +171,20 @@ export default function DeskLandingPage() {
       <section id="rules" className="border-t border-[var(--rz-line)] bg-white">
         <div className="rz-section grid gap-10 md:grid-cols-2">
           <div>
-            <h2 className="rz-section-title">Call the play. Don’t guess.</h2>
+            <h2 className="rz-section-title">Call. Put. Done.</h2>
             <p className="text-[var(--rz-muted)]">
-              Settings from SpotGamma / FlashAlpha / tasty-style 0DTE desks and prop risk:
-              defined-risk only, 1% per trade, 3% daily stop, 50% TP, 2× SL, flat by 15:00 ET.
-              FOMC / CPI / NFP blackouts. Negative GEX + hot VIX = sit.
+              Super simple like Robinhood: the desk only ever says Call or Put. Buy the contract,
+              take profit at +50%, stop at −50%, flat by 15:00 ET. Sit on FOMC / CPI / NFP and when
+              GEX + VIX say no.
             </p>
           </div>
           <ol className="space-y-4 text-sm">
             {[
               ["Regime + news", "VIX, opening range, GEX, headlines, put/call, event blackouts."],
-              ["Defined risk", "Verticals or iron condors. Max loss = (width − credit) × 100."],
-              ["Strikes", "Short ~16Δ / VWAP distance. Long wing caps budgeted loss."],
-              ["Size", "1% of account per trade. Hard daily 3% — then shut it down."],
-              ["Exits", "50% profit. 2× credit stop. Flat before the final gamma spike."],
+              ["Call or Put", "Above VWAP / broke high → Call. Below / broke low → Put."],
+              ["Strike", "~25Δ that fits your starting money."],
+              ["Size", "Whole bankroll is the risk budget for that one contract."],
+              ["Exits", "+50% take profit. −50% stop. Flat before the close."],
             ].map(([title, body], i) => (
               <li key={title} className="flex gap-4 border-b border-[var(--rz-line)] pb-3">
                 <span className="desk-mono font-bold text-[var(--rz-red)]">0{i + 1}</span>

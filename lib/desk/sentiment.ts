@@ -40,7 +40,7 @@ export function evaluateSentiment(s: SentimentSnapshot): SentimentGate {
       allowPremiumSale = false;
       sizeMultiplier = 0;
       reasons.push(
-        `${ev.label} blackout (${ev.minutesUntil > 0 ? `in ${ev.minutesUntil}m` : "just printed"}) — no premium sales`
+        `${ev.label} blackout (${ev.minutesUntil > 0 ? `in ${ev.minutesUntil}m` : "just printed"}) — no trade`
       );
     }
   }
@@ -73,7 +73,7 @@ export function evaluateSentiment(s: SentimentSnapshot): SentimentGate {
 
   if (s.flowBias === "bearish" && s.headlineScore < -0.15) {
     sizeMultiplier = Math.min(sizeMultiplier, 0.65);
-    reasons.push("Bearish flow + soft headlines — reduce premium sales");
+    reasons.push("Bearish flow + soft headlines — reduce size");
   }
 
   if (!reasons.length) {

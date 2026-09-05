@@ -37,7 +37,7 @@ export function classifyRegime(m: MarketSnapshot): RegimeResult {
 
   if (negativeGex && vixHot) {
     reasons.push(
-      `Negative GEX (${fmtGex(m.gex)}) with VIX ${m.vix.toFixed(1)} — refuse premium sales`
+      `Negative GEX (${fmtGex(m.gex)}) with VIX ${m.vix.toFixed(1)} — no Call / Put`
     );
     reasons.push("0DTE gamma + short dealer gamma is where accounts die");
     return {
@@ -94,7 +94,7 @@ export function classifyRegime(m: MarketSnapshot): RegimeResult {
         ? `Inside opening range ${m.orLow.toFixed(2)}–${m.orHigh.toFixed(2)} — range day`
         : `Tight OR (${(rangePct * 100).toFixed(2)}%) — range day`
     );
-    if (positiveGex) reasons.push("Positive GEX supports mean-reversion / premium structures");
+    if (positiveGex) reasons.push("Positive GEX — lean with VWAP for Call or Put");
     return {
       regime: "range",
       reasons,

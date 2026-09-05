@@ -423,6 +423,46 @@
   animation: rz-fade 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+.rz-ticker-demo {
+  background: #444 !important;
+}
+
+.rz-side-pill {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rz-side-pill.call {
+  background: var(--rz-green-soft);
+  color: var(--rz-green);
+}
+
+.rz-side-pill.put {
+  background: var(--rz-stop-soft);
+  color: var(--rz-stop);
+}
+
+.rz-play-row {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 2px solid var(--rz-line);
+  background: #fff;
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.rz-play-row:hover,
+.rz-play-row.active {
+  border-color: var(--rz-ink);
+  background: var(--rz-off);
+}
+
 .rz-fade-delay {
   animation: rz-fade 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
 }

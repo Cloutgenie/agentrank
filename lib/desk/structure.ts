@@ -1,15 +1,19 @@
 import type { MarketSnapshot, RegimeResult, StructurePlan } from "./types";
 
+/**
+ * Robinhood-simple: only Call or Put.
+ * Call = bullish · Put = bearish.
+ */
 export function selectStructure(
   m: MarketSnapshot,
   regime: RegimeResult,
-  opts?: { preferVertical?: boolean }
+  _opts?: { preferVertical?: boolean }
 ): StructurePlan {
   if (regime.regime === "refuse" || !regime.allowPremiumSale) {
     return {
       kind: "no_trade",
       bias: "none",
-      reason: "Regime refused premium sales — sit on hands",
+      reason: "Regime refused — sit on hands",
     };
   }
 
@@ -17,47 +21,25 @@ export function selectStructure(
   const brokeHigh = m.underlying > m.orHigh;
   const brokeLow = m.underlying < m.orLow;
 
-  // Small starting bankrolls: single vertical keeps max loss inside the budget.
-  if (opts?.preferVertical || regime.regime === "vol_expansion") {
-    if (brokeHigh || (aboveVwap && regime.regime !== "range")) {
-      return {
-        kind: "bear_call_vertical",
-        bias: "bearish",
-        reason: opts?.preferVertical
-          ? "Starter bankroll → defined-risk call credit vertical"
-          : "Vol expansion into highs → defined-risk call credit vertical",
-      };
-    }
-    if (brokeLow || !aboveVwap || opts?.preferVertical) {
-      return {
-        kind: "bull_put_vertical",
-        bias: "bullish",
-        reason: opts?.preferVertical
-          ? "Starter bankroll → defined-risk put credit vertical"
-          : "Vol expansion into lows → defined-risk put credit vertical",
-      };
-    }
-  }
-
-  if (regime.regime === "range") {
+  if (brokeHigh || (aboveVwap && regime.regime !== "range")) {
     return {
-      kind: "iron_condor",
-      bias: "neutral",
-      reason: "Range day → iron condor, defined risk both sides",
+      kind: "call",
+      bias: "bullish",
+      reason: brokeHigh ? "Broke highs → Call" : "Above VWAP → Call",
     };
   }
 
-  if (brokeLow || (!aboveVwap && m.underlying < m.orLow + (m.orHigh - m.orLow) * 0.25)) {
+  if (brokeLow || !aboveVwap) {
     return {
-      kind: "bear_call_vertical",
+      kind: "put",
       bias: "bearish",
-      reason: "Trend down / below VWAP → bear call vertical",
+      reason: brokeLow ? "Broke lows → Put" : "Below VWAP → Put",
     };
   }
 
-  return {
-    kind: "bull_put_vertical",
-    bias: "bullish",
-    reason: "Trend up / above VWAP → bull put vertical",
-  };
+  const mid = (m.orHigh + m.orLow) / 2;
+  if (m.underlying >= mid) {
+    return { kind: "call", bias: "bullish", reason: "Range bias up → Call" };
+  }
+  return { kind: "put", bias: "bearish", reason: "Range bias down → Put" };
 }

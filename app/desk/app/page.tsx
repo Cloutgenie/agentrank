@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState, useTransition } from "react";
-import type { DeskPlay } from "@/lib/desk";
+import type { DeskPlay, FeedStatus } from "@/lib/desk";
 import { DEFAULT_STARTING_MONEY } from "@/lib/desk";
 
 interface Wire {
@@ -17,6 +17,8 @@ interface ScanResponse {
   plays: DeskPlay[];
   refusedMessage?: string;
   wire?: Wire;
+  feed?: FeedStatus;
+  liveDataExplainer?: string;
   startingMoney?: number;
   generatedAt: string;
 }
@@ -64,22 +66,26 @@ export default function DeskAppPage() {
     setStartingMoney(n);
   };
 
+  const feedMode = data?.feed?.mode ?? "demo";
+
   return (
     <main>
       <div className="rz-ticker">
-        <div className="rz-ticker-live">
+        <div className={`rz-ticker-live ${feedMode === "live" ? "" : "rz-ticker-demo"}`}>
           <span className="rz-dot" />
-          Live
+          {feedMode === "live" ? "Live" : "Demo"}
         </div>
         <div className="rz-ticker-track">
-          {(data?.wire?.headlines?.length
-            ? data.wire.headlines
-            : ["Enter starting money · desk finds the play"]
-          )
+          {(data?.feed?.message ? [data.feed.message] : [])
+            .concat(
+              data?.wire?.headlines?.length
+                ? data.wire.headlines
+                : ["Enter starting money · desk finds Call or Put"]
+            )
             .concat(data?.wire?.headlines ?? [])
             .map((h, i) => (
               <span key={`${h}-${i}`} className="rz-ticker-item">
-                <span className="sym">WIRE</span>
+                <span className="sym">{i === 0 && data?.feed ? "FEED" : "WIRE"}</span>
                 <span>{h}</span>
               </span>
             ))}
@@ -88,12 +94,12 @@ export default function DeskAppPage() {
 
       <div className="rz-section">
         <div className="rz-fade border-b-4 border-[var(--rz-red)] pb-6">
-          <p className="rz-kicker !mb-2">Find the play</p>
-          <h1 className="desk-display text-4xl font-bold md:text-5xl">Starting money</h1>
+          <p className="rz-kicker !mb-2">Robinhood-simple</p>
+          <h1 className="desk-display text-4xl font-bold md:text-5xl">Call or Put</h1>
           <p className="mt-2 max-w-xl text-sm text-[var(--rz-muted)]">
-            Put in what you want to start with. The desk scans the market and sizes{" "}
-            <strong className="text-[var(--rz-ink)]">one play</strong> to that bankroll — entry,
-            take profit, stop.
+            Enter starting money. The desk picks{" "}
+            <strong className="text-[var(--rz-ink)]">one Call or one Put</strong> — Buy, take
+            profit, stop. Nothing else.
           </p>
 
           <form
@@ -122,11 +128,39 @@ export default function DeskAppPage() {
               {isPending ? "Finding…" : "Find my play"}
             </button>
             <p className="w-full text-xs text-[var(--rz-muted)] md:w-auto md:pb-2">
-              Example: <button type="button" className="font-bold text-[var(--rz-red)] underline" onClick={() => { setDraftMoney("100"); setStartingMoney(100); }}> $100</button>
+              Example:{" "}
+              <button
+                type="button"
+                className="font-bold text-[var(--rz-red)] underline"
+                onClick={() => {
+                  setDraftMoney("100");
+                  setStartingMoney(100);
+                }}
+              >
+                $100
+              </button>
               {" · "}
-              <button type="button" className="font-bold text-[var(--rz-red)] underline" onClick={() => { setDraftMoney("500"); setStartingMoney(500); }}>$500</button>
+              <button
+                type="button"
+                className="font-bold text-[var(--rz-red)] underline"
+                onClick={() => {
+                  setDraftMoney("500");
+                  setStartingMoney(500);
+                }}
+              >
+                $500
+              </button>
               {" · "}
-              <button type="button" className="font-bold text-[var(--rz-red)] underline" onClick={() => { setDraftMoney("1000"); setStartingMoney(1000); }}>$1,000</button>
+              <button
+                type="button"
+                className="font-bold text-[var(--rz-red)] underline"
+                onClick={() => {
+                  setDraftMoney("1000");
+                  setStartingMoney(1000);
+                }}
+              >
+                $1,000
+              </button>
             </p>
           </form>
         </div>
@@ -135,14 +169,15 @@ export default function DeskAppPage() {
           <span>
             Bankroll{" "}
             <span className="desk-mono font-bold text-[var(--rz-ink)]">${startingMoney}</span>
-            {data?.wire && (
+            {data?.feed && (
               <>
                 {" "}
-                · P/C{" "}
-                <span className="desk-mono text-[var(--rz-ink)]">
-                  {data.wire.putCallRatio.toFixed(2)}
-                </span>{" "}
-                · flow {data.wire.flowBias}
+                · Feed{" "}
+                <span className="desk-mono font-bold text-[var(--rz-ink)]">
+                  {data.feed.mode.toUpperCase()}
+                </span>
+                {" / "}
+                {data.feed.provider}
               </>
             )}
           </span>
@@ -152,6 +187,15 @@ export default function DeskAppPage() {
             </span>
           )}
         </div>
+
+        {data?.liveDataExplainer && (
+          <p className="mt-4 max-w-2xl text-xs leading-relaxed text-[var(--rz-muted)]">
+            <span className="font-extrabold uppercase tracking-wide text-[var(--rz-ink)]">
+              Live data ·{" "}
+            </span>
+            {data.liveDataExplainer}
+          </p>
+        )}
 
         {error && (
           <p className="mt-6 bg-[var(--rz-stop-soft)] px-4 py-3 text-sm text-[var(--rz-stop)]">
@@ -196,12 +240,16 @@ export default function DeskAppPage() {
                     >
                       <div className="flex items-baseline justify-between gap-2">
                         <span className="desk-display text-xl font-bold">{play.symbol}</span>
-                        <span className="desk-mono text-xs text-[var(--rz-muted)]">#{play.rank}</span>
+                        <span
+                          className={`rz-side-pill ${play.side === "Call" ? "call" : "put"}`}
+                        >
+                          {play.side}
+                        </span>
                       </div>
-                      <p className="mt-1 text-sm text-[var(--rz-muted)]">{play.title}</p>
-                      <p className="desk-mono mt-2 text-xs font-semibold text-[var(--rz-green)]">
-                        Buy ${play.ticket.entry.toFixed(2)} · TP ${play.ticket.takeProfit.toFixed(2)} ·
-                        SL ${play.ticket.stopLoss.toFixed(2)}
+                      <p className="desk-mono mt-2 text-xs font-semibold text-[var(--rz-ink)]">
+                        Buy ${play.ticket.entry.toFixed(2)} · TP $
+                        {play.ticket.takeProfit.toFixed(2)} · SL $
+                        {play.ticket.stopLoss.toFixed(2)}
                       </p>
                     </button>
                   );
@@ -224,6 +272,7 @@ function TicketDetail({
   play: DeskPlay;
   startingMoney: number;
 }) {
+  const isCall = play.side === "Call";
   return (
     <article className="rz-box rz-fade-delay">
       <div className="rz-box-head">
@@ -233,12 +282,30 @@ function TicketDetail({
         <span className="rz-badge">{play.regime.regime.replace("_", " ")}</span>
       </div>
       <div className="rz-box-body !p-6 md:!p-8">
-        <h2 className="desk-display text-4xl font-bold tracking-tight">{play.symbol}</h2>
-        <p className="mt-1 text-sm text-[var(--rz-muted)]">{play.title}</p>
+        <div className="flex flex-wrap items-end gap-4">
+          <div>
+            <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-[var(--rz-muted)]">
+              {play.symbol}
+            </p>
+            <h2
+              className={`desk-display text-6xl font-bold tracking-tight md:text-7xl ${
+                isCall ? "text-[var(--rz-green)]" : "text-[var(--rz-red)]"
+              }`}
+            >
+              {play.side}
+            </h2>
+          </div>
+          <div className="pb-2">
+            <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-[var(--rz-muted)]">
+              Strike
+            </p>
+            <p className="desk-mono text-3xl font-bold">${play.ticket.strike}</p>
+          </div>
+        </div>
 
         <div className="rz-box-grid mt-6 !gap-2">
           <div className="rz-stat entry">
-            <div className="rz-stat-label">Buy / sell here</div>
+            <div className="rz-stat-label">Buy</div>
             <div className="rz-stat-value">${play.ticket.entry.toFixed(2)}</div>
             <p className="mt-1 text-[10px] text-[var(--rz-muted)]">
               {play.ticket.contracts} contract{play.ticket.contracts === 1 ? "" : "s"}
@@ -260,7 +327,6 @@ function TicketDetail({
           <Meta label="Exit by" value={play.ticket.exitBy} />
           <Meta label="Max loss" value={`$${play.ticket.maxLoss.toFixed(0)}`} />
           <Meta label="Contracts" value={String(play.ticket.contracts)} />
-          <Meta label="Of bankroll" value={`${play.size.riskPct}%`} />
         </div>
 
         <p className="desk-mono mt-5 text-sm leading-relaxed text-[var(--rz-ink)]">

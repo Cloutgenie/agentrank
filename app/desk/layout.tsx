@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     template: `%s · ${BRAND.name}`,
   },
   description:
-    "0DTE rules desk. Scans the market with regime, GEX, news, and sentiment — then gives you one play: entry, take profit, stop.",
+    "0DTE rules desk. Robinhood-simple: Call or Put — Buy, take profit, stop. Demo or live bid/ask via ThetaData / ORATS.",
 };
 
 export default function DeskLayout({ children }: { children: React.ReactNode }) {
