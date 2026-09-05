@@ -54,7 +54,7 @@ export function runRulesEngine(input: EngineInput): EngineResult {
     };
   }
 
-  const exits = defineExits(structure, input.market.sessionProgress);
+  const exits = defineExits(structure, input.market.sessionProgress, input.market.asOf);
   const maxLoss = structure.maxLossPerContract * size.contracts;
   const strike = structure.legs[0]?.strike ?? 0;
   const title = `${structureLabel(structure.kind)} · $${strike}`;
@@ -74,11 +74,13 @@ export function runRulesEngine(input: EngineInput): EngineResult {
       entry: structure.debit,
       takeProfit: exits.takeProfitPrice,
       stopLoss: exits.stopLossPrice,
+      takeAt: exits.takeAt,
+      enterBy: exits.enterBy,
       exitBy: exits.timeExitEt,
       contracts: size.contracts,
       maxLoss: Math.round(maxLoss * 100) / 100,
       strike,
-      summary: `Buy ${size.contracts}× ${input.market.symbol} ${structure.side} $${strike} @ $${structure.debit.toFixed(2)} · TP $${exits.takeProfitPrice.toFixed(2)} · SL $${exits.stopLossPrice.toFixed(2)} · flat by ${exits.timeExitEt}`,
+      summary: `Take ${exits.takeAt} · open by ${exits.enterBy} · Buy ${size.contracts}× ${input.market.symbol} ${structure.side} $${strike} @ $${structure.debit.toFixed(2)} · TP $${exits.takeProfitPrice.toFixed(2)} · SL $${exits.stopLossPrice.toFixed(2)} · flat by ${exits.timeExitEt}`,
     },
     asOf: input.market.asOf,
     rank: 1,

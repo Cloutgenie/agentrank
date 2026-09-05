@@ -7,6 +7,7 @@ ESPN-style desk that scans the market and returns **one play**:
 | | |
 |---|---|
 | **Side** | Call (bullish) or Put (bearish) |
+| **When** | Take now — open within 15 minutes (no new entries after 13:30 ET) |
 | **Entry** | Buy-to-open debit |
 | **Take profit** | +50% of premium |
 | **Stop loss** | −50% of premium |

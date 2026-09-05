@@ -247,9 +247,8 @@ export default function DeskAppPage() {
                         </span>
                       </div>
                       <p className="desk-mono mt-2 text-xs font-semibold text-[var(--rz-ink)]">
-                        Buy ${play.ticket.entry.toFixed(2)} · TP $
-                        {play.ticket.takeProfit.toFixed(2)} · SL $
-                        {play.ticket.stopLoss.toFixed(2)}
+                        Take {play.ticket.takeAt} · Buy ${play.ticket.entry.toFixed(2)} · TP $
+                        {play.ticket.takeProfit.toFixed(2)} · SL ${play.ticket.stopLoss.toFixed(2)}
                       </p>
                     </button>
                   );
@@ -303,6 +302,20 @@ function TicketDetail({
           </div>
         </div>
 
+        <div className="rz-take-banner mt-5">
+          <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-[var(--rz-muted)]">
+            When to take it
+          </p>
+          <p className="desk-mono mt-1 text-xl font-bold text-[var(--rz-ink)] md:text-2xl">
+            {play.ticket.takeAt}
+          </p>
+          <p className="mt-1 text-sm text-[var(--rz-muted)]">
+            Open by <span className="desk-mono font-semibold text-[var(--rz-ink)]">{play.ticket.enterBy}</span>
+            {" · "}
+            Flat by <span className="desk-mono font-semibold text-[var(--rz-ink)]">{play.ticket.exitBy}</span>
+          </p>
+        </div>
+
         <div className="rz-box-grid mt-6 !gap-2">
           <div className="rz-stat entry">
             <div className="rz-stat-label">Buy</div>
@@ -324,6 +337,7 @@ function TicketDetail({
         </div>
 
         <div className="mt-6 flex flex-wrap gap-6 border-y border-[var(--rz-line)] py-4 text-sm">
+          <Meta label="Take by" value={play.ticket.enterBy} />
           <Meta label="Exit by" value={play.ticket.exitBy} />
           <Meta label="Max loss" value={`$${play.ticket.maxLoss.toFixed(0)}`} />
           <Meta label="Contracts" value={String(play.ticket.contracts)} />

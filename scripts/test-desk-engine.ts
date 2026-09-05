@@ -38,12 +38,19 @@ assert.ok(play.play.ticket.stopLoss < play.play.ticket.entry);
 assert.ok(play.play.ticket.contracts >= 1);
 assert.ok(play.play.ticket.maxLoss <= 100 + 1e-6);
 
+assert.ok(play.play.ticket.takeAt);
+assert.ok(play.play.ticket.enterBy);
+assert.match(play.play.ticket.summary, /Take |open by/i);
+
 const scan = scanForPlays({ risk: starter });
 assert.ok(scan.primary, scan.refusedMessage);
 assert.ok(scan.primary.ticket.maxLoss <= 100 + 1e-6);
+assert.ok(scan.primary.ticket.takeAt);
+assert.ok(scan.primary.ticket.enterBy);
 assert.equal(scan.feed.mode, "demo");
 assert.ok(explainLiveData().includes("ThetaData") || explainLiveData().includes("ORATS"));
 
 console.log("desk engine ok");
 console.log(`$100 start → ${scan.primary.side} · ${scan.primary.ticket.summary}`);
+console.log(`take: ${scan.primary.ticket.takeAt} · open by ${scan.primary.ticket.enterBy}`);
 console.log(`feed: ${scan.feed.message}`);

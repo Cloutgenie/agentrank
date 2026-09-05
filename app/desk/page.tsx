@@ -75,6 +75,15 @@ export default function DeskLandingPage() {
                   {primary.side}
                 </p>
                 <p className="desk-mono mt-1 text-lg font-bold">${primary.ticket.strike}</p>
+                <p className="mt-3 text-xs font-extrabold uppercase tracking-[0.14em] text-[var(--rz-muted)]">
+                  When to take it
+                </p>
+                <p className="desk-mono text-lg font-bold text-[var(--rz-ink)]">
+                  {primary.ticket.takeAt}
+                </p>
+                <p className="mt-1 text-xs text-[var(--rz-muted)]">
+                  Open by {primary.ticket.enterBy} · flat by {primary.ticket.exitBy}
+                </p>
                 <div className="rz-box-grid">
                   <div className="rz-stat entry">
                     <div className="rz-stat-label">Buy</div>
@@ -90,8 +99,7 @@ export default function DeskLandingPage() {
                   </div>
                 </div>
                 <p className="desk-mono mt-3 text-xs text-[var(--rz-muted)]">
-                  Flat by {primary.ticket.exitBy} · {primary.ticket.contracts} ct · max loss $
-                  {primary.ticket.maxLoss.toFixed(0)}
+                  {primary.ticket.contracts} ct · max loss ${primary.ticket.maxLoss.toFixed(0)}
                 </p>
               </div>
             </div>
@@ -182,6 +190,7 @@ export default function DeskLandingPage() {
             {[
               ["Regime + news", "VIX, opening range, GEX, headlines, put/call, event blackouts."],
               ["Call or Put", "Above VWAP / broke high → Call. Below / broke low → Put."],
+              ["When", "Take it now — open within 15 minutes (no new entries after 13:30 ET)."],
               ["Strike", "~25Δ that fits your starting money."],
               ["Size", "Whole bankroll is the risk budget for that one contract."],
               ["Exits", "+50% take profit. −50% stop. Flat before the close."],

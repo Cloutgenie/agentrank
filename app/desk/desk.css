@@ -466,3 +466,10 @@
 .rz-fade-delay {
   animation: rz-fade 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
 }
+
+
+.rz-take-banner {
+  border: 2px solid var(--rz-ink);
+  background: #fff;
+  padding: 0.85rem 1rem;
+}

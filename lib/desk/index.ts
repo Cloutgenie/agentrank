@@ -20,7 +20,7 @@ export { classifyRegime, inferGexSign } from "./regime";
 export { selectStructure } from "./structure";
 export { buildStructure, synthesizeChain } from "./strikes";
 export { sizePosition, maxLossDollars } from "./sizing";
-export { defineExits } from "./exits";
+export { defineExits, entryTiming } from "./exits";
 export {
   runRulesEngine,
   scanForPlays,

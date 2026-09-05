@@ -22,6 +22,10 @@ export const SETTINGS = {
   stopLossPct: 0.5,
   /** Kept for exit-plan typing; equals stopLossPct. */
   stopMultiple: 0.5,
+  /** Minutes after the signal the user still has to take the play. */
+  entryWindowMinutes: 15,
+  /** Do not open new 0DTE plays after this clock time. */
+  lastEntryEt: "13:30 ET",
   timeExitEt: "15:00 ET",
   lateSessionExitEt: "14:30 ET",
   lateSessionProgress: 0.75,

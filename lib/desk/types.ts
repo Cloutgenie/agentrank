@@ -91,6 +91,10 @@ export interface ExitPlan {
   stopLossPrice: number;
   takeProfitPct: number;
   stopMultiple: number;
+  /** Clock time the signal says to take the play (usually "now"). */
+  takeAt: string;
+  /** Deadline to open — miss this and skip the play. */
+  enterBy: string;
   timeExitEt: string;
   notes: string[];
 }
@@ -110,6 +114,10 @@ export interface DeskPlay {
     entry: number;
     takeProfit: number;
     stopLoss: number;
+    /** When to take the play (e.g. "Now · by 10:57 ET"). */
+    takeAt: string;
+    /** Hard deadline to open the trade. */
+    enterBy: string;
     exitBy: string;
     contracts: number;
     maxLoss: number;
