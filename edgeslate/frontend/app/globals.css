@@ -1,0 +1,54 @@
+@import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: "Archivo Black", Impact, sans-serif;
+  --font-sans: "DM Sans", system-ui, sans-serif;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  @apply bg-void font-sans text-mist antialiased;
+  background-image:
+    radial-gradient(900px 480px at 12% -8%, rgba(200, 255, 0, 0.12), transparent 55%),
+    radial-gradient(700px 420px at 95% 0%, rgba(200, 255, 0, 0.05), transparent 50%),
+    linear-gradient(180deg, #0a0a0a 0%, #070707 100%);
+  background-attachment: fixed;
+}
+
+::selection {
+  background: #c8ff00;
+  color: #070707;
+}
+
+.noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+@layer components {
+  .pick-card {
+    @apply rounded-sheet border border-line bg-card shadow-card transition;
+  }
+  .pick-card:hover {
+    border-color: rgba(200, 255, 0, 0.35);
+  }
+  .side-toggle {
+    @apply grid grid-cols-2 gap-1 rounded-xl bg-void p-1;
+  }
+  .side-toggle button {
+    @apply rounded-lg px-3 py-2.5 text-xs font-bold uppercase tracking-wide transition;
+  }
+  .side-toggle button[data-active="true"] {
+    @apply bg-lime text-void;
+  }
+  .side-toggle button[data-active="false"] {
+    @apply text-mute hover:text-mist;
+  }
+}
