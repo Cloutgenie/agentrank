@@ -79,14 +79,14 @@ class PolymarketClient:
         self.enabled = get_settings().polymarket_enabled
 
     @retry(stop=stop_after_attempt(2), wait=wait_exponential(multiplier=0.5, min=0.5, max=3))
-    async def fetch_nba_win_markets(self) -> list[dict[str, Any]]:
+    async def fetch_win_markets(self, tag: str = "NBA") -> list[dict[str, Any]]:
         if not self.enabled:
             return []
         params = {
             "active": "true",
             "closed": "false",
             "limit": 100,
-            "tag": "NBA",
+            "tag": tag,
         }
         async with httpx.AsyncClient(timeout=30.0) as client:
             try:
@@ -154,11 +154,11 @@ class KalshiClient:
         self.api_key = api_key if api_key is not None else get_settings().kalshi_api_key
 
     @retry(stop=stop_after_attempt(2), wait=wait_exponential(multiplier=0.5, min=0.5, max=3))
-    async def fetch_nba_markets(self) -> list[dict[str, Any]]:
+    async def fetch_markets(self, series_ticker: str = "KXNBAGAME") -> list[dict[str, Any]]:
         headers = {}
         if self.api_key:
             headers["Authorization"] = f"Bearer {self.api_key}"
-        params = {"limit": 100, "status": "open", "series_ticker": "KXNBAGAME"}
+        params = {"limit": 100, "status": "open", "series_ticker": series_ticker}
         async with httpx.AsyncClient(timeout=30.0) as client:
             try:
                 r = await client.get(KALSHI_MARKETS, params=params, headers=headers)
@@ -206,3 +206,9 @@ def robinhood_prediction_deep_link(home: str, away: str) -> str:
     """Best-effort Robinhood Prediction Markets deep link (search-style)."""
     q = f"{away}%20@%20{home}%20NBA"
     return f"https://robinhood.com/prediction-markets/?search={q}"
+
+    async def fetch_nba_win_markets(self) -> list[dict[str, Any]]:
+        return await self.fetch_win_markets(tag="NBA")
+
+    async def fetch_nba_markets(self) -> list[dict[str, Any]]:
+        return await self.fetch_markets(series_ticker="KXNBAGAME")

@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
+from app.core.sports import SUPPORTED_SPORTS, normalize_sport
 from app.db import models
 from app.db.session import get_db
 from app.schemas.api import IngestResponse, PipelineStatusOut
@@ -11,15 +12,23 @@ router = APIRouter(prefix="/ingest", tags=["ingest"])
 
 
 @router.post("/run", response_model=IngestResponse)
-async def run_ingest(db: Session = Depends(get_db)) -> IngestResponse:
-    stats = await run_full_pipeline(db)
+async def run_ingest(
+    sport: str | None = Query(default=None),
+    db: Session = Depends(get_db),
+) -> IngestResponse:
+    sports = [normalize_sport(sport)] if sport else list(SUPPORTED_SPORTS)
+    stats = await run_full_pipeline(db, sports=sports)
     return IngestResponse(ok=True, message="Pipeline completed", stats=stats)
 
 
 @router.post("/demo", response_model=IngestResponse)
-def seed(db: Session = Depends(get_db)) -> IngestResponse:
-    stats = seed_demo(db)
-    preds = run_game_predictions(db)
+def seed(
+    sport: str | None = Query(default=None),
+    db: Session = Depends(get_db),
+) -> IngestResponse:
+    sports = [normalize_sport(sport)] if sport else list(SUPPORTED_SPORTS)
+    stats = seed_demo(db, sports=sports)
+    preds = run_game_predictions(db, sport=sport)
     stats["predictions"] = len(preds)
     return IngestResponse(ok=True, message="Demo slate seeded", stats=stats)
 

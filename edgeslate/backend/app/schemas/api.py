@@ -9,11 +9,13 @@ from pydantic import BaseModel, Field
 class HealthOut(BaseModel):
     status: str
     demo_mode: bool
-    sport: str = "NBA"
+    sport: str = "NFL"
+    sports: list[dict[str, str]] = Field(default_factory=list)
 
 
 class GamePickOut(BaseModel):
     game_id: int
+    sport: str = "NBA"
     commence_time: datetime
     home_team: str
     away_team: str
@@ -43,6 +45,7 @@ class PropPick(BaseModel):
 class LineupOut(BaseModel):
     rank: int
     platform: str
+    sport: Optional[str] = None
     expected_value: float
     win_prob: float
     salary_used: Optional[float] = None
@@ -79,6 +82,7 @@ class PipelineStatusOut(BaseModel):
 
 
 class OptimizeRequest(BaseModel):
+    sport: Optional[str] = Field(default=None, description="NBA | NFL | CFB")
     platform: str = Field(default="prizepicks", pattern="^(prizepicks|underdog)$")
     slate_size: int = Field(default=5, ge=2, le=6)
     top_n: int = Field(default=5, ge=1, le=20)

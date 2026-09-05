@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.clients.prediction_markets import robinhood_prediction_deep_link
 from app.core.config import get_settings
+from app.core.sports import get_sport
 from app.db import models
 from app.services.probs import american_to_implied, blend_probs, clamp, elo_win_prob, remove_vig_two_way
 
@@ -26,18 +27,26 @@ class PickResult:
     deep_link: str
 
 
-def _team_elo(db: Session, abbr: str) -> float:
-    team = db.query(models.Team).filter(models.Team.abbr == abbr).one_or_none()
+def _team_elo(db: Session, abbr: str, sport: str) -> float:
+    team = (
+        db.query(models.Team)
+        .filter(models.Team.abbr == abbr, models.Team.sport == sport)
+        .one_or_none()
+    )
+    if not team:
+        team = db.query(models.Team).filter(models.Team.abbr == abbr).one_or_none()
     if not team:
         return 1500.0
-    # Efficiency blend nudges Elo
-    off_adj = (team.offensive_rating - 112.0) * 4.0
-    def_adj = (112.0 - team.defensive_rating) * 4.0
+    cfg = get_sport(sport)
+    baseline = cfg.efficiency_baseline
+    # Football baselines are points-ish; scale nudge smaller than basketball
+    scale = 4.0 if sport == "NBA" else 2.5
+    off_adj = (team.offensive_rating - baseline) * scale
+    def_adj = (baseline - team.defensive_rating) * scale
     return team.elo + off_adj + def_adj
 
 
 def _consensus_market_home_prob(db: Session, game: models.Game) -> float:
-    """Blend sportsbook H2H (de-vigged) with prediction-market probs when present."""
     snaps = (
         db.query(models.OddsSnapshot)
         .filter(
@@ -75,16 +84,16 @@ def _consensus_market_home_prob(db: Session, game: models.Game) -> float:
         return sportsbook
     if prediction is not None:
         return prediction
-    # Neutral prior
     return 0.5
 
 
 def score_game(db: Session, game: models.Game) -> Optional[PickResult]:
     settings = get_settings()
+    cfg = get_sport(game.sport)
     market_home = clamp(_consensus_market_home_prob(db, game))
-    home_elo = _team_elo(db, game.home_team)
-    away_elo = _team_elo(db, game.away_team)
-    elo_home = clamp(elo_win_prob(home_elo, away_elo, home_advantage=60.0))
+    home_elo = _team_elo(db, game.home_team, game.sport)
+    away_elo = _team_elo(db, game.away_team, game.sport)
+    elo_home = clamp(elo_win_prob(home_elo, away_elo, home_advantage=cfg.home_advantage_elo))
 
     model_home = clamp(
         blend_probs(
@@ -97,7 +106,6 @@ def score_game(db: Session, game: models.Game) -> Optional[PickResult]:
     model_away = 1.0 - model_home
     market_away = 1.0 - market_home
 
-    # Edge after vig already removed in market consensus
     edge_home = (model_home - market_home) * 100.0
     edge_away = (model_away - market_away) * 100.0
 
@@ -127,19 +135,16 @@ def score_game(db: Session, game: models.Game) -> Optional[PickResult]:
     )
 
 
-def run_game_predictions(db: Session) -> list[models.GamePrediction]:
-    games = (
-        db.query(models.Game)
-        .filter(models.Game.status.in_(["scheduled", "live"]))
-        .order_by(models.Game.commence_time.asc())
-        .all()
-    )
+def run_game_predictions(db: Session, sport: str | None = None) -> list[models.GamePrediction]:
+    q = db.query(models.Game).filter(models.Game.status.in_(["scheduled", "live"]))
+    if sport:
+        q = q.filter(models.Game.sport == normalize_sport_safe(sport))
+    games = q.order_by(models.Game.commence_time.asc()).all()
     created: list[models.GamePrediction] = []
     for game in games:
         result = score_game(db, game)
         if result is None:
             continue
-        # Upsert-ish: delete prior ungraded prediction for this game
         db.query(models.GamePrediction).filter(
             models.GamePrediction.game_id == game.id,
             models.GamePrediction.graded.is_(False),
@@ -161,3 +166,9 @@ def run_game_predictions(db: Session) -> list[models.GamePrediction]:
     for row in created:
         db.refresh(row)
     return created
+
+
+def normalize_sport_safe(value: str) -> str:
+    from app.core.sports import normalize_sport
+
+    return normalize_sport(value)

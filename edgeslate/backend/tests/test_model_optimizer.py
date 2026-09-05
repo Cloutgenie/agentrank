@@ -32,10 +32,11 @@ def db():
     Session = sessionmaker(bind=engine)
     session = Session()
 
-    session.add(Team(abbr="BOS", name="Boston Celtics", elo=1680, offensive_rating=118, defensive_rating=109))
-    session.add(Team(abbr="NYK", name="New York Knicks", elo=1580, offensive_rating=115, defensive_rating=111))
+    session.add(Team(sport="NBA", abbr="BOS", name="Boston Celtics", elo=1680, offensive_rating=118, defensive_rating=109))
+    session.add(Team(sport="NBA", abbr="NYK", name="New York Knicks", elo=1580, offensive_rating=115, defensive_rating=111))
     game = Game(
         external_id="t1",
+        sport="NBA",
         commence_time=datetime.now(timezone.utc),
         home_team="BOS",
         away_team="NYK",
@@ -76,6 +77,7 @@ def db():
         session.add(
             Player(
                 name=name,
+                sport="NBA",
                 team_abbr=team,
                 season_avg_pts=pts,
                 season_avg_reb=reb,
@@ -86,6 +88,7 @@ def db():
         session.add(
             PropLine(
                 platform="prizepicks",
+                sport="NBA",
                 external_id=f"p-{name}",
                 player_name=name,
                 team_abbr=team,

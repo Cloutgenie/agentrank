@@ -42,3 +42,9 @@ def blend_probs(market: float, elo: float, market_w: float, elo_w: float) -> flo
 
 def clamp(x: float, lo: float = 0.01, hi: float = 0.99) -> float:
     return max(lo, min(hi, x))
+
+
+# Aliases
+american_to_implied = american_to_implied
+remove_vig_two_way = remove_vig_two_way
+elo_win_prob = elo_win_prob

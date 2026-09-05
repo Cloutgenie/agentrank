@@ -21,7 +21,7 @@ export default function HomePage() {
       <section className="mx-auto grid max-w-6xl items-center gap-12 px-4 pb-20 pt-8 md:grid-cols-2 md:px-8 md:pt-16">
         <div className="animate-rise">
           <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-lime/30 bg-lime/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-lime">
-            <LogoMark className="h-4 w-4" /> NBA · Live edge
+            <LogoMark className="h-4 w-4" /> NFL · CFB · NBA
           </p>
           <h1 className="font-display text-5xl uppercase leading-[0.9] tracking-tight text-mist md:text-7xl">
             Beat the
@@ -29,7 +29,7 @@ export default function HomePage() {
             <span className="text-lime">board.</span>
           </h1>
           <p className="mt-5 max-w-md text-base leading-relaxed text-mute md:text-lg">
-            Consensus model over books + prediction markets. Ranked winners and Monte Carlo
+            Consensus model for NFL, College Football, and NBA. Ranked winners and Monte Carlo
             lineups for PrizePicks &amp; Underdog — one tap to the slip.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
@@ -53,8 +53,8 @@ export default function HomePage() {
                 <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-mute">
                   Featured edge
                 </p>
-                <p className="mt-2 font-display text-4xl uppercase text-mist">OKC</p>
-                <p className="text-sm text-mute">vs DEN · Moneyline</p>
+                <p className="mt-2 font-display text-4xl uppercase text-mist">KC</p>
+                <p className="text-sm text-mute">vs BUF · Moneyline</p>
               </div>
               <div className="rounded-2xl bg-lime px-4 py-3 text-center text-void">
                 <p className="text-[10px] font-bold uppercase tracking-wider">Edge</p>

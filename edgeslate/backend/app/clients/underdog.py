@@ -43,6 +43,9 @@ def _index_by_id(rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
 
 
 class UnderdogClient:
+    def __init__(self, sport_keys: tuple[str, ...] | None = None) -> None:
+        self.sport_keys = tuple(k.lower() for k in sport_keys) if sport_keys else None
+
     @retry(stop=stop_after_attempt(2), wait=wait_exponential(multiplier=0.5, min=0.5, max=3))
     async def fetch_over_under_lines(self) -> list[dict[str, Any]]:
         last_error: Exception | None = None
@@ -100,7 +103,10 @@ class UnderdogClient:
 
             sport = (appearance.get("attributes") or appearance).get("sport_id") or ""
             sport_l = str(sport).lower()
-            if sport_l and "nba" not in sport_l and sport_l not in ("nba", "3"):
+            if self.sport_keys:
+                if sport_l and not any(k in sport_l or sport_l == k for k in self.sport_keys):
+                    continue
+            elif sport_l and sport_l not in ("nba", "3") and "nba" not in sport_l:
                 if any(x in sport_l for x in ("nfl", "mlb", "nhl", "cfb", "soccer")):
                     continue
 

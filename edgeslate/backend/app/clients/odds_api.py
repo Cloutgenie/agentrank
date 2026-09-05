@@ -18,10 +18,10 @@ BASE = "https://api.the-odds-api.com/v4"
 
 
 class OddsApiClient:
-    def __init__(self, api_key: Optional[str] = None) -> None:
+    def __init__(self, api_key: Optional[str] = None, sport_key: Optional[str] = None) -> None:
         settings = get_settings()
         self.api_key = api_key if api_key is not None else settings.odds_api_key
-        self.sport = settings.sport_key
+        self.sport = sport_key if sport_key is not None else settings.sport_key
 
     @property
     def configured(self) -> bool:

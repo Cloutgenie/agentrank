@@ -2,34 +2,36 @@
 
 import { useEffect, useState } from "react";
 import { Nav } from "@/components/Nav";
+import { SportSwitcher } from "@/components/SportSwitcher";
 import { EdgePill, GhostButton, PrimaryButton, Segmented } from "@/components/ui";
-import { client, pct, type Lineup } from "@/lib/api";
+import { client, pct, type Lineup, type SportId } from "@/lib/api";
 
 export default function LineupsPage() {
+  const [sport, setSport] = useState<SportId>("NFL");
   const [platform, setPlatform] = useState<"prizepicks" | "underdog">("prizepicks");
   const [lineups, setLineups] = useState<Lineup[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function loadCached() {
+  async function loadCached(nextSport: SportId = sport, nextPlatform = platform) {
     setError(null);
     try {
-      setLineups(await client.lineups(platform));
+      setLineups(await client.lineups(nextPlatform, nextSport));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load");
     }
   }
 
   useEffect(() => {
-    loadCached();
+    loadCached(sport, platform);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [platform]);
+  }, [platform, sport]);
 
   async function optimize() {
     setLoading(true);
     setError(null);
     try {
-      setLineups(await client.optimize(platform, 5));
+      setLineups(await client.optimize(platform, sport, 5));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Optimize failed");
     } finally {
@@ -48,10 +50,11 @@ export default function LineupsPage() {
               Lineup lab
             </h1>
             <p className="mt-2 max-w-md text-sm text-mute">
-              Monte Carlo sims · max 3 from one team · top 5 EV slips for PrizePicks &amp; Underdog.
+              Monte Carlo sims for NFL / CFB / NBA · max 3 from one team · PrizePicks &amp; Underdog.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
+            <SportSwitcher value={sport} onChange={setSport} />
             <Segmented
               value={platform}
               onChange={setPlatform}
@@ -75,7 +78,7 @@ export default function LineupsPage() {
         <div className="mt-8 space-y-5">
           {lineups.map((lu) => (
             <article
-              key={`${lu.platform}-${lu.rank}-${lu.expected_value}`}
+              key={`${lu.platform}-${lu.sport}-${lu.rank}-${lu.expected_value}`}
               className="pick-card p-5"
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
@@ -83,6 +86,7 @@ export default function LineupsPage() {
                   <span className="font-display text-3xl uppercase">#{lu.rank}</span>
                   <EdgePill>EV {(lu.expected_value * 100).toFixed(1)}%</EdgePill>
                   <EdgePill tone="mute">Win {pct(lu.win_prob, 2)}</EdgePill>
+                  <EdgePill tone="mute">{lu.sport || sport}</EdgePill>
                 </div>
                 {lu.deep_link && (
                   <PrimaryButton href={lu.deep_link}>Open {platform}</PrimaryButton>
@@ -128,7 +132,7 @@ export default function LineupsPage() {
 
           {!loading && lineups.length === 0 && (
             <div className="pick-card p-8">
-              <p className="font-display text-2xl uppercase">No slips yet</p>
+              <p className="font-display text-2xl uppercase">No {sport} slips yet</p>
               <p className="mt-2 text-sm text-mute">
                 Seed demo props from Picks, then run the optimizer.
               </p>

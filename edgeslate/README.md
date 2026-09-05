@@ -163,3 +163,13 @@ No live betting, no real-money wallets, no social, NBA only.
 ## License
 
 Private / proprietary unless otherwise noted.
+
+
+## Multi-sport
+
+EdgeSlate supports **NFL**, **College Football (CFB)**, and **NBA**.
+
+- API: pass `?sport=NFL|CFB|NBA` on `/api/picks/games`, `/api/lineups`, and `/api/ingest/*`
+- Default sport is **NFL**
+- Demo seed loads all three slates when no Odds API key is configured
+- PrizePicks league IDs: NBA=7, NFL=9, CFB=15

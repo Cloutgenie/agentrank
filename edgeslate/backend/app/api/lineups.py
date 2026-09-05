@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
+from app.core.sports import normalize_sport
 from app.db import models
 from app.db.session import get_db
 from app.schemas.api import LineupOut, OptimizeRequest, PropPick
@@ -27,6 +28,7 @@ def _to_out(row: models.OptimizedLineup) -> LineupOut:
     return LineupOut(
         rank=row.rank,
         platform=row.platform,
+        sport=getattr(row, "sport", None),
         expected_value=row.expected_value,
         win_prob=row.win_prob,
         salary_used=row.salary_used,
@@ -36,15 +38,20 @@ def _to_out(row: models.OptimizedLineup) -> LineupOut:
 
 
 @router.get("", response_model=list[LineupOut])
-def list_lineups(platform: str = "prizepicks", db: Session = Depends(get_db)) -> list[LineupOut]:
-    rows = (
-        db.query(models.OptimizedLineup)
-        .filter(models.OptimizedLineup.platform == platform)
-        .order_by(models.OptimizedLineup.created_at.desc(), models.OptimizedLineup.rank.asc())
-        .limit(5)
-        .all()
-    )
-    # Keep only latest batch (same created_at minute / first rank=1 cluster)
+def list_lineups(
+    platform: str = "prizepicks",
+    sport: str | None = Query(default=None),
+    db: Session = Depends(get_db),
+) -> list[LineupOut]:
+    try:
+        sport_id = normalize_sport(sport) if sport else None
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    q = db.query(models.OptimizedLineup).filter(models.OptimizedLineup.platform == platform)
+    if sport_id:
+        q = q.filter(models.OptimizedLineup.sport == sport_id)
+    rows = q.order_by(models.OptimizedLineup.created_at.desc(), models.OptimizedLineup.rank.asc()).limit(5).all()
     if not rows:
         return []
     latest = rows[0].created_at
@@ -54,11 +61,16 @@ def list_lineups(platform: str = "prizepicks", db: Session = Depends(get_db)) ->
 
 @router.post("/optimize", response_model=list[LineupOut])
 def optimize(body: OptimizeRequest, db: Session = Depends(get_db)) -> list[LineupOut]:
+    try:
+        sport_id = normalize_sport(body.sport) if body.sport else None
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     rows = optimize_lineups(
         db,
         platform=body.platform,
         slate_size=body.slate_size,
         top_n=body.top_n,
         max_from_team=body.max_from_team,
+        sport=sport_id,
     )
     return [_to_out(r) for r in rows]

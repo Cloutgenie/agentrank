@@ -2,20 +2,22 @@
 
 import { useEffect, useState } from "react";
 import { Nav } from "@/components/Nav";
+import { SportSwitcher } from "@/components/SportSwitcher";
 import { EdgePill, GhostButton, PrimaryButton } from "@/components/ui";
-import { client, edgeLabel, pct, type GamePick } from "@/lib/api";
+import { client, edgeLabel, pct, type GamePick, type SportId } from "@/lib/api";
 
 export default function PicksPage() {
+  const [sport, setSport] = useState<SportId>("NFL");
   const [picks, setPicks] = useState<GamePick[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [seeding, setSeeding] = useState(false);
 
-  async function load() {
+  async function load(nextSport: SportId = sport) {
     setLoading(true);
     setError(null);
     try {
-      setPicks(await client.gamePicks());
+      setPicks(await client.gamePicks(nextSport));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load picks");
     } finally {
@@ -24,14 +26,15 @@ export default function PicksPage() {
   }
 
   useEffect(() => {
-    load();
-  }, []);
+    load(sport);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sport]);
 
   async function seed() {
     setSeeding(true);
     try {
-      await client.seedDemo();
-      await load();
+      await client.seedDemo(sport);
+      await load(sport);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Seed failed");
     } finally {
@@ -50,18 +53,24 @@ export default function PicksPage() {
               Today&apos;s picks
             </h1>
             <p className="mt-2 max-w-md text-sm text-mute">
-              Only slips where model beats market by 2+ pp after vig. One tap into Robinhood.
+              NFL, College Football, and NBA — only slips where model beats market by 2+ pp after vig.
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <SportSwitcher
+              value={sport}
+              onChange={(s) => {
+                setSport(s);
+              }}
+            />
             <GhostButton onClick={seed} disabled={seeding}>
               {seeding ? "Seeding…" : "Seed demo"}
             </GhostButton>
-            <GhostButton onClick={load}>Refresh</GhostButton>
+            <GhostButton onClick={() => load(sport)}>Refresh</GhostButton>
           </div>
         </div>
 
-        {loading && <p className="mt-10 text-mute">Loading board…</p>}
+        {loading && <p className="mt-10 text-mute">Loading {sport} board…</p>}
         {error && (
           <p className="mt-8 rounded-2xl border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger">
             {error}. Is the API on :8000?
@@ -70,10 +79,10 @@ export default function PicksPage() {
 
         {!loading && !error && picks.length === 0 && (
           <div className="pick-card mt-10 p-8">
-            <p className="font-display text-2xl uppercase">No edged picks</p>
+            <p className="font-display text-2xl uppercase">No edged {sport} picks</p>
             <p className="mt-2 text-sm text-mute">Seed the demo slate or run ingest with API keys.</p>
             <div className="mt-5">
-              <PrimaryButton onClick={seed}>Seed demo slate</PrimaryButton>
+              <PrimaryButton onClick={seed}>Seed {sport} demo</PrimaryButton>
             </div>
           </div>
         )}
@@ -90,6 +99,7 @@ export default function PicksPage() {
                   <div className="flex flex-wrap items-center gap-2">
                     <EdgePill>{edgeLabel(p.edge_pp)} edge</EdgePill>
                     <EdgePill tone="mute">Pick {p.pick_team}</EdgePill>
+                    <EdgePill tone="mute">{p.sport || sport}</EdgePill>
                   </div>
                   <h2 className="mt-3 font-display text-3xl uppercase tracking-tight">
                     {p.away_team} <span className="text-mute">@</span> {p.home_team}

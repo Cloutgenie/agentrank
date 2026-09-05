@@ -22,9 +22,11 @@ from app.db.session import Base
 
 class Team(Base):
     __tablename__ = "teams"
+    __table_args__ = (UniqueConstraint("sport", "abbr", name="uq_team_sport_abbr"),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    abbr: Mapped[str] = mapped_column(String(8), unique=True, index=True)
+    sport: Mapped[str] = mapped_column(String(16), default="NBA", index=True)
+    abbr: Mapped[str] = mapped_column(String(8), index=True)
     name: Mapped[str] = mapped_column(String(64))
     conference: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
     elo: Mapped[float] = mapped_column(Float, default=1500.0)
@@ -38,10 +40,12 @@ class Player(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     external_id: Mapped[Optional[str]] = mapped_column(String(64), nullable=True, index=True)
     name: Mapped[str] = mapped_column(String(128), index=True)
+    sport: Mapped[str] = mapped_column(String(16), default="NBA", index=True)
     team_abbr: Mapped[Optional[str]] = mapped_column(String(8), nullable=True, index=True)
     position: Mapped[Optional[str]] = mapped_column(String(8), nullable=True)
     status: Mapped[str] = mapped_column(String(32), default="active")  # active / injured / out
     usage_rate: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    # Basketball: pts/reb/ast/fg3m. Football: pts≈pass/rush yds, reb≈rush/rec TDs proxy, ast≈rec yds, fg3m≈receptions
     season_avg_pts: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     season_avg_reb: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     season_avg_ast: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
@@ -53,7 +57,7 @@ class Game(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     external_id: Mapped[Optional[str]] = mapped_column(String(64), nullable=True, unique=True)
-    sport: Mapped[str] = mapped_column(String(32), default="NBA")
+    sport: Mapped[str] = mapped_column(String(16), default="NBA", index=True)
     commence_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
     home_team: Mapped[str] = mapped_column(String(8), index=True)
     away_team: Mapped[str] = mapped_column(String(8), index=True)
@@ -74,7 +78,7 @@ class OddsSnapshot(Base):
     bookmaker: Mapped[str] = mapped_column(String(64))
     market: Mapped[str] = mapped_column(String(32))  # h2h / spreads / totals / player_prop
     outcome: Mapped[str] = mapped_column(String(128))
-    price: Mapped[float] = mapped_column(Float)  # American or decimal implied handled upstream
+    price: Mapped[float] = mapped_column(Float)
     point: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     implied_prob: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     captured_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), index=True)
@@ -123,6 +127,7 @@ class PropLine(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     platform: Mapped[str] = mapped_column(String(32), index=True)  # prizepicks / underdog / odds_api
+    sport: Mapped[str] = mapped_column(String(16), default="NBA", index=True)
     external_id: Mapped[Optional[str]] = mapped_column(String(128), nullable=True, index=True)
     player_name: Mapped[str] = mapped_column(String(128), index=True)
     team_abbr: Mapped[Optional[str]] = mapped_column(String(8), nullable=True)
@@ -140,7 +145,8 @@ class OptimizedLineup(Base):
     __tablename__ = "optimized_lineups"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    platform: Mapped[str] = mapped_column(String(32))
+    platform: Mapped[str] = mapped_column(String(32), index=True)
+    sport: Mapped[str] = mapped_column(String(16), default="NBA", index=True)
     rank: Mapped[int] = mapped_column(Integer)
     expected_value: Mapped[float] = mapped_column(Float)
     win_prob: Mapped[float] = mapped_column(Float)
