@@ -1,5 +1,6 @@
 import { DEMO_BACKTEST, DEMO_LINEUPS, DEMO_PICKS } from "@/lib/demo";
 
+/** Empty = same-origin Next.js routes (Vercel live Odds API path). */
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
 export type SportId = "NBA" | "NFL" | "CFB";
@@ -64,7 +65,6 @@ export type BacktestSummary = {
 };
 
 async function api<T>(path: string, init?: RequestInit): Promise<T> {
-  if (!API_URL) throw new Error("API not configured");
   const res = await fetch(`${API_URL}${path}`, {
     ...init,
     headers: {
@@ -73,7 +73,16 @@ async function api<T>(path: string, init?: RequestInit): Promise<T> {
     },
     cache: "no-store",
   });
-  if (!res.ok) throw new Error(`API ${path} failed: ${res.status}`);
+  if (!res.ok) {
+    let detail = "";
+    try {
+      const body = (await res.json()) as { error?: string; hint?: string };
+      detail = body.error || body.hint || "";
+    } catch {
+      /* ignore */
+    }
+    throw new Error(detail || `API ${path} failed: ${res.status}`);
+  }
   return res.json() as Promise<T>;
 }
 
@@ -97,14 +106,15 @@ function qs(params: Record<string, string | undefined>) {
 export const client = {
   health: () =>
     withDemo(
-      () => api<{ status: string; demo_mode: boolean; sport?: string }>("/health"),
-      { status: "ok", demo_mode: true, sport: "NFL" }
+      () =>
+        api<{ status: string; demo_mode: boolean; live_odds?: boolean; sport?: string }>(
+          "/health"
+        ),
+      { status: "ok", demo_mode: true, live_odds: false, sport: "NFL" }
     ),
+  /** Live Odds API via same-origin route — do not silently fall back to demo. */
   gamePicks: (sport: SportId = "NFL") =>
-    withDemo(
-      () => api<GamePick[]>(`/api/picks/games${qs({ sport })}`),
-      DEMO_PICKS.filter((p) => (p.sport || "NBA") === sport)
-    ),
+    api<GamePick[]>(`/api/picks/games${qs({ sport })}`),
   lineups: (platform: string, sport: SportId = "NFL") =>
     withDemo(
       () => api<Lineup[]>(`/api/lineups${qs({ platform, sport })}`),

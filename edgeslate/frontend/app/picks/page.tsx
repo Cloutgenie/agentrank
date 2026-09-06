@@ -12,11 +12,14 @@ export default function PicksPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [seeding, setSeeding] = useState(false);
+  const [liveOdds, setLiveOdds] = useState(false);
 
   async function load(nextSport: SportId = sport) {
     setLoading(true);
     setError(null);
     try {
+      const health = await client.health();
+      setLiveOdds(Boolean(health.live_odds) || health.demo_mode === false);
       setPicks(await client.gamePicks(nextSport));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load picks");
@@ -48,12 +51,14 @@ export default function PicksPage() {
       <div className="mx-auto max-w-3xl px-4 pb-24 pt-6 md:px-8">
         <div className="animate-rise flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-lime">Game board</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-lime">
+              Game board {liveOdds ? "· LIVE" : "· DEMO"}
+            </p>
             <h1 className="mt-1 font-display text-4xl uppercase tracking-tight md:text-5xl">
               Today&apos;s picks
             </h1>
             <p className="mt-2 max-w-md text-sm text-mute">
-              NFL, College Football, and NBA — only slips where model beats market by 2+ pp after vig.
+              Live odds from The Odds API — NFL, CFB, and NBA. Shows edged slips (2+ pp) when available.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -73,14 +78,16 @@ export default function PicksPage() {
         {loading && <p className="mt-10 text-mute">Loading {sport} board…</p>}
         {error && (
           <p className="mt-8 rounded-2xl border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger">
-            {error}. Is the API on :8000?
+            {error}
           </p>
         )}
 
         {!loading && !error && picks.length === 0 && (
           <div className="pick-card mt-10 p-8">
             <p className="font-display text-2xl uppercase">No edged {sport} picks</p>
-            <p className="mt-2 text-sm text-mute">Seed the demo slate or run ingest with API keys.</p>
+            <p className="mt-2 text-sm text-mute">
+              No games cleared the edge bar in the next 2 weeks, or ODDS_API_KEY is missing on this deploy.
+            </p>
             <div className="mt-5">
               <PrimaryButton onClick={seed}>Seed {sport} demo</PrimaryButton>
             </div>
