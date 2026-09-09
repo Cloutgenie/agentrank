@@ -179,11 +179,27 @@ function toPick(event: EventRow, sport: SportId, index: number): LiveGamePick | 
 }
 
 function readOddsKey(): string {
-  return process.env.ODDS_API_KEY?.trim() || process.env.THE_ODDS_API_KEY?.trim() || "";
+  // Accept common Vercel paste mistakes: quoted values, accidental prefixes.
+  const raw =
+    process.env.ODDS_API_KEY ||
+    process.env.THE_ODDS_API_KEY ||
+    process.env.ODDS_KEY ||
+    "";
+  return raw
+    .trim()
+    .replace(/^ODDS_API_KEY\s*=\s*/i, "")
+    .replace(/^["']|["']$/g, "")
+    .trim();
 }
 
 export function oddsApiConfigured(): boolean {
   return Boolean(readOddsKey());
+}
+
+/** Safe diagnostics for /health — never returns the key itself. */
+export function readOddsKeyPublicMeta(): { configured: boolean; length: number } {
+  const key = readOddsKey();
+  return { configured: key.length > 0, length: key.length };
 }
 
 export async function fetchLiveGamePicks(sport: SportId): Promise<{
