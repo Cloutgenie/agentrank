@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
+    "test:desk": "npx --yes tsx scripts/test-desk-engine.ts",
     "db:types": "supabase gen types typescript --local > lib/database.types.ts"
   },
   "dependencies": {
