@@ -30,6 +30,10 @@ export default function PicksPage() {
 
   useEffect(() => {
     load(sport);
+    const id = window.setInterval(() => {
+      load(sport);
+    }, 60_000);
+    return () => window.clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sport]);
 
@@ -52,13 +56,13 @@ export default function PicksPage() {
         <div className="animate-rise flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-lime">
-              Game board {liveOdds ? "· LIVE" : "· DEMO"}
+              Game board {liveOdds ? "· LIVE · REAL-TIME" : "· DEMO"}
             </p>
             <h1 className="mt-1 font-display text-4xl uppercase tracking-tight md:text-5xl">
               Today&apos;s picks
             </h1>
             <p className="mt-2 max-w-md text-sm text-mute">
-              Live odds from The Odds API — NFL, CFB, and NBA. Shows edged slips (2+ pp) when available.
+              Real-time odds from The Odds API — NFL, CFB, and NBA. Board refreshes every 60s.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -68,9 +72,11 @@ export default function PicksPage() {
                 setSport(s);
               }}
             />
-            <GhostButton onClick={seed} disabled={seeding}>
-              {seeding ? "Seeding…" : "Seed demo"}
-            </GhostButton>
+            {!liveOdds && (
+              <GhostButton onClick={seed} disabled={seeding}>
+                {seeding ? "Seeding…" : "Seed demo"}
+              </GhostButton>
+            )}
             <GhostButton onClick={() => load(sport)}>Refresh</GhostButton>
           </div>
         </div>
@@ -84,13 +90,17 @@ export default function PicksPage() {
 
         {!loading && !error && picks.length === 0 && (
           <div className="pick-card mt-10 p-8">
-            <p className="font-display text-2xl uppercase">No edged {sport} picks</p>
+            <p className="font-display text-2xl uppercase">No live {sport} games</p>
             <p className="mt-2 text-sm text-mute">
-              No games cleared the edge bar in the next 2 weeks, or ODDS_API_KEY is missing on this deploy.
+              {liveOdds
+                ? "No upcoming games in the next 2 weeks for this sport right now."
+                : "ODDS_API_KEY is missing on this deploy — add it in Vercel, then redeploy."}
             </p>
-            <div className="mt-5">
-              <PrimaryButton onClick={seed}>Seed {sport} demo</PrimaryButton>
-            </div>
+            {!liveOdds && (
+              <div className="mt-5">
+                <PrimaryButton onClick={seed}>Seed {sport} demo</PrimaryButton>
+              </div>
+            )}
           </div>
         )}
 
@@ -105,7 +115,9 @@ export default function PicksPage() {
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
                     <EdgePill>{edgeLabel(p.edge_pp)} edge</EdgePill>
-                    <EdgePill tone="mute">Pick {p.pick_team}</EdgePill>
+                    <EdgePill tone="mute">
+                      {p.status === "pick" ? "PICK" : "WATCH"} {p.pick_team}
+                    </EdgePill>
                     <EdgePill tone="mute">{p.sport || sport}</EdgePill>
                   </div>
                   <h2 className="mt-3 font-display text-3xl uppercase tracking-tight">

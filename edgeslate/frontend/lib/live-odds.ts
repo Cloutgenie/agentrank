@@ -211,13 +211,17 @@ export async function fetchLiveGamePicks(sport: SportId): Promise<{
   const raw = (await res.json()) as EventRow[];
   const events = raw.filter((e) => inWindow(e.commence_time));
 
-  const scored = events
+  // Always return the live slate so the board reads as real-time odds data.
+  // Edged games stay sorted to the top; the rest remain as "watch".
+  const picks = events
     .map((e, i) => toPick(e, sport, i))
     .filter((p): p is LiveGamePick => p != null)
-    .sort((a, b) => b.edge_pp - a.edge_pp);
-
-  const edged = scored.filter((p) => p.edge_pp >= EDGE_MIN);
-  const picks = edged.length > 0 ? edged : scored.slice(0, 12);
+    .sort((a, b) => {
+      const aEdge = a.edge_pp >= EDGE_MIN ? 1 : 0;
+      const bEdge = b.edge_pp >= EDGE_MIN ? 1 : 0;
+      if (bEdge !== aEdge) return bEdge - aEdge;
+      return b.edge_pp - a.edge_pp;
+    });
 
   return { picks, source: "live", event_count: events.length };
 }
