@@ -12,17 +12,19 @@ export default function PicksPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [seeding, setSeeding] = useState(false);
-  const [liveOdds, setLiveOdds] = useState(false);
+  const [liveOdds, setLiveOdds] = useState<boolean | null>(null);
 
   async function load(nextSport: SportId = sport) {
     setLoading(true);
     setError(null);
     try {
       const health = await client.health();
-      setLiveOdds(Boolean(health.live_odds) || health.demo_mode === false);
+      const live = Boolean(health.live_odds) || health.demo_mode === false;
+      setLiveOdds(live);
       setPicks(await client.gamePicks(nextSport));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load picks");
+      setLiveOdds(false);
     } finally {
       setLoading(false);
     }
@@ -56,13 +58,15 @@ export default function PicksPage() {
         <div className="animate-rise flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-lime">
-              Game board {liveOdds ? "· LIVE · REAL-TIME" : "· DEMO"}
+              Game board{" "}
+              {liveOdds === null ? "· …" : liveOdds ? "· LIVE · REAL-TIME" : "· DEMO"}
             </p>
             <h1 className="mt-1 font-display text-4xl uppercase tracking-tight md:text-5xl">
               Today&apos;s picks
             </h1>
             <p className="mt-2 max-w-md text-sm text-mute">
-              Real-time odds from The Odds API — NFL, CFB, and NBA. Board refreshes every 60s.
+              Live moneyline consensus from The Odds API, with Elo leans only on toss-up games.
+              Board refreshes every 60s.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -72,7 +76,7 @@ export default function PicksPage() {
                 setSport(s);
               }}
             />
-            {!liveOdds && (
+            {liveOdds === false && (
               <GhostButton onClick={seed} disabled={seeding}>
                 {seeding ? "Seeding…" : "Seed demo"}
               </GhostButton>
@@ -96,7 +100,7 @@ export default function PicksPage() {
                 ? "No upcoming games in the next 2 weeks for this sport right now."
                 : "ODDS_API_KEY is missing on this deploy — add it in Vercel, then redeploy."}
             </p>
-            {!liveOdds && (
+            {liveOdds === false && (
               <div className="mt-5">
                 <PrimaryButton onClick={seed}>Seed {sport} demo</PrimaryButton>
               </div>
